@@ -7,7 +7,6 @@ public class MovementConfig_SO : ScriptableObject
     public float walkSpeed = 5f;
     public float runSpeed = 10f;
     public float smoothing = 10f;
-    public float jetpackBoostForce = 5f;
 
     [Header("Vertical")]
     public float gravity = -20f;
@@ -16,4 +15,5 @@ public class MovementConfig_SO : ScriptableObject
     [Header("Jetpack")]
     public float jetpackForce = 12f;
     public float maxJetpackFuel  = 10f;
+    public float jetpackBoostForce = 5f;
 }

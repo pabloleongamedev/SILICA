@@ -20,8 +20,8 @@ public class PlayerController : MonoBehaviour
 
         inputActions.Player.Jump.started += ctx => movementController.OnJumpStarted();
 
-        inputActions.Player.Jetpack.performed += ctx => movementController.SetJumpHolding(true);
-        inputActions.Player.Jetpack.canceled += ctx => movementController.SetJumpHolding(false);
+        inputActions.Player.Jetpack.performed += ctx => movementController.SetJetpack(true);
+        inputActions.Player.Jetpack.canceled += ctx => movementController.SetJetpack(false);
 
         inputActions.Player.Sprint.performed += OnSprint;
         inputActions.Player.Sprint.canceled += OnSprint;
