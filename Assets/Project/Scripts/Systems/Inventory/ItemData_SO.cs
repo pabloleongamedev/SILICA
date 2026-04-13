@@ -1,16 +1,16 @@
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "Inventory/Item Data")]
-public class ItemData_SO: ScriptableObject
+[CreateAssetMenu(menuName = "Inventory/Items/Item")]
+public class ItemData_SO : ScriptableObject
 {
-    public string itemName;
+    public string itemID;
+    public string displayName;
     public Sprite icon;
 
-    [Header("Grid Size")]
-    public int width = 1;
-    public int height = 1;
+    [TextArea]
+    public string description;
 
-    [Header("Stack")]
-    public bool stackable = false;
+    // Para futuro crafting
     public int maxStack = 1;
+    public int cantidad = 1;
 }

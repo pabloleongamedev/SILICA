@@ -27,7 +27,7 @@ public class VerticalMovementSystem
         {
             verticalVelocity += gravity * deltaTime;
 
-            // 🔥 CLAVE: limitar la caída
+            // limitar la caída
             float maxFallSpeed = -20f;
 
             if (verticalVelocity < maxFallSpeed)

@@ -22,24 +22,23 @@ public class MovementController : MonoBehaviour
     private Vector2 moveInput;
     private Vector3 currentVelocity;
     private bool isGrounded;
-    private bool isJumpPressed;
     private bool isJumpDown;
     private bool isSprinting;
     private bool isJetpackActive;
 
     private void Awake()
     {
-        // 🔥 VALIDACIONES (evita NullReference)
+        // validaciones evitar NullReference)
         if (config == null)
         {
-            Debug.LogError("❌ MovementConfig no asignado", this);
+            Debug.LogError(" MovementConfig no asignado", this);
             enabled = false;
             return;
         }
 
         if (groundCheck == null)
         {
-            Debug.LogError("❌ GroundCheck no asignado", this);
+            Debug.LogError(" GroundCheck no asignado", this);
             enabled = false;
             return;
         }
@@ -48,12 +47,11 @@ public class MovementController : MonoBehaviour
 
         if (rb == null)
         {
-            Debug.LogError("❌ Rigidbody no encontrado", this);
+            Debug.LogError(" Rigidbody no encontrado", this);
             enabled = false;
             return;
         }
 
-        // 🔹 Systems
         movementSystem = new MovementSystem();
         verticalSystem = new VerticalMovementSystem(config.gravity, config.jumpForce);
 
@@ -64,15 +62,14 @@ public class MovementController : MonoBehaviour
 
         jetpackAbility = new JetpackAbility(jetpackSystem);
 
-        // 🔹 Strategies
         walkStrategy = new WalkMovement(config.walkSpeed);
         runStrategy = new RunMovement(config.runSpeed);
 
         movementSystem.SetStrategy(walkStrategy);
 
-        // 🔹 Rigidbody config
+  
         rb.freezeRotation = true;
-        rb.useGravity = false; // 🔥 IMPORTANTE: usamos gravedad manual
+        rb.useGravity = false; 
     }
 
     public void SetMoveInput(Vector2 input)
@@ -102,13 +99,13 @@ public class MovementController : MonoBehaviour
     {
         CheckGround();
 
-        // 🔹 Strategy según estado
+        // Strategy según estado
         if (isGrounded)
             movementSystem.SetStrategy(isSprinting ? runStrategy : walkStrategy);
         else
             movementSystem.SetStrategy(walkStrategy);
 
-        // 🔹 Movimiento Horizontal
+        // Movimiento Horizontal
         Vector3 desiredVelocity = movementSystem.CalculateVelocity(moveInput, transform);
         currentVelocity = Vector3.Lerp(
             currentVelocity,
@@ -116,18 +113,18 @@ public class MovementController : MonoBehaviour
             config.smoothing * Time.fixedDeltaTime
         );
 
-        // 🔹 Movimiento Vertical (SALTO)
+        // Movimiento Vertical (SALTO)
         verticalSystem.Tick(isGrounded, isJumpDown, Time.fixedDeltaTime);
         isJumpDown = false;
 
-        // 🔹 Jetpack Ability
+        // Jetpack Ability
         jetpackAbility.SetInput(isJetpackActive);
         jetpackAbility.SetGrounded(isGrounded);
         jetpackAbility.Tick(Time.fixedDeltaTime);
 
         float jetpackVelocity = jetpackAbility.GetForce();
 
-        // 🔹 Boost hacia adelante
+        // Boost hacia adelante
         Vector3 forwardBoost = Vector3.zero;
         if (!isGrounded && isJetpackActive && isSprinting)
         {
@@ -136,7 +133,7 @@ public class MovementController : MonoBehaviour
 
         Vector3 finalVelocity = currentVelocity + forwardBoost;
 
-        // 🔹 Control del eje Y (PRIORIDAD LIMPIA)
+        // Control del eje Y (PRIORIDAD LIMPIA)
         float verticalVelocity = verticalSystem.GetVelocity();
         
         float finalY = verticalVelocity + jetpackVelocity;

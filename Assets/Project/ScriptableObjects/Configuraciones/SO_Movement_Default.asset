@@ -15,8 +15,8 @@ MonoBehaviour:
   walkSpeed: 5
   runSpeed: 10
   smoothing: 10
-  jetpackBoostForce: 5
   gravity: -20
   jumpForce: 8
-  jetpackForce: 21
+  jetpackForce: 22
   maxJetpackFuel: 10
+  jetpackBoostForce: 5
