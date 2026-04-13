@@ -19,4 +19,4 @@ MonoBehaviour:
   jumpForce: 8
   jetpackForce: 22
   maxJetpackFuel: 10
-  jetpackBoostForce: 5
+  jetpackBoostForce: 100

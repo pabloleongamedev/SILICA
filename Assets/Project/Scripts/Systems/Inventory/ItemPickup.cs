@@ -12,7 +12,7 @@ public class ItemPickup : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        var player = other.GetComponent<PlayerInventoryBridge>();
+        var player = other.GetComponent<InventoryController>();
 
         if (player == null) return;
 

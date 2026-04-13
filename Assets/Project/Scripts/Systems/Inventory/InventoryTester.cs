@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 public class InventoryTester : MonoBehaviour
 {
-    [SerializeField] private PlayerInventoryBridge playerInventory;
+    [SerializeField] private InventoryController playerInventory;
 
     private void Update()
     {

@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Item_Gas
   m_EditorClassIdentifier: Assembly-CSharp::ItemData_SO
   itemID: Gas
-  displayName: O
+  displayName: Gas
   icon: {fileID: 21300000, guid: c4e4beff344b8fc4e8b2f51634259d27, type: 3}
   description: 'Gas: Combustible para el jetpack'
   maxStack: 99

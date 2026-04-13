@@ -2,6 +2,8 @@ using UnityEngine;
 public class InventorySystem
 {
     private InventoryGrid grid;
+    public event System.Action<InventoryItemInstance> OnItemAdded;
+    public event System.Action OnInventoryFull;
 
     public InventorySystem(int width, int height)
     {
@@ -16,13 +18,12 @@ public class InventorySystem
 
         if (result)
         {
-            Debug.Log($"Item agregado: {itemData.displayName}");
+            OnItemAdded?.Invoke(instance);
         }
         else
         {
-            Debug.Log("Inventario lleno");
+            OnInventoryFull?.Invoke();
         }
-
         return result;
     }
 

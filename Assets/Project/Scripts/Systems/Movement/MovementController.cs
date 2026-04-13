@@ -14,62 +14,34 @@ public class MovementController : MonoBehaviour
 
     private MovementSystem movementSystem;
     private VerticalMovementSystem verticalSystem;
-    private JetpackAbility jetpackAbility;
+    private JetpackSystem jetpackSystem;
 
     private IMovementStrategy walkStrategy;
     private IMovementStrategy runStrategy;
 
     private Vector2 moveInput;
     private Vector3 currentVelocity;
+
     private bool isGrounded;
+    private bool isJumpPressed;
     private bool isJumpDown;
     private bool isSprinting;
     private bool isJetpackActive;
 
     private void Awake()
     {
-        // validaciones evitar NullReference)
-        if (config == null)
-        {
-            Debug.LogError(" MovementConfig no asignado", this);
-            enabled = false;
-            return;
-        }
-
-        if (groundCheck == null)
-        {
-            Debug.LogError(" GroundCheck no asignado", this);
-            enabled = false;
-            return;
-        }
-
         rb = GetComponent<Rigidbody>();
-
-        if (rb == null)
-        {
-            Debug.LogError(" Rigidbody no encontrado", this);
-            enabled = false;
-            return;
-        }
 
         movementSystem = new MovementSystem();
         verticalSystem = new VerticalMovementSystem(config.gravity, config.jumpForce);
-
-        JetpackSystem jetpackSystem = new JetpackSystem(
-            config.jetpackForce,
-            config.maxJetpackFuel
-        );
-
-        jetpackAbility = new JetpackAbility(jetpackSystem);
+        jetpackSystem = new JetpackSystem(config.jetpackForce, config.maxJetpackFuel);
 
         walkStrategy = new WalkMovement(config.walkSpeed);
         runStrategy = new RunMovement(config.runSpeed);
 
         movementSystem.SetStrategy(walkStrategy);
 
-  
         rb.freezeRotation = true;
-        rb.useGravity = false; 
     }
 
     public void SetMoveInput(Vector2 input)
@@ -90,16 +62,21 @@ public class MovementController : MonoBehaviour
         isJumpDown = true;
     }
 
+    public void SetJumpHolding(bool isHolding)
+    {
+        isJumpPressed = isHolding;
+    }
+
     public void SetJetpack(bool isActive)
     {
-        this.isJetpackActive = isActive;
+        isJetpackActive = isActive;
     }
 
     private void FixedUpdate()
     {
         CheckGround();
 
-        // Strategy según estado
+        // Strategy cambio dinámico
         if (isGrounded)
             movementSystem.SetStrategy(isSprinting ? runStrategy : walkStrategy);
         else
@@ -107,24 +84,20 @@ public class MovementController : MonoBehaviour
 
         // Movimiento Horizontal
         Vector3 desiredVelocity = movementSystem.CalculateVelocity(moveInput, transform);
-        currentVelocity = Vector3.Lerp(
-            currentVelocity,
-            desiredVelocity,
-            config.smoothing * Time.fixedDeltaTime
-        );
+        currentVelocity = Vector3.Lerp(currentVelocity, desiredVelocity, config.smoothing * Time.fixedDeltaTime);
 
-        // Movimiento Vertical (SALTO)
+        // Movimiento Vertical (salto + gravedad)
         verticalSystem.Tick(isGrounded, isJumpDown, Time.fixedDeltaTime);
         isJumpDown = false;
 
-        // Jetpack Ability
-        jetpackAbility.SetInput(isJetpackActive);
-        jetpackAbility.SetGrounded(isGrounded);
-        jetpackAbility.Tick(Time.fixedDeltaTime);
+        // Jetpack
+        float jetpackVelocity = jetpackSystem.Tick(
+            isGrounded,
+            isJetpackActive,
+            Time.fixedDeltaTime
+        );
 
-        float jetpackVelocity = jetpackAbility.GetForce();
-
-        // Boost hacia adelante
+        // Boost hacia adelante (solo aire + sprint + jetpack)
         Vector3 forwardBoost = Vector3.zero;
         if (!isGrounded && isJetpackActive && isSprinting)
         {
@@ -133,10 +106,7 @@ public class MovementController : MonoBehaviour
 
         Vector3 finalVelocity = currentVelocity + forwardBoost;
 
-        // Control del eje Y (PRIORIDAD LIMPIA)
-        float verticalVelocity = verticalSystem.GetVelocity();
-        
-        float finalY = verticalVelocity + jetpackVelocity;
+        float finalY = verticalSystem.GetVelocity() + jetpackVelocity;
 
         rb.linearVelocity = new Vector3(finalVelocity.x, finalY, finalVelocity.z);
     }
@@ -158,5 +128,20 @@ public class MovementController : MonoBehaviour
     public bool IsGrounded()
     {
         return isGrounded;
+    }
+
+    public float GetJetpackRatio()
+    {
+        return jetpackSystem.GetFuelRatio();
+    }
+
+    public float GetJetpackFuel()
+    {
+        return jetpackSystem.GetCurrentFuel();
+    }
+
+    public void RechargeJetpack(float amount)
+    {
+        jetpackSystem.Recharge(amount);
     }
 }
