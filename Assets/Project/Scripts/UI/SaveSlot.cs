@@ -1,5 +1,6 @@
 using UnityEngine;
 using TMPro;
+using System.IO;
 
 public class SaveSlot : MonoBehaviour
 {
@@ -8,12 +9,24 @@ public class SaveSlot : MonoBehaviour
     [SerializeField] private TextMeshProUGUI _textLabel;
 
     private bool _hasData = false;
+    string _fullPath; // Guardar la ruta completa
 
+    void Awake()
+    {
+        // Construir la ruta del archivo al iniciar
+        // Se usa el ID para que cada slot busque su propio archivo (save1.json, save2.json ...)
+        _fullPath = Path.Combine(Application.persistentDataPath, $"save_{slotID}.json");
+    }
     void Start()
     {
-        UpdateSlotVisual();
+        RefreshSlot();
     }
 
+    public void RefreshSlot()
+    {
+        // Preguntar al disco duro si el archivo existe
+        _hasData = File.Exists(_fullPath);
+    }
     public void UpdateSlotVisual()
     {
         // Para revisar si el archivo "save1.json" existe
@@ -31,13 +44,13 @@ public class SaveSlot : MonoBehaviour
     {
         if (_hasData)
         {
-            Debug.Log($"Cargando partida del Slot {slotID}...");
-            // Aquí llamarías a cargar los datos
+            Debug.Log($"Cargando partida desde {_fullPath}...");
+            // Lógica para cargar el JSON
         }
         else
         {
-            Debug.Log($"Creando nueva partida en el Slot {slotID}...");
-            // Iniciar la introducción del juego
+            Debug.Log($"No existen datos. Creando aventura desde cero ...");
+            // Lógica para crear el archivo inicial
         }
     }
 }

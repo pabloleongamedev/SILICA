@@ -28,7 +28,17 @@ public class MainMenuManager : MonoBehaviour
 
     public void ShowMainMenu() => SwitchPanel(mainPanel, mainFirstButton);
     
-    public void ShowPlayMenu() => SwitchPanel(playPanel, playFirstButton);
+    public void ShowPlayMenu() 
+{
+    SwitchPanel(playPanel, playFirstButton);
+    
+    // Buscamos todos los slots en la escena y los actualizamos
+    SaveSlot[] slots = FindObjectsByType<SaveSlot>(FindObjectsSortMode.None);
+    foreach (SaveSlot slot in slots)
+    {
+        slot.RefreshSlot();
+    }
+}
 
     public void ShowOptions() => SwitchPanel(optionsPanel, optionsFirstButton);
 
