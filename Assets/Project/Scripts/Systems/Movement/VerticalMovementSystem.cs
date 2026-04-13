@@ -15,9 +15,6 @@ public class VerticalMovementSystem
 
     public void Tick(bool isGrounded, bool jumpDown, float deltaTime)
     {
-        // Gravedad siempre
-        verticalVelocity += gravity * deltaTime;
-
         if (isGrounded)
         {
             if (verticalVelocity < 0)
@@ -26,8 +23,17 @@ public class VerticalMovementSystem
             if (jumpDown)
                 verticalVelocity = jumpForce;
         }
-    }
+        else
+        {
+            verticalVelocity += gravity * deltaTime;
 
+            // limitar la caída
+            float maxFallSpeed = -20f;
+
+            if (verticalVelocity < maxFallSpeed)
+                verticalVelocity = maxFallSpeed;
+        }
+    }
     public float GetVelocity()
     {
         return verticalVelocity;
