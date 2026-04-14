@@ -1,11 +1,18 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+/// <summary>
+/// PlayerController: Controla la entrada del jugador.
+/// INTEGRACIÓN CON GAMEMANAGER: Sincroniza posición/rotación para guardado automático.
+/// </summary>
 public class PlayerController : MonoBehaviour
 {
     private MovementController movementController;
     private InputSystem_Actions inputActions;
     [SerializeField] private MouseLook mouseLook;
+
+    private float lastGameManagerUpdateTime = 0f;
+    private float gameManagerUpdateInterval = 0.5f; // Actualizar cada 0.5 segundos
 
     private void Awake()
     {
@@ -33,6 +40,22 @@ public class PlayerController : MonoBehaviour
         inputActions.Player.Look.canceled += OnLook;
     }
 
+    private void Update()
+    {
+        // Sincronizar con GameManager periódicamente para auto-save
+        if (GameManager.Instance != null)
+        {
+            lastGameManagerUpdateTime += Time.deltaTime;
+
+            if (lastGameManagerUpdateTime >= gameManagerUpdateInterval)
+            {
+                GameManager.Instance.UpdatePlayerPosition(transform.position);
+                GameManager.Instance.UpdatePlayerRotation(transform.rotation);
+                lastGameManagerUpdateTime = 0f;
+            }
+        }
+    }
+
     private void OnMove(InputAction.CallbackContext context) => movementController.SetMoveInput(context.ReadValue<Vector2>());
 
     private void OnSprint(InputAction.CallbackContext context) => movementController.SetSprint(context.ReadValueAsButton());
@@ -40,4 +63,16 @@ public class PlayerController : MonoBehaviour
     private void OnLook(InputAction.CallbackContext context) => mouseLook.SetLookInput(context.ReadValue<Vector2>());
 
     private void OnDisable() => inputActions.Disable();
+
+    /// <summary>
+    /// Se llama cuando el jugador presiona una tecla de guardado manual (Ctrl+S)
+    /// </summary>
+    public void RequestManualSave()
+    {
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.SaveGame();
+            Debug.Log("[PlayerController] Guardado manual ejecutado");
+        }
+    }
 }

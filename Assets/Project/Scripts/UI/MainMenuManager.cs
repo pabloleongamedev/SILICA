@@ -3,11 +3,20 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using UnityEngine.EventSystems; // ¡Importante para el foco!
 
+/// <summary>
+/// MainMenuManager: Gestiona la navegación del menú principal.
+/// Sistema simplificado con una única partida guardada.
+/// 
+/// FLUJO:
+/// 1. Usuario abre juego → ve Menu
+/// 2. Click "Jugar" → muestra "Continuar" o "Nueva Partida"
+/// 3. Click en el botón → carga TestMechanics automáticamente
+/// </summary>
 public class MainMenuManager : MonoBehaviour
 {
     [Header("Panels")]
     [SerializeField] private GameObject mainPanel;
-    [SerializeField] private GameObject playPanel; // Nuevo: Para las ranuras
+    [SerializeField] private GameObject playPanel; // Panel con botón "Continuar" / "Nueva Partida"
     [SerializeField] private GameObject optionsPanel;
     [SerializeField] private GameObject creditsPanel;
 
@@ -20,6 +29,14 @@ public class MainMenuManager : MonoBehaviour
 
     void Start()
     {
+        // Asegurarse de que GameManager esté inicializado
+        if (GameManager.Instance == null)
+        {
+            Debug.LogWarning("[MainMenuManager] Creando GameManager...");
+            GameObject gmObject = new GameObject("GameManager");
+            gmObject.AddComponent<GameManager>();
+        }
+
         // Al iniciar, nos aseguramos de estar en el menú principal
         ShowMainMenu();
     }
@@ -29,16 +46,30 @@ public class MainMenuManager : MonoBehaviour
     public void ShowMainMenu() => SwitchPanel(mainPanel, mainFirstButton);
     
     public void ShowPlayMenu() 
-{
-    SwitchPanel(playPanel, playFirstButton);
-    
-    // Buscamos todos los slots en la escena y los actualizamos
-    SaveSlot[] slots = FindObjectsByType<SaveSlot>(FindObjectsSortMode.None);
-    foreach (SaveSlot slot in slots)
     {
-        slot.RefreshSlot();
+        // Verificar si existe un guardado previo
+        const string UNIQUE_SLOT = "1";
+        
+        if (GameManager.Instance.HasSaveFile(UNIQUE_SLOT))
+        {
+            // Si hay guardado: mostrar opciones "Continuar" / "Nueva Partida"
+            SwitchPanel(playPanel, playFirstButton);
+            
+            GameManager.Instance.RefreshSaveStates();
+            SaveSlot saveSlot = playPanel.GetComponentInChildren<SaveSlot>();
+            if (saveSlot != null)
+            {
+                saveSlot.RefreshSlot();
+                Debug.Log("[MainMenuManager] Guardado detectado - mostrando panel de opciones");
+            }
+        }
+        else
+        {
+            // Si NO hay guardado: crear nueva partida y cargar directamente
+            Debug.Log("[MainMenuManager] Primera vez - cargando TestMechanics automáticamente");
+            GameManager.Instance.CreateNewGame(UNIQUE_SLOT);
+        }
     }
-}
 
     public void ShowOptions() => SwitchPanel(optionsPanel, optionsFirstButton);
 
@@ -70,10 +101,24 @@ public class MainMenuManager : MonoBehaviour
 
     // --- ACCIONES FINALES ---
 
-    public void StartGame(int sceneIndex)
+    /// <summary>
+    /// Carga la escena de juego (TestMechanics)
+    /// Se llama desde SaveSlot cuando el usuario selecciona una partida
+    /// </summary>
+    public void StartGame()
     {
-        // Aquí podrías guardar cuál slot se eligió antes de cargar
-        SceneManager.LoadSceneAsync(sceneIndex);
+        // El GameManager ya maneja la carga correcta de escena
+        // Este método se puede usar como punto de extensión
+        Debug.Log("[MainMenuManager] StartGame() llamado - GameManager manejará la carga");
+    }
+
+    /// <summary>
+    /// Carga la escena de juego por nombre (alternativo)
+    /// </summary>
+    public void LoadGameScene(string sceneName = "TestMechanics")
+    {
+        SceneManager.LoadSceneAsync(sceneName);
+        Debug.Log($"[MainMenuManager] Cargando escena: {sceneName}");
     }
 
     public void QuitGame()
