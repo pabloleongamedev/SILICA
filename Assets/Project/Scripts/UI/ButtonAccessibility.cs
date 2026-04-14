@@ -23,13 +23,16 @@ public class ButtonAccessibility : MonoBehaviour, ISelectHandler, IDeselectHandl
     public void OnPointerEnter(PointerEventData eventData)
     {
         // Al entrar con el mouse, le decimos al sistema que este es el objeto seleccionado
-        EventSystem.current.SetSelectedGameObject(gameObject);
+        if (EventSystem.current != null)
+        {
+            EventSystem.current.SetSelectedGameObject(gameObject);
+        }
     }
     
     public void OnPointerExit(PointerEventData eventData)
     {
         // Al salir con el mouse, quitamos la selección si no hay otro mando activo
-        if (EventSystem.current.currentSelectedGameObject == gameObject)
+        if (EventSystem.current != null && EventSystem.current.currentSelectedGameObject == gameObject)
         {
             EventSystem.current.SetSelectedGameObject(null);
         }

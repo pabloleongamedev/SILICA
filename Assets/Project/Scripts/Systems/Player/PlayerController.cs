@@ -23,6 +23,9 @@ public class PlayerController : MonoBehaviour
         movementController = GetComponent<MovementController>();
         mouseLook = GetComponentInChildren<MouseLook>();
         inputActions = new InputSystem_Actions();
+        
+        // No resetear la posición del jugador - dejar que GameRestorer la restaure
+        // si es una partida cargada
     }
 
     private void OnEnable()
