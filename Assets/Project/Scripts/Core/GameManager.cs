@@ -111,8 +111,11 @@ public class GameManager : MonoBehaviour
         {
             currentGameData = loadedData;
             currentSlotID = slotID;
+            sessionStartTime = Time.time; // Resetear sessionStartTime para nueva sesión
+            timeSinceLastSave = 0f;
 
             Debug.Log($"[GameManager] Partida cargada del slot {slotID}");
+            Debug.Log($"[GameManager] Posición guardada: {currentGameData.playerData.GetPosition()}");
 
             // Cargar la escena de la partida guardada
             SceneManager.LoadScene(currentGameData.currentScene);
@@ -132,8 +135,10 @@ public class GameManager : MonoBehaviour
         currentSlotID = slotID;
         sessionStartTime = Time.time;
         timeSinceLastSave = 0f;
+        isInGame = false; // Se establecerá a true en OnSceneLoaded
 
         Debug.Log($"[GameManager] Nueva partida creada en slot {slotID}");
+        Debug.Log($"[GameManager] Posición inicial: {currentGameData.playerData.GetPosition()}");
 
         // Cargar la primera escena del juego
         SceneManager.LoadScene(currentGameData.currentScene);
@@ -307,6 +312,12 @@ public class GameManager : MonoBehaviour
             Transform playerTransform = playerController.transform;
             currentGameData.playerData.SetPosition(playerTransform.position);
             currentGameData.playerData.SetRotation(playerTransform.rotation);
+            
+            Debug.Log($"[GameManager] UpdatePlayerData - Posición sincronizada: {playerTransform.position}");
+        }
+        else
+        {
+            Debug.LogWarning("[GameManager] PlayerController no encontrado en UpdatePlayerData");
         }
     }
 
