@@ -19,4 +19,8 @@ MonoBehaviour:
   jumpForce: 8
   jetpackForce: 22
   maxJetpackFuel: 10
-  jetpackBoostForce: 100
+  jetpackBoostForce: 200
+  maxJetpackHeight: 30
+  groundCheckDistance: 0.4
+  maxGroundAngle: 60
+  groundedGraceTime: 0.15

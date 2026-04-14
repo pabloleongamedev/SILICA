@@ -16,22 +16,14 @@ public class InventoryGrid
         {
             for (int y = 0; y < height; y++)
             {
-                grid[x, y] = new InventorySlot();
+                grid[x, y] = new InventorySlot(x, y);
             }
         }
     }
 
-    public bool TryAddItem(InventoryItemInstance item)
-    {
-        if (!TryFindFirstEmptySlot(out int x, out int y))
-            return false; // invenario lleno
-
-        grid[x, y].SetItem(item);
-        return true;
-    }
     public bool TryFindFirstEmptySlot(out int outX, out int outY)
     {
-        for (int y = 0; y < Height; y++) // IMPORTANTE: orden tipo lectura
+        for (int y = 0; y < Height; y++)
         {
             for (int x = 0; x < Width; x++)
             {
@@ -49,8 +41,13 @@ public class InventoryGrid
         return false;
     }
 
-        public InventorySlot GetSlot(int x, int y)
-        {
-            return grid[x, y];
-        }
+    public void SetItem(int x, int y, InventoryItemInstance item)
+    {
+        grid[x, y].SetItem(item);
     }
+
+    public InventorySlot GetSlot(int x, int y)
+    {
+        return grid[x, y];
+    }
+}

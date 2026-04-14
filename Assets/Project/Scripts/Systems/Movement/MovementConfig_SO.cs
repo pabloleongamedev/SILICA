@@ -16,4 +16,11 @@ public class MovementConfig_SO : ScriptableObject
     public float jetpackForce = 12f;
     public float maxJetpackFuel  = 10f;
     public float jetpackBoostForce = 5f;
+    public float maxJetpackHeight = 50f;
+
+    [Header("Ground Detection")]
+    public float groundCheckDistance = 0.4f;
+    public float maxGroundAngle = 60f;
+    public float groundedGraceTime = 0.15f;
+
 }

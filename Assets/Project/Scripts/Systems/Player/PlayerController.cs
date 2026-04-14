@@ -1,3 +1,4 @@
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -6,6 +7,9 @@ public class PlayerController : MonoBehaviour
     private MovementController movementController;
     private InputSystem_Actions inputActions;
     [SerializeField] private MouseLook mouseLook;
+    [SerializeField] private GameObject inventoryPanel;
+    [SerializeField] private GameObject inventoryDescription;
+    private bool isInventoryOpen;
 
     private void Awake()
     {
@@ -19,6 +23,7 @@ public class PlayerController : MonoBehaviour
         inputActions.Enable();
 
         inputActions.Player.Jump.started += ctx => movementController.OnJumpStarted();
+        inputActions.Player.Inventory.performed += ctx => ToggleInventory();
 
         inputActions.Player.Jetpack.performed += ctx => movementController.SetJetpack(true);
         inputActions.Player.Jetpack.canceled += ctx => movementController.SetJetpack(false);
@@ -31,6 +36,16 @@ public class PlayerController : MonoBehaviour
 
         inputActions.Player.Look.performed += OnLook;
         inputActions.Player.Look.canceled += OnLook;
+    }
+    private void ToggleInventory()
+    {
+        isInventoryOpen = !isInventoryOpen;
+
+        inventoryPanel.SetActive(isInventoryOpen);
+        //inventoryDescription.SetActive(true);
+
+        Cursor.lockState = isInventoryOpen ? CursorLockMode.None : CursorLockMode.Locked;
+        Cursor.visible = isInventoryOpen;
     }
 
     private void OnMove(InputAction.CallbackContext context) => movementController.SetMoveInput(context.ReadValue<Vector2>());

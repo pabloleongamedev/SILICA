@@ -7,26 +7,26 @@ public class MovementController : MonoBehaviour
 
     [Header("Ground Check")]
     [SerializeField] private Transform groundCheck;
-    [SerializeField] private float groundDistance = 0.3f;
-    [SerializeField] private LayerMask groundLayer;
-
     private Rigidbody rb;
 
     private MovementSystem movementSystem;
     private VerticalMovementSystem verticalSystem;
     private JetpackSystem jetpackSystem;
-
+    private AbilitySystem abilitySystem;
+    private JetpackAbility jetpackAbility;
     private IMovementStrategy walkStrategy;
     private IMovementStrategy runStrategy;
-
     private Vector2 moveInput;
     private Vector3 currentVelocity;
 
     private bool isGrounded;
-    private bool isJumpPressed;
     private bool isJumpDown;
     private bool isSprinting;
-    private bool isJetpackActive;
+    private float groundedTimer;
+
+    // fuerzas externas (abilities)
+    private float externalVerticalForce;
+    private Vector3 externalHorizontalForce;
 
     private void Awake()
     {
@@ -35,6 +35,10 @@ public class MovementController : MonoBehaviour
         movementSystem = new MovementSystem();
         verticalSystem = new VerticalMovementSystem(config.gravity, config.jumpForce);
         jetpackSystem = new JetpackSystem(config.jetpackForce, config.maxJetpackFuel);
+
+        abilitySystem = new AbilitySystem();
+        jetpackAbility = new JetpackAbility(this, jetpackSystem);
+        abilitySystem.Register(jetpackAbility);
 
         walkStrategy = new WalkMovement(config.walkSpeed);
         runStrategy = new RunMovement(config.runSpeed);
@@ -61,73 +65,97 @@ public class MovementController : MonoBehaviour
     {
         isJumpDown = true;
     }
-
-    public void SetJumpHolding(bool isHolding)
-    {
-        isJumpPressed = isHolding;
-    }
-
     public void SetJetpack(bool isActive)
     {
-        isJetpackActive = isActive;
+        jetpackAbility.SetActive(isActive);
     }
 
     private void FixedUpdate()
     {
         CheckGround();
 
-        // Strategy cambio dinámico
+        // Strategy
         if (isGrounded)
             movementSystem.SetStrategy(isSprinting ? runStrategy : walkStrategy);
         else
             movementSystem.SetStrategy(walkStrategy);
 
-        // Movimiento Horizontal
+        // Movimiento horizontal
         Vector3 desiredVelocity = movementSystem.CalculateVelocity(moveInput, transform);
         currentVelocity = Vector3.Lerp(currentVelocity, desiredVelocity, config.smoothing * Time.fixedDeltaTime);
 
-        // Movimiento Vertical (salto + gravedad)
+        // Movimiento vertical base
         verticalSystem.Tick(isGrounded, isJumpDown, Time.fixedDeltaTime);
         isJumpDown = false;
 
-        // Jetpack
-        float jetpackVelocity = jetpackSystem.Tick(
-            isGrounded,
-            isJetpackActive,
-            Time.fixedDeltaTime
-        );
+        // ABILITIES
+        abilitySystem.Tick(Time.fixedDeltaTime);
 
-        // Boost hacia adelante (solo aire + sprint + jetpack)
-        Vector3 forwardBoost = Vector3.zero;
-        if (!isGrounded && isJetpackActive && isSprinting)
-        {
-            forwardBoost = transform.forward * config.jetpackBoostForce * Time.fixedDeltaTime;
-        }
-
-        Vector3 finalVelocity = currentVelocity + forwardBoost;
-
-        float finalY = verticalSystem.GetVelocity() + jetpackVelocity;
+        // aplicar fuerzas finales
+        Vector3 finalVelocity = currentVelocity + externalHorizontalForce;
+        float finalY = verticalSystem.GetVelocity() + externalVerticalForce;
 
         rb.linearVelocity = new Vector3(finalVelocity.x, finalY, finalVelocity.z);
+
+        // reset fuerzas externas
+        externalVerticalForce = 0f;
+        externalHorizontalForce = Vector3.zero;
     }
 
     private void CheckGround()
     {
-        isGrounded = Physics.CheckSphere(
-            groundCheck.position,
-            groundDistance,
-            groundLayer
-        );
+        float rayDistance = config.groundCheckDistance;
+
+        if (Physics.Raycast(groundCheck.position, Vector3.down, out RaycastHit hit, rayDistance))
+        {
+            float angle = Vector3.Angle(hit.normal, Vector3.up);
+
+            if (angle <= config.maxGroundAngle)
+            {
+                isGrounded = true;
+                groundedTimer = config.groundedGraceTime;
+                return;
+            }
+        }
+
+        groundedTimer -= Time.fixedDeltaTime;
+        isGrounded = groundedTimer > 0f;
+    }
+    public float GetMaxJetpackHeight()
+    {
+        return config.maxJetpackHeight;
     }
 
-    public float GetHorizontalSpeed()
+    // ===== API PARA ABILITIES =====
+
+    public void AddExternalVerticalForce(float force)
     {
-        return new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z).magnitude;
+        externalVerticalForce += force;
+    }
+
+    public void AddExternalHorizontalForce(Vector3 force)
+    {
+        externalHorizontalForce += force;
     }
 
     public bool IsGrounded()
     {
         return isGrounded;
+    }
+
+    public bool IsSprinting()
+    {
+        return isSprinting;
+    }
+
+    public float GetJetpackBoost()
+    {
+        return config.jetpackBoostForce;
+    }
+
+    public float GetHorizontalSpeed()
+    {
+        return new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z).magnitude;
     }
 
     public float GetJetpackRatio()
@@ -143,5 +171,9 @@ public class MovementController : MonoBehaviour
     public void RechargeJetpack(float amount)
     {
         jetpackSystem.Recharge(amount);
+    }
+    public float GetCurrentHeight()
+    {
+        return transform.position.y;
     }
 }
