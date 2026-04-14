@@ -1,56 +1,96 @@
 using UnityEngine;
 using TMPro;
-using System.IO;
 
+/// <summary>
+/// SaveSlot: Botón para continuar o crear nueva partida.
+/// Sistema simplificado de una única partida guardada.
+/// 
+/// FUNCIONALIDAD:
+/// - Botón "Continuar" si hay partida guardada
+/// - Botón "Nueva Partida" si no hay guardado
+/// - Usa siempre slot "1" (una única partida)
+/// </summary>
 public class SaveSlot : MonoBehaviour
 {
     [Header("Configuración")]
-    public int slotID;
-    [SerializeField] private TextMeshProUGUI _textLabel;
+    [SerializeField] private TextMeshProUGUI textLabel;
+    [SerializeField] private TextMeshProUGUI infoLabel; // Opcional: muestra tiempo de juego
 
-    private bool _hasData = false;
-    string _fullPath; // Guardar la ruta completa
+    // Siempre usar slot "1" (partida única)
+    private const string UNIQUE_SLOT = "1";
+    private bool hasData = false;
+    private SaveInfo saveInfo;
 
-    void Awake()
-    {
-        // Construir la ruta del archivo al iniciar
-        // Se usa el ID para que cada slot busque su propio archivo (save1.json, save2.json ...)
-        _fullPath = Path.Combine(Application.persistentDataPath, $"save_{slotID}.json");
-    }
     void Start()
     {
+        // Asegurarse de que GameManager esté inicializado
+        if (GameManager.Instance == null)
+        {
+            Debug.LogError("[SaveSlot] GameManager no encontrado en la escena");
+            enabled = false;
+            return;
+        }
+
         RefreshSlot();
     }
 
+    /// <summary>
+    /// Refresca el estado consultando GameManager
+    /// </summary>
     public void RefreshSlot()
     {
-        // Preguntar al disco duro si el archivo existe
-        _hasData = File.Exists(_fullPath);
+        hasData = GameManager.Instance.HasSaveFile(UNIQUE_SLOT);
+        saveInfo = GameManager.Instance.GetSaveInfo(UNIQUE_SLOT);
+        UpdateSlotVisual();
     }
-    public void UpdateSlotVisual()
+
+    /// <summary>
+    /// Actualiza la UI del botón según si hay guardado o no
+    /// </summary>
+    private void UpdateSlotVisual()
     {
-        // Para revisar si el archivo "save1.json" existe
-        if (_hasData)
+        if (textLabel == null)
         {
-            _textLabel.text = $"Slot {slotID} - Continuar";
+            Debug.LogError("[SaveSlot] TextLabel no asignado", this);
+            return;
+        }
+
+        if (hasData && saveInfo != null)
+        {
+            // Hay guardado: mostrar "Continuar"
+            textLabel.text = "Continuar";
+            
+            if (infoLabel != null)
+            {
+                infoLabel.text = $"{saveInfo.playTime} | {saveInfo.lastSaveTime}";
+            }
         }
         else
         {
-            _textLabel.text = $"Slot {slotID} - Nueva Partida";
+            // Sin guardado: mostrar "Nueva Partida"
+            textLabel.text = "Nueva Partida";
+            
+            if (infoLabel != null)
+            {
+                infoLabel.text = "Sin partida guardada";
+            }
         }
     }
 
+    /// <summary>
+    /// Se llama cuando el usuario presiona el botón
+    /// </summary>
     public void OnSlotPressed()
     {
-        if (_hasData)
+        if (hasData)
         {
-            Debug.Log($"Cargando partida desde {_fullPath}...");
-            // Lógica para cargar el JSON
+            Debug.Log($"[SaveSlot] Cargando partida guardada...");
+            GameManager.Instance.LoadGame(UNIQUE_SLOT);
         }
         else
         {
-            Debug.Log($"No existen datos. Creando aventura desde cero ...");
-            // Lógica para crear el archivo inicial
+            Debug.Log($"[SaveSlot] Creando nueva partida...");
+            GameManager.Instance.CreateNewGame(UNIQUE_SLOT);
         }
     }
 }
