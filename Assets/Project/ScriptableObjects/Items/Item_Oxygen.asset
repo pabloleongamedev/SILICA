@@ -12,9 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f8ea758fc9c82e94ca5c432a90fe54dd, type: 3}
   m_Name: Item_Oxygen
   m_EditorClassIdentifier: Assembly-CSharp::ItemData_SO
-  itemID: oxygen
+  itemID: Oxygen
   displayName: O
-  icon: {fileID: 21300000, guid: 36b48528702016c469123af8f01de698, type: 3}
-  description: 'Oxigeno: El elemento mas abundante de la tierra'
+  icon: {fileID: 21300000, guid: 0a37882c41411f649bf9202a729d3694, type: 3}
+  description: "Ox\xEDgeno: Elemento qu\xEDmico gaseoso, incoloro e inodoro, esencial
+    para la respiraci\xF3n de la mayor\xEDa de los seres vivos y para los procesos
+    de combusti\xF3n. Representa aproximadamente el 21% de la atm\xF3sfera terrestre,
+    ademas es el elemento mas abundante en la tierra princalmente en forma de agua.
+    \xA1No podiser de otra forma!"
   maxStack: 99
-  cantidad: 2
+  cantidad: 11
