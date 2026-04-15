@@ -122,7 +122,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 6291795761477096114}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 0}
+        m_TargetAssemblyTypeName: SaveSlot, Assembly-CSharp
+        m_MethodName: OnSlotPressed
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &8814253761732492258
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -150,6 +162,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2cd488beed8b92c43a72340b09bfe1fb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ButtonAccessibility
+  _hoverScale: 1.05
 --- !u!1 &5657728453113905172
 GameObject:
   m_ObjectHideFlags: 0
@@ -215,17 +228,17 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: JUGAR
+  m_text: BUTTON
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 4c14f6210fa010b45b5badc266d3071e, type: 2}
+  m_sharedMaterial: {fileID: -1116201953909007505, guid: 4c14f6210fa010b45b5badc266d3071e, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4294494780
-  m_fontColor: {r: 0.23529412, g: 0.7921569, b: 0.972549, a: 1}
+    rgba: 4294967040
+  m_fontColor: {r: 0, g: 1, b: 1, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
