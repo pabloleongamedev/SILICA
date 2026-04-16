@@ -4,8 +4,9 @@ using UnityEngine.UI;
 public class GraphicsSettings : MonoBehaviour
 {
     [Header("UI References")]
-    public Toggle fullscreenToggle;
     public Slider brightnessSlider;
+    public Toggle fullscreenToggle;
+    public Image brightnessOverlay;
 
     void Start()
     {
@@ -13,20 +14,33 @@ public class GraphicsSettings : MonoBehaviour
         fullscreenToggle.isOn = PlayerPrefs.GetInt("Fullscreen", 1) == 1;
         brightnessSlider.value = PlayerPrefs.GetFloat("Brightness", 0.8f);
 
-        ApplyGraphics();
+        ApplyBrightness(brightnessSlider.value);
+        ApplyFullscreen(fullscreenToggle.isOn);
+
+        // Conectar eventos
+        brightnessSlider.onValueChanged.AddListener(ApplyBrightness);
+        fullscreenToggle.onValueChanged.AddListener(ApplyFullscreen);
     }
 
-    public void ApplyGraphics()
+    void ApplyBrightness(float value)
     {
-        // Pantalla completa
-        Screen.fullScreen = fullscreenToggle.isOn;
+        if (brightnessOverlay != null)
+        {
+            Color c = brightnessOverlay.color;
+            c.a = 1f - value; // más brillo = menos opacidad
+            brightnessOverlay.color = c;
+        }
 
-        // Brillo (ajustando luz ambiental)
-        RenderSettings.ambientLight = Color.white * brightnessSlider.value;
-
-        // Guardar
-        PlayerPrefs.SetInt("Fullscreen", fullscreenToggle.isOn ? 1 : 0);
-        PlayerPrefs.SetFloat("Brightness", brightnessSlider.value);
+        PlayerPrefs.SetFloat("Brightness", value);
         PlayerPrefs.Save();
+        Debug.Log("✅ Brillo aplicado: " + value);
+    }
+
+    void ApplyFullscreen(bool isFullscreen)
+    {
+        Screen.fullScreen = isFullscreen;
+        PlayerPrefs.SetInt("Fullscreen", isFullscreen ? 1 : 0);
+        PlayerPrefs.Save();
+        Debug.Log("✅ Pantalla completa: " + isFullscreen);
     }
 }
