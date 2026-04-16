@@ -36,8 +36,11 @@ public class InventorySlotView : MonoBehaviour,
         icon.sprite = slot.Item.Data.icon;
 
         int quantity = slot.Item.Quantity;
-        Debug.Log("CANTIDAD: "+ quantity);
+
         quantityText.text = quantity.ToString();
+
+        // 🔥 SOLO mostrar si > 1
+        quantityText.gameObject.SetActive(quantity > 1);
     }
 
     // ================= CLICK =================

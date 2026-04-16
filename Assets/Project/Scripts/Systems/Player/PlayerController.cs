@@ -46,6 +46,9 @@ public class PlayerController : MonoBehaviour
 
         inputActions.Player.Look.performed += OnLook;
         inputActions.Player.Look.canceled += OnLook;
+
+        Cursor.visible = false;
+        
     }
     private void ToggleInventory()
     {

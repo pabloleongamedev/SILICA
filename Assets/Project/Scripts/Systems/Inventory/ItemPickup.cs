@@ -4,6 +4,7 @@ using UnityEngine;
 public class ItemPickup : MonoBehaviour
 {
     [SerializeField] private ItemData_SO itemData;
+    [SerializeField] private int quantity;
 
     private void Reset()
     {
@@ -16,7 +17,7 @@ public class ItemPickup : MonoBehaviour
 
         if (player == null) return;
 
-        bool added = player.TryAddItem(itemData);
+        bool added = player.TryAddItem(itemData, quantity);
 
         if (added)
         {

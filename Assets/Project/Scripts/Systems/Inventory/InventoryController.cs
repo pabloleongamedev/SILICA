@@ -11,9 +11,9 @@ public class InventoryController : MonoBehaviour
         inventory = new InventorySystem(config.width, config.height);
     }
 
-    public bool TryAddItem(ItemData_SO itemData)
+    public bool TryAddItem(ItemData_SO itemData, int quantity)
     {
-        return inventory.AddItem(itemData);
+        return inventory.AddItem(itemData, quantity);
     }
 
     public InventorySystem GetInventory()
