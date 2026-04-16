@@ -51,11 +51,23 @@ public class PlayerController : MonoBehaviour
     {
         isInventoryOpen = !isInventoryOpen;
 
+        // UI
         inventoryPanel.SetActive(isInventoryOpen);
-        //inventoryDescription.SetActive(true);
 
+        // Cursor
         Cursor.lockState = isInventoryOpen ? CursorLockMode.None : CursorLockMode.Locked;
         Cursor.visible = isInventoryOpen;
+
+        // Pausa del juego
+        Time.timeScale = isInventoryOpen ? 0f : 1f;
+
+        // Bloquear cámara
+        if (mouseLook != null)
+            mouseLook.enabled = !isInventoryOpen;
+
+        // Bloquear movimiento
+        if (movementController != null)
+            movementController.SetInputEnabled(!isInventoryOpen);
     }
 
     private void Update()
