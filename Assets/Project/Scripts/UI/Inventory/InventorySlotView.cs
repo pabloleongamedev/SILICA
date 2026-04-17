@@ -1,110 +1,77 @@
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
 using UnityEngine.EventSystems;
+using TMPro;
+using System;
 
 public class InventorySlotView : MonoBehaviour,
-    IBeginDragHandler, IDragHandler, IEndDragHandler, IDropHandler, IPointerClickHandler
+    IBeginDragHandler, IDragHandler, IEndDragHandler,
+    IDropHandler, IPointerClickHandler
 {
+    private int index;
+
+    [Header("UI")]
     [SerializeField] private Image icon;
-    [SerializeField] private TextMeshProUGUI quantityText;
+    [SerializeField] private TextMeshProUGUI stackText;
 
+    private InventoryDragHandler dragHandler;
+    private InventoryItemInstance currentItem;
 
-    private InventoryView inventoryView;
-    private int x;
-    private int y;
+    public Action<InventoryItemInstance> OnSlotClicked;
+    public Action<int, int> OnItemDropped;
 
-    private bool isDragging;
-
-    public void Init(InventoryView view, int x, int y)
+    public void Initialize(int index, InventoryDragHandler dragHandler)
     {
-        this.inventoryView = view;
-        this.x = x;
-        this.y = y;
+        this.index = index;
+        this.dragHandler = dragHandler;
     }
 
-    public void UpdateView(InventorySlot slot)
+    public void SetItem(InventoryItemInstance item, int amount)
     {
-        if (slot.IsEmpty)
+        currentItem = item;
+
+        if (item == null)
         {
             icon.enabled = false;
-            quantityText.text = "";
+            icon.sprite = null;
+            stackText.text = "";
             return;
         }
 
         icon.enabled = true;
-        icon.sprite = slot.Item.Data.icon;
-
-        int quantity = slot.Item.Quantity;
-        Debug.Log("CANTIDAD: "+ quantity);
-        quantityText.text = quantity.ToString();
+        icon.sprite = item.Data.icon;
+        stackText.text = amount > 1 ? amount.ToString() : "";
     }
-
-    // ================= CLICK =================
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        if (isDragging) return; // 🔥 FIX
-
-        inventoryView.OnSlotSelected(x, y);
+        if (currentItem == null) return;
+        OnSlotClicked?.Invoke(currentItem);
     }
-
-    // ================= DRAG =================
 
     public void OnBeginDrag(PointerEventData eventData)
     {
-        var slot = inventoryView.GetInventory().GetGrid().GetSlot(x, y);
-
-        if (slot.IsEmpty)
-            return;
-
-        isDragging = true;
-
-        // ❌ NO desactivar icon
-       icon.color = new Color(1, 1, 1, 0.2f);
-
-        inventoryView.StartDrag(x, y, slot.Item.Data.icon);
+        if (currentItem == null || dragHandler == null) return;
+        dragHandler.StartDrag(currentItem.Data.icon);
     }
 
-public void OnDrag(PointerEventData eventData)
-{
-    inventoryView.UpdateDrag(eventData.position);
-}
-
-public void OnEndDrag(PointerEventData eventData)
-{
-    isDragging = false;
-
-    // ❌ NO reactivar icon
-    icon.color = new Color(1, 1, 1, 1f);
-
-    inventoryView.EndDrag();
-}
-
-/*    public void OnEndDrag(PointerEventData eventData)
+    public void OnDrag(PointerEventData eventData)
     {
-        isDragging = false;
-        icon.enabled = true;
-
-        // 🔥 Detectar si no cayó en slot
-        if (eventData.pointerEnter == null ||
-            eventData.pointerEnter.GetComponent<InventorySlotView>() == null)
-        {
-            Debug.Log("Drop inválido");
-        }
-
-        inventoryView.EndDrag();
+        if (dragHandler == null) return;
+        dragHandler.UpdateDrag(eventData.position);
     }
-*/
+
+    public void OnEndDrag(PointerEventData eventData)
+    {
+        if (dragHandler == null) return;
+        dragHandler.EndDrag();
+    }
+
     public void OnDrop(PointerEventData eventData)
     {
-        var dragged = eventData.pointerDrag?.GetComponent<InventorySlotView>();
+        var fromSlot = eventData.pointerDrag?.GetComponent<InventorySlotView>();
+        if (fromSlot == null) return;
 
-        if (dragged == null)
-        {
-            return;
-        }
-        inventoryView.OnDrop(x, y);
-
+        OnItemDropped?.Invoke(fromSlot.index, this.index);
     }
 }
