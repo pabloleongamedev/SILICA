@@ -368,7 +368,6 @@ GameObject:
   - component: {fileID: 7820194272653009722}
   - component: {fileID: 1048679916943791147}
   - component: {fileID: 6274182785611220715}
-  - component: {fileID: 257418968595210597}
   m_Layer: 5
   m_Name: DescriptionPanel
   m_TagString: Untagged
@@ -463,21 +462,6 @@ MonoBehaviour:
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
 --- !u!114 &6274182785611220715
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2260692159448723208}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0f134a17d83f5f04ba18fd44cf579935, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::DescriptionPanelView
-  itemName: {fileID: 4818261186461403570}
-  itemIcon: {fileID: 3507443220262572017}
-  itemDescription: {fileID: 2079575291943829066}
---- !u!114 &257418968595210597
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1622,11 +1606,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 92838ae836413b245befe8a5641d6dca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::InventoryView
-  inventoryController: {fileID: 0}
   slotPrefab: {fileID: 5022299233272472526, guid: 8fcf12a3979a85943bb102f16e695ed8, type: 3}
-  gridParent: {fileID: 8527971858223214391}
+  container: {fileID: 0}
+  descriptionPanel: {fileID: 0}
   dragHandler: {fileID: 349078590549493121}
-  descriptionPanel: {fileID: 257418968595210597}
+  controller: {fileID: 0}
 --- !u!1 &7204165895382694370
 GameObject:
   m_ObjectHideFlags: 0

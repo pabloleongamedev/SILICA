@@ -15,10 +15,9 @@ MonoBehaviour:
   itemID: Hydrogen
   displayName: H
   icon: {fileID: 21300000, guid: a2832e0bb109abb45ace59069ec7025e, type: 3}
+  maxStack: 99
   description: "Hidr\xF3geno: Es el elemento m\xE1s ligero, sencillo y abundante
     del universo, conformado por un solo prot\xF3n y un electr\xF3n. En condiciones
     normales es un gas incoloro, inodoro y altamente inflamable que no suele encontrarse
     libre en la Tierra, sino combinado con otros elementos formando sustancias como
-    el agua (H\u2082O).  \xA1Riesgo Alto!"
-  maxStack: 99
-  cantidad: 8
+    el agua (H2O).  \xA1Riesgo Alto!"

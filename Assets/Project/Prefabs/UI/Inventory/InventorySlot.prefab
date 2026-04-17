@@ -348,4 +348,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::InventorySlotView
   icon: {fileID: 7786803769538261392}
-  quantityText: {fileID: 445623998450621218}
+  stackText: {fileID: 445623998450621218}

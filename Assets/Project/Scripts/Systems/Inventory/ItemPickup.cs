@@ -4,7 +4,7 @@ using UnityEngine;
 public class ItemPickup : MonoBehaviour
 {
     [SerializeField] private ItemData_SO itemData;
-    [SerializeField] private int quantity;
+    [SerializeField] private int amount;
 
     private void Reset()
     {
@@ -13,15 +13,21 @@ public class ItemPickup : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        var player = other.GetComponent<InventoryController>();
+        var controller = other.GetComponent<InventoryController>();
 
-        if (player == null) return;
+        if (controller == null)
+            return;
 
-        bool added = player.TryAddItem(itemData, quantity);
+        int remaining = controller.TryAddItem(itemData, amount);
 
-        if (added)
+        if (remaining <= 0)
         {
             Destroy(gameObject);
+        }
+        else
+        {
+            amount = remaining;
+            Debug.Log("Inventario lleno parcialmente, quedan: " + remaining);
         }
     }
 }
