@@ -38,7 +38,6 @@ public class OptionsMenuManager : MonoBehaviour
         GameSettings.Instance.EffectsVolume = effectsSlider.value;
         GameSettings.Instance.MasterVolume = masterVolumeSlider.value;
         GameSettings.Instance.Save();
-        Debug.Log("✅ Ajustes aplicados y guardados.");
     }
 
     void ResetSettings()
@@ -49,13 +48,10 @@ public class OptionsMenuManager : MonoBehaviour
         musicSlider.value = GameSettings.Instance.MusicVolume;
         effectsSlider.value = GameSettings.Instance.EffectsVolume;
         masterVolumeSlider.value = GameSettings.Instance.MasterVolume;
-
-        Debug.Log("🔄 Ajustes restablecidos a valores iniciales.");
     }
 
     void CloseOptionsPanel()
     {
         optionsPanel.SetActive(false);
-        Debug.Log("❌ Panel de opciones cerrado.");
     }
 }

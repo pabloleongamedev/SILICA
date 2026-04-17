@@ -13,10 +13,14 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private MouseLook mouseLook;
     [SerializeField] private GameObject inventoryPanel;
     [SerializeField] private GameObject inventoryDescription;
+    [SerializeField] PauseMenuManager pauseMenuManager;
     private bool isInventoryOpen;
+    bool isPaused = false; 
 
     private float lastGameManagerUpdateTime = 0f;
     private float gameManagerUpdateInterval = 0.5f; // Actualizar cada 0.5 segundos
+
+
 
     private void Awake()
     {
@@ -34,6 +38,8 @@ public class PlayerController : MonoBehaviour
 
         inputActions.Player.Jump.started += ctx => movementController.OnJumpStarted();
         inputActions.Player.Inventory.performed += ctx => ToggleInventory();
+        inputActions.UI.Pause.performed += ctx => TogglePause(); // 
+    // ... resto de acciones
 
         inputActions.Player.Jetpack.performed += ctx => movementController.SetJetpack(true);
         inputActions.Player.Jetpack.canceled += ctx => movementController.SetJetpack(false);
@@ -56,6 +62,14 @@ public class PlayerController : MonoBehaviour
 
         Cursor.lockState = isInventoryOpen ? CursorLockMode.None : CursorLockMode.Locked;
         Cursor.visible = isInventoryOpen;
+    }
+
+    void TogglePause()
+    {
+        if(pauseMenuManager.IsPaused)
+            pauseMenuManager.ResumeGame();
+        else
+            pauseMenuManager.PauseGame();
     }
 
     private void Update()
@@ -93,4 +107,19 @@ public class PlayerController : MonoBehaviour
             Debug.Log("[PlayerController] Guardado manual ejecutado");
         }
     }
+
+    // Desactivar interacciones mientras se presente el menú de Pausa
+    public void SetPaused(bool paused)
+{
+    isPaused = paused;
+    if (paused)
+    {
+        movementController.SetMoveInput(Vector2.zero);
+        mouseLook.enabled = false;
+    }
+    else
+    {
+        mouseLook.enabled = true;
+    }
+}
 }
