@@ -39,7 +39,7 @@ public class GameData
             lastSaveTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
             playTimeSeconds = 0,
             playerData = PlayerSaveData.CreateDefault(),
-            currentScene = "TestMechanics",
+            currentScene = "Pablo_TestMechanics",
             inventoryItems = new List<InventorySaveData>(),
             scannedElements = new List<string>(),
             collectedItems = new List<string>(),
