@@ -142,7 +142,7 @@ public class GameManager : MonoBehaviour
 
         // Cargar la primera escena del juego
         //SceneManager.LoadScene(currentGameData.currentScene);
-         SceneManager.LoadScene("Scene1");
+         SceneManager.LoadScene(1);
     }
 
     /// <summary>
