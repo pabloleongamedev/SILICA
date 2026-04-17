@@ -60,6 +60,7 @@ public class PauseMenuManager : MonoBehaviour
     public void GoToMainMenu()
     {
         Time.timeScale = 1f;
+        playerController.SetPaused(false);
         SceneManager.LoadScene("Menu");
     }
 
@@ -74,7 +75,7 @@ public class PauseMenuManager : MonoBehaviour
     {
         optionsPanelUI.SetActive(false);
         pauseMenuUI.transform.Find("Panel").gameObject.SetActive(true);
-        Debug.Log("🔄 Cerrando opciones y regresando al menú de pausa.");
+        ResumeGame();
     }
 
     public void QuitGame()

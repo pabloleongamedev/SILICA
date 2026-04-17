@@ -115,15 +115,13 @@ public class MainMenuManager : MonoBehaviour
     /// <summary>
     /// Carga la escena de juego por nombre (alternativo)
     /// </summary>
-    public void LoadGameScene(string sceneName = "Pablo_TestMechanics")
+    public void LoadGameScene()
     {
-        SceneManager.LoadSceneAsync(sceneName);
-        Debug.Log($"[MainMenuManager] Cargando escena: {sceneName}");
+        SceneManager.LoadSceneAsync(1);
     }
 
-    public void QuitGame()
+    public void ExitGame()
     {
-        Debug.Log("Saliendo del juego...");
         Application.Quit();
     }
 }

@@ -2,26 +2,25 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.Collections;
 
-/// <summary>
-/// GameManager Singleton: Gestiona el estado completo de la partida y auto-guardado.
-/// 
+/// GameManager: Gestiona el estado completo de la partida y auto-guardado.
 /// CARACTERISTICAS:
 /// - Acceso global: GameManager.Instance.SaveGame()
 /// - Auto-guardado periódico durante el juego
 /// - Carga/guardado transparente de datos complejos
 /// - Persiste entre escenas (DontDestroyOnLoad)
-/// 
 /// FLUJO DE USO:
 /// 1. Menú: GameManager.Instance.RefreshSaveStates() → muestra "Continuar" o "Nueva Partida"
 /// 2. Cargar: GameManager.Instance.LoadGame(slotID)
 /// 3. Juego: Auto-save cada X segundos automáticamente
 /// 4. Guardar: GameManager.Instance.SaveGame() manualmente si es necesario
-/// </summary>
+
 public class GameManager : MonoBehaviour
 {
     // ===== SINGLETON =====
     public static GameManager Instance { get; private set; }
 
+    [SerializeField] private GameObject mainMenuPanel;
+    [SerializeField] private GameObject optionsPanel;
     private void Awake()
     {
         // Patrón Singleton con DontDestroyOnLoad para persistencia entre escenas
@@ -84,7 +83,7 @@ public class GameManager : MonoBehaviour
             currentGameData.currentScene = scene.name;
 
             // Si no es el menú, estamos en juego
-            isInGame = (scene.name != "Menu");
+            isInGame = scene.name != "Menu";
 
             if (isInGame)
             {
@@ -194,33 +193,28 @@ public class GameManager : MonoBehaviour
         return saveController.GetSaveInfo(slotID);
     }
 
-    /// <summary>
     /// Obtiene información de todos los guardos (para menú)
-    /// </summary>
+
     public SaveInfo[] GetAllSaveInfos()
     {
         return saveController.GetAllSaveInfos();
     }
 
-    /// <summary>
     /// Recarga datos de guardos desde disco (útil al volver al menú)
-    /// </summary>
+
     public void RefreshSaveStates()
     {
         Debug.Log("[GameManager] Estados de guardos refrescados");
     }
 
-    /// <summary>
     /// Obtiene la partida actualmente cargada
-    /// </summary>
+
     public GameData GetCurrentGameData()
     {
         return currentGameData;
     }
 
-    /// <summary>
     /// Obtiene el ID del slot actual
-    /// </summary>
     public string GetCurrentSlotID()
     {
         return currentSlotID;
@@ -250,9 +244,8 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    /// <summary>
     /// Registra la salud del jugador
-    /// </summary>
+
     public void UpdatePlayerHealth(int health, int maxHealth)
     {
         if (currentGameData != null)
@@ -262,9 +255,8 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    /// <summary>
     /// Agrega un item al inventario guardado
-    /// </summary>
+
     public void AddInventoryItem(string itemID, int gridX, int gridY, int quantity = 1)
     {
         if (currentGameData == null)
@@ -279,9 +271,9 @@ public class GameManager : MonoBehaviour
         });
     }
 
-    /// <summary>
+
     /// Registra un elemento como escaneado
-    /// </summary>
+
     public void RegisterScannedElement(string elementID)
     {
         if (currentGameData != null && !currentGameData.scannedElements.Contains(elementID))
@@ -290,12 +282,8 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    // ===== MÉTODOS PRIVADOS =====
-
-    /// <summary>
     /// Actualiza todos los datos del jugador antes de guardar
     /// (Se llama automáticamente en SaveGame y AutoSave)
-    /// </summary>
     private void UpdatePlayerData()
     {
         if (currentGameData == null)
@@ -321,11 +309,21 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    // ===== DEBUGGING =====
+    public void OpenOptions()
+    {
+        mainMenuPanel.SetActive(false);
+        optionsPanel.SetActive(true);
+    }
+    public void CloseOptions()
+    // Al momento de cerrar (ícono) se vuelve a activar el menú principal
 
-    /// <summary>
+    {
+        optionsPanel.SetActive(false);
+        mainMenuPanel.SetActive(true);
+    }
+
     /// Imprime el estado actual de la partida (para debugging)
-    /// </summary>
+
     public string DebugGetGameState()
     {
         if (currentGameData == null)
