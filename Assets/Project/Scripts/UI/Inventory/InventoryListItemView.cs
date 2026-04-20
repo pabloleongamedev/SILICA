@@ -39,7 +39,7 @@ public class InventoryListItemView : MonoBehaviour,
 
         icon.enabled = true;
         icon.sprite = item.Data.icon;
-        nameText.text = item.Data.displayName;
+        nameText.text = item.Data.itemID;
         amountText.text = item.Quantity > 1 ? $"x{item.Quantity}" : "";
     }
 
@@ -75,5 +75,9 @@ public class InventoryListItemView : MonoBehaviour,
         if (from == null) return;
 
         OnItemDropped?.Invoke(from.index, this.index);
+    }
+    public InventoryItemInstance GetItem()
+    {
+        return currentItem;
     }
 }

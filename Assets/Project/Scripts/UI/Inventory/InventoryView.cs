@@ -6,7 +6,7 @@ public class InventoryView : MonoBehaviour
 {
     [Header("UI")]
     [SerializeField] private InventorySlotView slotPrefab;
-    [SerializeField] private Transform container;
+    [SerializeField] private Transform InventoryPanelContainer;
     [SerializeField] private DescriptionPanelView descriptionPanel;
     [SerializeField] private InventoryDragHandler dragHandler;
 
@@ -27,7 +27,7 @@ public class InventoryView : MonoBehaviour
     {
         for (int i = 0; i < inventory.Capacity; i++)
         {
-            var slot = Instantiate(slotPrefab, container);
+            var slot = Instantiate(slotPrefab, InventoryPanelContainer);
 
             // 🔥 INYECCIÓN
             slot.Initialize(i, dragHandler);
