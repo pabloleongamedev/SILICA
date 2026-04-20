@@ -7,7 +7,7 @@ public class InventoryController : MonoBehaviour
     [Header("View")]
     [SerializeField] private InventoryView inventoryView;
     [SerializeField] private InventoryListView listView;
-    [SerializeField] private UIButtonDropSlot CraftingTarget;
+  
     
 
     private InventorySystem inventorySystem;
@@ -30,7 +30,6 @@ public class InventoryController : MonoBehaviour
 
         // 🔥 CONEXIÓN EVENTO (CLAVE)
         inventoryView.OnItemDropped += MoveItem;
-        CraftingTarget.OnItemDropped += HandleItemUsed;
         
         // 🔥 conectar drag
         listView.OnItemDropped += MoveItem; 
@@ -42,16 +41,6 @@ public class InventoryController : MonoBehaviour
     public int TryAddItem(ItemData_SO data, int amount)
     {
         return inventorySystem.AddItem(data, amount);
-    }
-    private void HandleItemUsed(InventoryItemInstance item)
-    {
-        Debug.Log("Usando item: " + item.Data.displayName);
-
-        // ejemplo:
-        item.Remove(1);
-
-        // 🔥 refrescar UI (si no tienes eventos automáticos)
-        inventorySystem.AddItem(item.Data, 0); 
     }
 
     // =========================

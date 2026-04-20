@@ -1,3 +1,4 @@
+using Microsoft.Unity.VisualStudio.Editor;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -13,6 +14,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private MouseLook mouseLook;
     [SerializeField] private GameObject inventoryPanel;
     [SerializeField] private GameObject inventoryDescription;
+    [SerializeField] private GameObject crosshair;
     private bool isInventoryOpen;
 
     private float lastGameManagerUpdateTime = 0f;
@@ -56,6 +58,7 @@ public class PlayerController : MonoBehaviour
 
         // UI
         inventoryPanel.SetActive(isInventoryOpen);
+        crosshair.SetActive(!isInventoryOpen);
 
         // Cursor
         Cursor.lockState = isInventoryOpen ? CursorLockMode.None : CursorLockMode.Locked;
