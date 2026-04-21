@@ -1,7 +1,8 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-using UnityEngine.EventSystems; // ¡Importante para el foco!
+using UnityEngine.EventSystems;
+using System.Collections; // ¡Importante para el foco!
 
 /// <summary>
 /// MainMenuManager: Gestiona la navegación del menú principal.
@@ -26,6 +27,11 @@ public class MainMenuManager : MonoBehaviour
     [SerializeField] private Button playFirstButton;
     [SerializeField] private Button optionsFirstButton;
     [SerializeField] private Button creditsFirstButton;
+
+    [Header("UI References")]
+    Button playButton;
+    HUDManager hUDManager;
+
 
     void Start()
     {
@@ -124,4 +130,35 @@ public class MainMenuManager : MonoBehaviour
     {
         Application.Quit();
     }
+
+
+    public void LoadGameSceneAndStartTimer()
+    {
+        StartCoroutine(LoadSceneAndStartTimerCoroutine());
+    }
+
+    private IEnumerator LoadSceneAndStartTimerCoroutine()
+    {
+        // Cambia "1" por el índice o nombre de tu escena de juego si es distinto
+        AsyncOperation op = SceneManager.LoadSceneAsync(1);
+        // Esperar hasta que la escena termine de cargar
+        while (!op.isDone)
+            yield return null;
+
+        // Esperar un frame para asegurarnos de que Awake/Start de los objetos de la escena ya corrieron
+        yield return null;
+
+        // Buscar el HUDManager en la escena cargada y arrancar el timer
+        // HUDManager hud = FindFirstObjectByType<HUDManager>();
+        // if (hud != null && hud.missionTimer != null)
+        // {
+        //     hud.StartMission();
+        //     Debug.Log("[MainMenuManager] HUDManager encontrado y MissionTimer iniciado.");
+        // }
+        // else
+        // {
+        //     Debug.LogWarning("[MainMenuManager] No se encontró HUDManager o MissionTimer en la escena cargada.");
+        // }
+    }
+
 }

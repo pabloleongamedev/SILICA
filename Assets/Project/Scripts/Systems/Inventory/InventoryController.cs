@@ -8,7 +8,15 @@ public class InventoryController : MonoBehaviour
 
     private void Awake()
     {
-        inventory = new InventorySystem(config.width, config.height);
+        if (config == null)
+        {
+            Debug.LogWarning("[InventoryController] No config assigned, using default 5x5 inventory");
+            inventory = new InventorySystem(5, 5);
+        }
+        else
+        {
+            inventory = new InventorySystem(config.width, config.height);
+        }
     }
 
     public bool TryAddItem(ItemData_SO itemData)
