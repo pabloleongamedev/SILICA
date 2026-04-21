@@ -83,6 +83,61 @@ public class InventorySystem : IInventoryWriteModel
         return (x, y);
     }
 
+    public int GetAmount(ItemData_SO item)
+    {
+        int total = 0;
+
+        for (int y = 0; y < grid.Height; y++)
+        {
+            for (int x = 0; x < grid.Width; x++)
+            {
+                var slot = GetSlot(x, y); // 👈 TU método real
+
+                if (slot.IsEmpty)
+                    continue;
+
+                if (slot.Item.Data.itemID == item.itemID)
+                {
+                    total += slot.Item.Quantity;
+                }
+            }
+        }
+
+        return total;
+    }
+    public void RemoveItem(ItemData_SO item, int amount)
+    {
+        int remaining = amount;
+
+        for (int y = 0; y < grid.Height; y++)
+        {
+            for (int x = 0; x < grid.Width; x++)
+            {
+                if (remaining <= 0)
+                    return;
+
+                var slot = GetSlot(x, y);
+
+                if (slot.IsEmpty)
+                    continue;
+
+                if (slot.Item.Data.itemID != item.itemID)
+                    continue;
+
+                int removed = slot.Item.Remove(remaining);
+                remaining -= removed;
+
+                // 🔥 NOTIFICAR CAMBIO (CLAVE)
+                NotifySlotChanged(x, y, slot.Item);
+
+                // 🔥 si quedó vacío, notifícalo como null
+                if (slot.Item.IsEmpty())
+                {
+                    NotifySlotChanged(x, y, null);
+                }
+            }
+        }
+    }
     // =========================
     // EVENT BRIDGE
     // =========================

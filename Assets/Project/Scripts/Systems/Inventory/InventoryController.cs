@@ -4,9 +4,11 @@ public class InventoryController : MonoBehaviour
 {
     [Header("Config")]
     [SerializeField] private InventoryConfig_SO config;
-
     [Header("View")]
     [SerializeField] private InventoryView inventoryView;
+    [SerializeField] private InventoryListView listView;
+  
+    
 
     private InventorySystem inventorySystem;
     private InventoryGrid grid;
@@ -24,9 +26,13 @@ public class InventoryController : MonoBehaviour
 
         // 🔥 INICIALIZACIÓN
         inventoryView.Initialize(inventorySystem.ReadModel);
+        listView.Initialize(inventorySystem.ReadModel); 
 
         // 🔥 CONEXIÓN EVENTO (CLAVE)
         inventoryView.OnItemDropped += MoveItem;
+        
+        // 🔥 conectar drag
+        listView.OnItemDropped += MoveItem; 
     }
 
     // =========================
@@ -36,7 +42,7 @@ public class InventoryController : MonoBehaviour
     {
         return inventorySystem.AddItem(data, amount);
     }
-    
+
     // =========================
     // MOVE / MERGE
     // =========================
