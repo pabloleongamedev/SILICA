@@ -1,33 +1,32 @@
 using UnityEngine;
 
 [RequireComponent(typeof(Collider))]
-public class ItemPickup : MonoBehaviour
+public class ItemPickup : MonoBehaviour, IInteractable
 {
     [SerializeField] private ItemData_SO itemData;
     [SerializeField] private int amount;
 
-    private void Reset()
+    private InventorySystem inventory;
+
+        public void Init(InventorySystem inv)
     {
-        GetComponent<Collider>().isTrigger = true;
+        inventory = inv;
     }
 
-    private void OnTriggerEnter(Collider other)
+    public void Interact()
     {
-        var controller = other.GetComponent<InventoryController>();
-
-        if (controller == null)
+        if (inventory == null)
+        {
+            Debug.LogError("Inventory NULL en WorldItem");
             return;
-
-        int remaining = controller.TryAddItem(itemData, amount);
-
-        if (remaining <= 0)
-        {
-            Destroy(gameObject);
         }
-        else
-        {
-            amount = remaining;
-            Debug.Log("Inventario lleno parcialmente, quedan: " + remaining);
-        }
+
+        inventory.AddItem(itemData, amount);
+        Destroy(gameObject);
+    }
+
+    public string GetInteractionText()
+    {
+        return $"Presiona E para recoger {itemData.itemID}";
     }
 }
