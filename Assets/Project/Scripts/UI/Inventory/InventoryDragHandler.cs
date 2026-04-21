@@ -31,5 +31,4 @@ public class InventoryDragHandler : MonoBehaviour
     {
         ghostIcon.gameObject.SetActive(false);
     }
-    
 }

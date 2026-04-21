@@ -23,7 +23,6 @@ public class MovementController : MonoBehaviour
     private bool isJumpDown;
     private bool isSprinting;
     private float groundedTimer;
-    private bool inputEnabled = true;
 
     // fuerzas externas (abilities)
     private float externalVerticalForce;
@@ -71,11 +70,6 @@ public class MovementController : MonoBehaviour
         jetpackAbility.SetActive(isActive);
     }
 
-    public void SetInputEnabled(bool value)
-    {
-        inputEnabled = value;
-    }
-
     private void FixedUpdate()
     {
         CheckGround();
@@ -106,14 +100,6 @@ public class MovementController : MonoBehaviour
         // reset fuerzas externas
         externalVerticalForce = 0f;
         externalHorizontalForce = Vector3.zero;
-    }
-    void Update()
-    {
-        if (!inputEnabled)
-        {
-            rb.linearVelocity = new Vector3(0, rb.linearVelocity.y, 0);
-            return;
-        }
     }
 
     private void CheckGround()

@@ -1,111 +1,86 @@
 using System;
 
-public class InventorySystem : IInventoryWriteModel
+public class InventorySystem
 {
     private InventoryGrid grid;
-    private InventoryOperations operations;
 
-    private GridInventoryAdapter adapter;
+    public event Action<InventoryItemInstance> OnItemAdded;
+    public event Action OnInventoryChanged;
+    public event Action OnInventoryFull;
 
-    public IInventoryReadModel ReadModel { get; private set; }
-
-    public InventorySystem(InventoryConfig_SO config, InventoryGrid grid)
+    public InventorySystem(int width, int height)
     {
-        this.grid = grid;
-
-        operations = new InventoryOperations(grid);
-
-        adapter = new GridInventoryAdapter(grid);
-        ReadModel = adapter;
+        grid = new InventoryGrid(width, height);
     }
 
-    // =========================
-    // ADD (RETURN REMAINING)
-    // =========================
-    public int AddItem(ItemData_SO data, int amount)
+    public bool AddItem(ItemData_SO itemData)
     {
-        return operations.AddItem(data, amount, NotifySlotChanged);
-    }
+        int remaining = itemData.cantidad;
 
-    // =========================
-    // MOVE BY INDEX (UI ENTRY POINT)
-    // =========================
-    public void MoveItem(int fromIndex, int toIndex)
-    {
-        var from = IndexToGrid(fromIndex);
-        var to = IndexToGrid(toIndex);
+        // 🔥 1. intentar stackear primero
+        remaining = TryStackItem(itemData, remaining);
 
-        var fromSlot = GetSlot(from.x, from.y);
-        var toSlot = GetSlot(to.x, to.y);
-
-        if (fromSlot.IsEmpty)
-            return;
-
-        // MERGE si mismo item
-        if (!toSlot.IsEmpty && fromSlot.Item.Data.itemID == toSlot.Item.Data.itemID)
+        // 🔥 2. crear nuevos stacks si sobra
+        while (remaining > 0)
         {
-            MergeItem(from.x, from.y, to.x, to.y);
+            if (!grid.TryFindFirstEmptySlot(out int x, out int y))
+            {
+                OnInventoryFull?.Invoke();
+                return false;
+            }
+
+            var instance = new InventoryItemInstance(itemData);
+
+            int added = instance.Add(remaining);
+            remaining -= added;
+
+            grid.SetItem(x, y, instance);
+
+            OnItemAdded?.Invoke(instance);
         }
-        else
-        {
-            MoveItem(from.x, from.y, to.x, to.y);
-        }
+
+        OnInventoryChanged?.Invoke();
+        return true;
     }
 
-    // =========================
-    // MOVE (GRID)
-    // =========================
-    public void MoveItem(int fromX, int fromY, int toX, int toY)
+    private bool TryAddInstance(InventoryItemInstance item)
     {
-        operations.Move(fromX, fromY, toX, toY, NotifySlotChanged);
+        if (!grid.TryFindFirstEmptySlot(out int x, out int y))
+            return false;
+
+        grid.SetItem(x, y, item);
+        return true;
     }
 
-    // =========================
-    // MERGE (GRID)
-    // =========================
-    public void MergeItem(int fromX, int fromY, int toX, int toY)
+    public InventoryGrid GetGrid()
     {
-        operations.Merge(fromX, fromY, toX, toY, NotifySlotChanged);
+        return grid;
     }
 
-    // =========================
-    // ACCESS
-    // =========================
-    public InventorySlot GetSlot(int x, int y)
+    public string GetDebugView()
     {
-        return grid.GetSlot(x, y);
-    }
+        var sb = new System.Text.StringBuilder();
 
-    public (int x, int y) IndexToGrid(int index)
-    {
-        int x = index % grid.Width;
-        int y = index / grid.Width;
-        return (x, y);
-    }
+        sb.AppendLine("=== INVENTORY ===");
 
-    public int GetAmount(ItemData_SO item)
-    {
-        int total = 0;
-
-        for (int y = 0; y < grid.Height; y++)
+        for (int y = grid.Height - 1; y >= 0; y--)
         {
             for (int x = 0; x < grid.Width; x++)
             {
-                var slot = GetSlot(x, y); // 👈 TU método real
+                var slot = grid.GetSlot(x, y);
 
                 if (slot.IsEmpty)
-                    continue;
-
-                if (slot.Item.Data.itemID == item.itemID)
-                {
-                    total += slot.Item.Quantity;
-                }
+                    sb.Append("[ EMPTY ]");
+                else
+                    sb.Append($"[ {slot.Item.Data.displayName} ]");
             }
+
+            sb.AppendLine();
         }
 
-        return total;
+        return sb.ToString();
     }
-    public void RemoveItem(ItemData_SO item, int amount)
+    private int TryStackItem(ItemData_SO data, int amount)
     {
         int remaining = amount;
 
@@ -113,36 +88,103 @@ public class InventorySystem : IInventoryWriteModel
         {
             for (int x = 0; x < grid.Width; x++)
             {
-                if (remaining <= 0)
-                    return;
-
-                var slot = GetSlot(x, y);
+                var slot = grid.GetSlot(x, y);
 
                 if (slot.IsEmpty)
                     continue;
 
-                if (slot.Item.Data.itemID != item.itemID)
+                var item = slot.Item;
+
+                // mismo tipo + stackable
+                if (item.Data != data || item.IsFull())
                     continue;
 
-                int removed = slot.Item.Remove(remaining);
-                remaining -= removed;
+                int added = item.Add(remaining);
+                remaining -= added;
 
-                // 🔥 NOTIFICAR CAMBIO (CLAVE)
-                NotifySlotChanged(x, y, slot.Item);
-
-                // 🔥 si quedó vacío, notifícalo como null
-                if (slot.Item.IsEmpty())
-                {
-                    NotifySlotChanged(x, y, null);
-                }
+                if (remaining <= 0)
+                    return 0;
             }
         }
+
+        return remaining;
     }
-    // =========================
-    // EVENT BRIDGE
-    // =========================
-    private void NotifySlotChanged(int x, int y, InventoryItemInstance item)
+    public InventoryItemInstance SplitItem(int x, int y, int amount)
     {
-        adapter.NotifySlotChanged(x, y, item);
+        var slot = grid.GetSlot(x, y);
+
+        if (slot.IsEmpty)
+            return null;
+
+        var item = slot.Item;
+
+        if (amount >= item.Quantity)
+            return null;
+
+        item.Remove(amount);
+
+        var newInstance = new InventoryItemInstance(item.Data);
+        newInstance.Add(amount);
+
+        OnInventoryChanged?.Invoke();
+
+        return newInstance;
     }
+    public bool MergeItems(int fromX, int fromY, int toX, int toY)
+    {
+        var fromSlot = grid.GetSlot(fromX, fromY);
+        var toSlot = grid.GetSlot(toX, toY);
+
+        if (fromSlot.IsEmpty || toSlot.IsEmpty)
+            return false;
+
+        var fromItem = fromSlot.Item;
+        var toItem = toSlot.Item;
+
+        if (fromItem.Data != toItem.Data)
+            return false;
+
+        int added = toItem.Add(fromItem.Quantity);
+        fromItem.Remove(added);
+
+        if (fromItem.IsEmpty())
+            fromSlot.Clear();
+
+        OnInventoryChanged?.Invoke();
+
+        return true;
+    }
+    public bool MoveItem(int fromX, int fromY, int toX, int toY)
+    {
+        var fromSlot = grid.GetSlot(fromX, fromY);
+        var toSlot = grid.GetSlot(toX, toY);
+
+        if (fromSlot.IsEmpty)
+            return false;
+
+        // si destino vacío → mover directo
+        if (toSlot.IsEmpty)
+        {
+            toSlot.SetItem(fromSlot.Item);
+            fromSlot.Clear();
+
+            OnInventoryChanged?.Invoke();
+            return true;
+        }
+
+        // si mismo tipo → merge
+        if (fromSlot.Item.Data == toSlot.Item.Data)
+        {
+            return MergeItems(fromX, fromY, toX, toY);
+        }
+
+        // swap
+        var temp = toSlot.Item;
+        toSlot.SetItem(fromSlot.Item);
+        fromSlot.SetItem(temp);
+
+        OnInventoryChanged?.Invoke();
+        return true;
+    }
+
 }
