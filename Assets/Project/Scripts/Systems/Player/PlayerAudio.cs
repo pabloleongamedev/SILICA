@@ -5,11 +5,17 @@ public class PlayerAudio : MonoBehaviour
 {
     [Header("Input Action")]
     public InputActionReference walkAction;
+    public InputActionReference runAction;
     private bool isWalkingSoundPlaying = false;
     private bool isGrounded = false; // This should be set based on your player's grounded state
     private void OnEnable()
     {
         walkAction.action.Enable();
+        if (runAction != null)
+        {
+            runAction.action.Enable();
+        }
+
     }
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -21,6 +27,7 @@ public class PlayerAudio : MonoBehaviour
     void Update()
     {
         float inputMovement = walkAction.action.ReadValue<Vector2>().magnitude;
+        bool isRunning = runAction.action.IsPressed();
         if (inputMovement > 0.1f && isGrounded)
         {
             if (!isWalkingSoundPlaying)
@@ -28,6 +35,8 @@ public class PlayerAudio : MonoBehaviour
                 AudioManager.Instance.Play("Playerwalksound");
                 isWalkingSoundPlaying=true;
             }
+        float targetPitch = isRunning ? 1.5f : 1f; // Adjust pitch for running
+        AudioManager.Instance.ChangePitch("Playerwalksound", targetPitch);
         }
         else
         {
@@ -51,4 +60,5 @@ public class PlayerAudio : MonoBehaviour
             isGrounded = false;
         }
     }
+
 }

@@ -63,4 +63,19 @@ public class AudioManager : MonoBehaviour
     {
         
     }
+    public void ChangePitch(string name, float pitch)
+    {
+        // Buscamos el sonido en la lista
+        Sound s = System.Array.Find(sounds, sound => sound.name == name);
+
+        if (s != null)
+        {
+            // Cambiamos el pitch del AudioSource que se creó en Awake
+            s.source.pitch = pitch;
+        }
+        else
+        {
+            Debug.LogWarning("AudioManager: No se pudo cambiar el pitch. Sonido no encontrado: " + name);
+        }
+    }
 }
