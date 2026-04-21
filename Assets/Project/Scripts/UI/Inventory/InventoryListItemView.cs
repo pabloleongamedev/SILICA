@@ -80,4 +80,9 @@ public class InventoryListItemView : MonoBehaviour,
     {
         return currentItem;
     }
+    public ItemData_SO GetItemData()
+    {
+        return currentItem != null ? currentItem.Data : null;
+    }
+    
 }

@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 public class InventoryGrid
 {
     private InventorySlot[,] grid;
@@ -50,4 +52,16 @@ public class InventoryGrid
     {
         return grid[x, y];
     }
+
+    public IEnumerable<InventorySlot> GetAllSlots()
+    {
+        for (int x = 0; x < Width; x++)
+        {
+            for (int y = 0; y < Height; y++)
+            {
+                yield return grid[x, y];
+            }
+        }
+    }
+
 }
