@@ -54,14 +54,18 @@ public class ScannerTrigger : MonoBehaviour
         if (PivotScan != null)
         {
             PivotScan.SetActive(true);
+            if (AudioManager.Instance != null)
+            {
+            AudioManager.Instance.Play("Scannersound");
+            }
             if (animator != null)
             {
                 animator.SetTrigger("StartScan");
             }
-            if (audioScanner != null)
-            {
-                audioScanner.Play();
-            }
+            //if (audioScanner != null)
+            //{
+            //    audioScanner.Play();
+            //}
 
         }
     }
@@ -72,6 +76,7 @@ public class ScannerTrigger : MonoBehaviour
         if (PivotScan != null)
         {
             PivotScan.SetActive(false);
+            AudioManager.Instance.Stop("Scannersound");
             if (animator != null)
             {
                 animator.ResetTrigger("StartScan");
