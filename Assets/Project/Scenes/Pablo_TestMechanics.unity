@@ -5663,6 +5663,22 @@ PrefabInstance:
       propertyPath: m_Name
       value: Items
       objectReference: {fileID: 0}
+    - target: {fileID: 266288236113729947, guid: abdee2fc88fec42488cd960532571dd4, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 2216967917003186833, guid: abdee2fc88fec42488cd960532571dd4, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 2824582496101187935, guid: abdee2fc88fec42488cd960532571dd4, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 4600925085957328286, guid: abdee2fc88fec42488cd960532571dd4, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: 5566752254829550970, guid: abdee2fc88fec42488cd960532571dd4, type: 3}
       propertyPath: m_LocalPosition.x
       value: 5
@@ -5702,6 +5718,18 @@ PrefabInstance:
     - target: {fileID: 5566752254829550970, guid: abdee2fc88fec42488cd960532571dd4, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5765777215681709417, guid: abdee2fc88fec42488cd960532571dd4, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 8149142113827196157, guid: abdee2fc88fec42488cd960532571dd4, type: 3}
+      propertyPath: m_IsTrigger
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8733136262742901142, guid: abdee2fc88fec42488cd960532571dd4, type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -7268,6 +7296,9 @@ GameObject:
   - component: {fileID: 7101781391045669552}
   - component: {fileID: 5277804911627652343}
   - component: {fileID: 8997971179566431273}
+  - component: {fileID: 8997971179566431275}
+  - component: {fileID: 8997971179566431274}
+  - component: {fileID: 8997971179566431276}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -9107,6 +9138,52 @@ MonoBehaviour:
   config: {fileID: 11400000, guid: 53d14ad7068ba3f4c974cf53c546b232, type: 2}
   inventoryView: {fileID: 9048766904311634866}
   listView: {fileID: 492744137}
+--- !u!114 &8997971179566431274
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2515014903725646224}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d97074985275f446aebf53edff5ca2c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::InteractionDetector
+--- !u!114 &8997971179566431275
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2515014903725646224}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aeb98a98c00f624458ae51c679918fdd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::InteractionController
+  detector: {fileID: 8997971179566431274}
+--- !u!135 &8997971179566431276
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2515014903725646224}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 1
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &9048766904311634866
 MonoBehaviour:
   m_ObjectHideFlags: 0
