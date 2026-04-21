@@ -27,31 +27,6 @@ public class ItemPickup : MonoBehaviour, IInteractable
 
     public string GetInteractionText()
     {
-        return $"Presiona E para recoger {itemData.name}";
-    }
-
-    private void Reset()
-    {
-        GetComponent<Collider>().isTrigger = true;
-    }
-
-    private void OnTriggerEnter(Collider other)
-    {
-        var controller = other.GetComponent<InventoryController>();
-
-        if (controller == null)
-            return;
-
-        int remaining = controller.TryAddItem(itemData, amount);
-
-        if (remaining <= 0)
-        {
-            Destroy(gameObject);
-        }
-        else
-        {
-            amount = remaining;
-            Debug.Log("Inventario lleno parcialmente, quedan: " + remaining);
-        }
+        return $"Presiona E para recoger {itemData.itemID}";
     }
 }

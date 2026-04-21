@@ -9,12 +9,6 @@ public class InteractionDetector : MonoBehaviour
 
     private void Update()
     {
-        UpdateCurrent();
-    }
-
-    private void UpdateCurrent()
-    {
-        // simple: toma el último (puedes mejorar esto luego por distancia)
         if (interactables.Count > 0)
         {
             CurrentInteractable = interactables[interactables.Count - 1];
@@ -23,25 +17,37 @@ public class InteractionDetector : MonoBehaviour
         {
             CurrentInteractable = null;
         }
+
+        Debug.Log("Current: " + CurrentInteractable);
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        var interactable = other.GetComponent<IInteractable>();
+        Debug.Log("Entró en trigger: " + other.name);
+
+        var interactable = other.GetComponentInParent<IInteractable>();
 
         if (interactable != null)
         {
-            interactables.Add(interactable);
+            if (!interactables.Contains(interactable))
+            {
+                interactables.Add(interactable);
+                Debug.Log("Interactuable agregado");
+            }
         }
     }
 
     private void OnTriggerExit(Collider other)
     {
-        var interactable = other.GetComponent<IInteractable>();
+        var interactable = other.GetComponentInParent<IInteractable>();
 
         if (interactable != null)
         {
-            interactables.Remove(interactable);
+            if (interactables.Contains(interactable))
+            {
+                interactables.Remove(interactable);
+                Debug.Log("Interactuable removido");
+            }
         }
     }
 }

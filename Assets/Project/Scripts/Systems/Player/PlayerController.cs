@@ -11,6 +11,8 @@ public class PlayerController : MonoBehaviour
 {
     private MovementController movementController;
     private InputSystem_Actions inputActions;
+    private InteractionDetector interactionDetector;
+
     [SerializeField] private MouseLook mouseLook;
     [SerializeField] private GameObject inventoryPanel;
     [SerializeField] private GameObject inventoryDescription;
@@ -25,6 +27,7 @@ public class PlayerController : MonoBehaviour
         movementController = GetComponent<MovementController>();
         mouseLook = GetComponentInChildren<MouseLook>();
         inputActions = new InputSystem_Actions();
+        interactionDetector = GetComponentInChildren<InteractionDetector>();
         
         // No resetear la posición del jugador - dejar que GameRestorer la restaure
         // si es una partida cargada
@@ -48,6 +51,8 @@ public class PlayerController : MonoBehaviour
 
         inputActions.Player.Look.performed += OnLook;
         inputActions.Player.Look.canceled += OnLook;
+
+        inputActions.Player.Interact.performed += OnInteract;
 
         Cursor.visible = false;
         
@@ -89,6 +94,22 @@ public class PlayerController : MonoBehaviour
                 GameManager.Instance.UpdatePlayerRotation(transform.rotation);
                 lastGameManagerUpdateTime = 0f;
             }
+        }
+    }
+    private void OnInteract(InputAction.CallbackContext ctx)
+    {
+        if (interactionDetector == null)
+        {
+            Debug.LogError("InteractionDetector NULL");
+            return;
+        }
+
+        var interactable = interactionDetector.CurrentInteractable;
+
+        if (interactable != null)
+        {
+            Debug.Log("INTERACTUANDO CON: " + interactable);
+            interactable.Interact();
         }
     }
 
