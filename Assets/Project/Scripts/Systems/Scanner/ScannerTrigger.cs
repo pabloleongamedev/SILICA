@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using TMPro;
 
 public class ScannerTrigger : MonoBehaviour
 {
@@ -9,12 +10,17 @@ public class ScannerTrigger : MonoBehaviour
     public GameObject PivotScan;
     public AudioSource audioScanner;
     private Animator animator;
+    [Header("Interfaz de usuario")]
+    public GameObject canvasName;
+    public TextMeshProUGUI elementNameText;
+    public GameObject objectActual;
     private void Awake()
     {
         if (PivotScan != null)
         {
         animator = PivotScan.GetComponent<Animator>();
         PivotScan.SetActive(false);
+
         }
         scanAction.action.performed += ctx => ToogleScanning();
     }
@@ -56,6 +62,7 @@ public class ScannerTrigger : MonoBehaviour
             {
                 audioScanner.Play();
             }
+
         }
     }
 
@@ -75,14 +82,26 @@ public class ScannerTrigger : MonoBehaviour
             }
         }
     }
+    public void captureElementInfo(GameObject element)
+    {
+        string nameScaned = element.name;
+        Debug.Log("Element scanned: " + nameScaned);
+        //if (canvasName != null && elementNameText !=null)
+        //{
+        //    elementNameText.text = element.name;
+            
+        //}
+    }
     public void OnTriggerEnter(Collider other)
     {
         
         if (other.CompareTag("Element"))
         {
+            objectActual = other.gameObject;
             string elementName = other.gameObject.name;
             Debug.Log("{elementName}" + elementName);
             Debug.Log(other.gameObject.name);
+  
             //ScannerSystem.Instance.StartScanning();
         }
     }
