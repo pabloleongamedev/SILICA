@@ -6,7 +6,9 @@ public class PlayerAudio : MonoBehaviour
     [Header("Input Action")]
     public InputActionReference walkAction;
     public InputActionReference runAction;
+    public InputActionReference jetPackAction;
     private bool isWalkingSoundPlaying = false;
+    private bool isJetpackSoundPlaying = false;
     private bool isGrounded = false; // This should be set based on your player's grounded state
     private void OnEnable()
     {
@@ -15,7 +17,11 @@ public class PlayerAudio : MonoBehaviour
         {
             runAction.action.Enable();
         }
-
+        if (jetPackAction != null)
+        {
+            jetPackAction.action.Enable();
+        }
+        
     }
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -28,6 +34,7 @@ public class PlayerAudio : MonoBehaviour
     {
         float inputMovement = walkAction.action.ReadValue<Vector2>().magnitude;
         bool isRunning = runAction.action.IsPressed();
+        bool isJetPackActive = jetPackAction.action.IsPressed();
         if (inputMovement > 0.1f && isGrounded)
         {
             if (!isWalkingSoundPlaying)
@@ -46,6 +53,21 @@ public class PlayerAudio : MonoBehaviour
                 isWalkingSoundPlaying = false;
             }
         }
+        if (isJetPackActive)
+        {
+            if (!isJetpackSoundPlaying)
+            {
+                AudioManager.Instance.Play("Playerjetpacksound");
+                isJetpackSoundPlaying=true;
+            }
+        }else
+        {
+            if (isJetpackSoundPlaying)
+            {
+                AudioManager.Instance.Stop("Playerjetpacksound");
+                isJetpackSoundPlaying = false;
+            }
+        }
     }
     private void OnCollisionStay(Collision collision) {
         if (collision.gameObject.CompareTag("Ground"))
@@ -60,5 +82,14 @@ public class PlayerAudio : MonoBehaviour
             isGrounded = false;
         }
     }
-
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("Ground"))
+        {
+            AudioManager.Instance.Play("Playerjumpsound");
+            isGrounded = true;
+        }
+    }
+    
 }
+
