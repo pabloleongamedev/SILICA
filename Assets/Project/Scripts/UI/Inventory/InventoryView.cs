@@ -1,110 +1,68 @@
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class InventoryView : MonoBehaviour
 {
-    [Header("References")]
-    [SerializeField] private InventoryController inventoryController;
+    [Header("UI")]
     [SerializeField] private InventorySlotView slotPrefab;
-    [SerializeField] private Transform gridParent;
-    [SerializeField] private InventoryDragHandler dragHandler;
+    [SerializeField] private Transform InventoryPanelContainer;
     [SerializeField] private DescriptionPanelView descriptionPanel;
-    
+    [SerializeField] private InventoryDragHandler dragHandler;
 
+    private IInventoryReadModel inventory;
+    private List<InventorySlotView> slotViews = new List<InventorySlotView>();
 
-    private InventorySystem inventory;
-    private InventorySlotView[,] slotViews;
-    private Vector2Int? dragStartSlot;
+    public Action<int, int> OnItemDropped;
 
-    private void Start()
+    public void Initialize(IInventoryReadModel inventory)
     {
-        inventory = inventoryController.GetInventory();
+        this.inventory = inventory;
 
-        BuildGrid();
-        Refresh();
-
-        inventory.OnInventoryChanged += Refresh;
-        //ClearItemInfo();
+        Build();
+        inventory.OnItemChanged += UpdateSlot;
     }
 
-    private void BuildGrid()
+    private void Build()
     {
-        var grid = inventory.GetGrid();
-
-        slotViews = new InventorySlotView[grid.Width, grid.Height];
-
-        for (int y = 0; y < grid.Height; y++)
+        for (int i = 0; i < inventory.Capacity; i++)
         {
-            for (int x = 0; x < grid.Width; x++)
-            {
-                var view = Instantiate(slotPrefab, gridParent);
-                view.Init(this, x, y);
+            var slot = Instantiate(slotPrefab, InventoryPanelContainer);
 
-                slotViews[x, y] = view;
-            }
+            // 🔥 INYECCIÓN
+            slot.Initialize(i, dragHandler);
+
+            slot.OnSlotClicked += HandleSlotClicked;
+            slot.OnItemDropped += HandleItemDropped;
+
+            slotViews.Add(slot);
+
+            var item = inventory.GetItem(i);
+            slot.SetItem(item, item != null ? item.Quantity : 0);
         }
     }
 
-    public void Refresh()
+    private void UpdateSlot(int index, InventoryItemInstance item)
     {
-        var grid = inventory.GetGrid();
-
-        for (int y = 0; y < grid.Height; y++)
-        {
-            for (int x = 0; x < grid.Width; x++)
-            {
-                var slot = grid.GetSlot(x, y);
-                slotViews[x, y].UpdateView(slot);
-            }
-        }
-    }
-
-    // 🔥 API para interacción
-    public void OnSlotClicked(int x, int y)
-    {
-        Debug.Log($"Click slot {x},{y}");
-    }
-
-    public InventorySystem GetInventory()
-    {
-        return inventory;
-    }
-    public void OnItemDropped(int fromX, int fromY, int toX, int toY)
-    {
-        inventory.MoveItem(fromX, fromY, toX, toY);
-    }
-    public void StartDrag(int x, int y, Sprite icon)
-    {
-        dragStartSlot = new Vector2Int(x, y);
-        dragHandler.StartDrag(icon);
-    }
-    public void UpdateDrag(Vector2 position)
-    {
-        dragHandler.UpdateDrag(position);
-    }
-    public void EndDrag()
-    {
-        dragStartSlot = null;
-        dragHandler.EndDrag();
-    }
-    public void OnDrop(int toX, int toY)
-    {
-        if (dragStartSlot == null)
+        if (index < 0 || index >= slotViews.Count)
             return;
 
-        var from = dragStartSlot.Value;
-
-        inventory.MoveItem(from.x, from.y, toX, toY);
-
-        dragStartSlot = null;
+        slotViews[index].SetItem(item, item != null ? item.Quantity : 0);
     }
-    public bool IsDragging()
-    {
-        return dragStartSlot != null;
-    }
-    public void OnSlotSelected(int x, int y)
-    {
-        var slot = inventory.GetGrid().GetSlot(x, y);
 
-        descriptionPanel.Show(slot);
+    private void HandleSlotClicked(InventoryItemInstance item)
+    {
+        if (descriptionPanel == null)
+        {
+            Debug.LogError("DescriptionPanel not assigned");
+            return;
+        }
+
+        descriptionPanel.Show(item);
+    }
+
+    private void HandleItemDropped(int fromIndex, int toIndex)
+    {
+        OnItemDropped?.Invoke(fromIndex, toIndex);
     }
 }

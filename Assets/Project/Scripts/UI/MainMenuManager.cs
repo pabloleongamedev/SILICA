@@ -115,7 +115,7 @@ public class MainMenuManager : MonoBehaviour
     /// <summary>
     /// Carga la escena de juego por nombre (alternativo)
     /// </summary>
-    public void LoadGameScene(string sceneName = "Pablo_TestMechanics")
+    public void LoadGameScene(string sceneName = "Scene1")
     {
         SceneManager.LoadSceneAsync(sceneName);
         Debug.Log($"[MainMenuManager] Cargando escena: {sceneName}");

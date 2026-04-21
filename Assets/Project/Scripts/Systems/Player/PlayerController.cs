@@ -1,3 +1,4 @@
+using Microsoft.Unity.VisualStudio.Editor;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -13,6 +14,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private MouseLook mouseLook;
     [SerializeField] private GameObject inventoryPanel;
     [SerializeField] private GameObject inventoryDescription;
+    [SerializeField] private GameObject crosshair;
     private bool isInventoryOpen;
 
     private float lastGameManagerUpdateTime = 0f;
@@ -46,16 +48,32 @@ public class PlayerController : MonoBehaviour
 
         inputActions.Player.Look.performed += OnLook;
         inputActions.Player.Look.canceled += OnLook;
+
+        Cursor.visible = false;
+        
     }
     private void ToggleInventory()
     {
         isInventoryOpen = !isInventoryOpen;
 
+        // UI
         inventoryPanel.SetActive(isInventoryOpen);
-        //inventoryDescription.SetActive(true);
+        crosshair.SetActive(!isInventoryOpen);
 
+        // Cursor
         Cursor.lockState = isInventoryOpen ? CursorLockMode.None : CursorLockMode.Locked;
         Cursor.visible = isInventoryOpen;
+
+        // Pausa del juego
+        Time.timeScale = isInventoryOpen ? 0f : 1f;
+
+        // Bloquear cámara
+        if (mouseLook != null)
+            mouseLook.enabled = !isInventoryOpen;
+
+        // Bloquear movimiento
+        if (movementController != null)
+            movementController.SetInputEnabled(!isInventoryOpen);
     }
 
     private void Update()
