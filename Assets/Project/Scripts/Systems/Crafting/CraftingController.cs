@@ -25,7 +25,7 @@ public class CraftingController : MonoBehaviour
             return;
         }
 
-        inventorySystem = inventoryController.GetInventorySystem();
+        inventorySystem = inventoryController.GetInventory();
 
         if (inventorySystem == null)
         {
