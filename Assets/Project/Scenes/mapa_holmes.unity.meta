@@ -1,5 +1,9 @@
 fileFormatVersion: 2
+<<<<<<< HEAD
 guid: c7d763c95ce6f7349ab0e12bb80c92c9
+=======
+guid: e72974f4c1210d64f99c88c45862d21f
+>>>>>>> 7ca46c4 (restore scripts interaction system)
 DefaultImporter:
   externalObjects: {}
   userData: 

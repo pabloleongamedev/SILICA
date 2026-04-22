@@ -141,7 +141,12 @@ public class GameManager : MonoBehaviour
         Debug.Log($"[GameManager] Posición inicial: {currentGameData.playerData.GetPosition()}");
 
         // Cargar la primera escena del juego
+<<<<<<< HEAD
         SceneManager.LoadScene(currentGameData.currentScene);
+=======
+        //SceneManager.LoadScene(currentGameData.currentScene);
+         SceneManager.LoadScene(1);
+>>>>>>> 7ca46c4 (restore scripts interaction system)
     }
 
     /// <summary>

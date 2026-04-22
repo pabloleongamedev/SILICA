@@ -62,7 +62,11 @@ public class GameRestorer : MonoBehaviour
             yield return new WaitForSeconds(0.05f);
             
             // Segunda restauración (por si algo la cambió)
+<<<<<<< HEAD
             RestorePositionAndRotation(playerTransform);
+=======
+           // RestorePositionAndRotation(playerTransform);
+>>>>>>> 7ca46c4 (restore scripts interaction system)
             
             Debug.Log($"[GameRestorer] ✓ Posición final: {playerTransform.position}");
             Debug.Log($"[GameRestorer] ✓ Rotación final: {playerTransform.eulerAngles}");

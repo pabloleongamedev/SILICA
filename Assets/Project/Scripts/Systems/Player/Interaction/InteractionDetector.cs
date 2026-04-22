@@ -9,6 +9,12 @@ public class InteractionDetector : MonoBehaviour
 
     private void Update()
     {
+<<<<<<< HEAD
+=======
+        // 🔥 Limpieza de referencias destruidas
+        interactables.RemoveAll(i => i == null);
+
+>>>>>>> 7ca46c4 (restore scripts interaction system)
         if (interactables.Count > 0)
         {
             CurrentInteractable = interactables[interactables.Count - 1];
@@ -17,8 +23,11 @@ public class InteractionDetector : MonoBehaviour
         {
             CurrentInteractable = null;
         }
+<<<<<<< HEAD
 
         Debug.Log("Current: " + CurrentInteractable);
+=======
+>>>>>>> 7ca46c4 (restore scripts interaction system)
     }
 
     private void OnTriggerEnter(Collider other)
@@ -27,12 +36,24 @@ public class InteractionDetector : MonoBehaviour
 
         var interactable = other.GetComponentInParent<IInteractable>();
 
+<<<<<<< HEAD
         if (interactable != null)
         {
             if (!interactables.Contains(interactable))
             {
                 interactables.Add(interactable);
                 Debug.Log("Interactuable agregado");
+=======
+        if (interactable != null && !interactables.Contains(interactable))
+        {
+            interactables.Add(interactable);
+            Debug.Log("Interactuable agregado");
+
+            // 🔥 Suscribirse si es ItemPickup
+            if (interactable is ItemPickup item)
+            {
+                item.OnPicked += HandleItemPicked;
+>>>>>>> 7ca46c4 (restore scripts interaction system)
             }
         }
     }
@@ -41,6 +62,7 @@ public class InteractionDetector : MonoBehaviour
     {
         var interactable = other.GetComponentInParent<IInteractable>();
 
+<<<<<<< HEAD
         if (interactable != null)
         {
             if (interactables.Contains(interactable))
@@ -50,4 +72,34 @@ public class InteractionDetector : MonoBehaviour
             }
         }
     }
+=======
+        if (interactable != null && interactables.Contains(interactable))
+        {
+            interactables.Remove(interactable);
+            Debug.Log("Interactuable removido");
+
+            // 🔥 Desuscribirse si es ItemPickup
+            if (interactable is ItemPickup item)
+            {
+                item.OnPicked -= HandleItemPicked;
+            }
+        }
+    }
+
+    // 🔥 Limpieza inmediata cuando el item se recoge
+    private void HandleItemPicked(ItemPickup item)
+    {
+        if (interactables.Contains(item))
+        {
+            interactables.Remove(item);
+            Debug.Log("Item removido por evento OnPicked");
+        }
+    }
+    public string GetCurrentInteractionText()
+    {
+        if (CurrentInteractable == null) return string.Empty;
+
+        return CurrentInteractable.GetInteractionText();
+    }
+>>>>>>> 7ca46c4 (restore scripts interaction system)
 }

@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+<<<<<<< HEAD
 using TMPro;
 using UnityEngine.EventSystems;
 
@@ -29,10 +30,48 @@ public class InventorySlotView : MonoBehaviour,
         {
             icon.enabled = false;
             quantityText.text = "";
+=======
+using UnityEngine.EventSystems;
+using TMPro;
+using System;
+
+public class InventorySlotView : MonoBehaviour,
+    IBeginDragHandler, IDragHandler, IEndDragHandler,
+    IDropHandler, IPointerClickHandler
+{
+    private int index;
+
+    [Header("UI")]
+    [SerializeField] private Image icon;
+    [SerializeField] private TextMeshProUGUI stackText;
+
+    private InventoryDragHandler dragHandler;
+    private InventoryItemInstance currentItem;
+
+    public Action<InventoryItemInstance> OnSlotClicked;
+    public Action<int, int> OnItemDropped;
+
+    public void Initialize(int index, InventoryDragHandler dragHandler)
+    {
+        this.index = index;
+        this.dragHandler = dragHandler;
+    }
+
+    public void SetItem(InventoryItemInstance item, int amount)
+    {
+        currentItem = item;
+
+        if (item == null)
+        {
+            icon.enabled = false;
+            icon.sprite = null;
+            stackText.text = "";
+>>>>>>> 7ca46c4 (restore scripts interaction system)
             return;
         }
 
         icon.enabled = true;
+<<<<<<< HEAD
         icon.sprite = slot.Item.Data.icon;
 
         int quantity = slot.Item.Quantity;
@@ -106,5 +145,42 @@ public void OnEndDrag(PointerEventData eventData)
         }
         inventoryView.OnDrop(x, y);
 
+=======
+        icon.sprite = item.Data.icon;
+        stackText.text = amount > 1 ? amount.ToString() : "";
+        Debug.LogWarning($"{item.Data.displayName}");
+    }
+
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        if (currentItem == null) return;
+        OnSlotClicked?.Invoke(currentItem);
+    }
+
+    public void OnBeginDrag(PointerEventData eventData)
+    {
+        if (currentItem == null || dragHandler == null) return;
+        dragHandler.StartDrag(currentItem.Data.icon);
+    }
+
+    public void OnDrag(PointerEventData eventData)
+    {
+        if (dragHandler == null) return;
+        dragHandler.UpdateDrag(eventData.position);
+    }
+
+    public void OnEndDrag(PointerEventData eventData)
+    {
+        if (dragHandler == null) return;
+        dragHandler.EndDrag();
+    }
+
+    public void OnDrop(PointerEventData eventData)
+    {
+        var fromSlot = eventData.pointerDrag?.GetComponent<InventorySlotView>();
+        if (fromSlot == null) return;
+
+        OnItemDropped?.Invoke(fromSlot.index, this.index);
+>>>>>>> 7ca46c4 (restore scripts interaction system)
     }
 }

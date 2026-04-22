@@ -1,5 +1,9 @@
 fileFormatVersion: 2
+<<<<<<< HEAD
 guid: 801f6617597a4e243b9b2be2d85f321d
+=======
+guid: 5128e04e30d0f5c4288bd496e7cc6f6b
+>>>>>>> 7ca46c4 (restore scripts interaction system)
 PrefabImporter:
   externalObjects: {}
   userData: 
