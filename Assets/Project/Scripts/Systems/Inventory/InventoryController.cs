@@ -23,17 +23,19 @@ public class InventoryController : MonoBehaviour
             Debug.LogError("InventoryView not assigned");
             return;
         }
-
-        // 🔥 INICIALIZACIÓN
-        inventoryView.Initialize(inventorySystem.ReadModel);
-        listView.Initialize(inventorySystem.ReadModel); 
-
-        // 🔥 CONEXIÓN EVENTO (CLAVE)
-        inventoryView.OnItemDropped += MoveItem;
-        
-        // 🔥 conectar drag
-        listView.OnItemDropped += MoveItem; 
     }
+    private void Start()
+    {
+        inventoryView.Initialize(inventorySystem.ReadModel);
+        listView.Initialize(inventorySystem.ReadModel);
+
+        inventoryView.OnItemDropped += MoveItem;
+        listView.OnItemDropped += MoveItem;
+
+        // 🔥 CLAVE: sincronizar después de todo
+        inventoryView.ForceRefresh();
+    }
+
 
     // =========================
     // ADD ITEM

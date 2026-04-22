@@ -25,6 +25,7 @@ public class InventoryView : MonoBehaviour
 
     private void Build()
     {
+        
         for (int i = 0; i < inventory.Capacity; i++)
         {
             var slot = Instantiate(slotPrefab, InventoryPanelContainer);
@@ -39,6 +40,7 @@ public class InventoryView : MonoBehaviour
 
             var item = inventory.GetItem(i);
             slot.SetItem(item, item != null ? item.Quantity : 0);
+            Debug.Log($"[InventoryView] Slot {i} → {inventory.GetItem(i)}");
         }
     }
 
@@ -47,7 +49,10 @@ public class InventoryView : MonoBehaviour
         if (index < 0 || index >= slotViews.Count)
             return;
 
-        slotViews[index].SetItem(item, item != null ? item.Quantity : 0);
+        // 🔥 SIEMPRE leer del modelo real
+        var realItem = inventory.GetItem(index);
+
+        slotViews[index].SetItem(realItem, realItem != null ? realItem.Quantity : 0);
     }
 
     private void HandleSlotClicked(InventoryItemInstance item)
@@ -64,5 +69,14 @@ public class InventoryView : MonoBehaviour
     private void HandleItemDropped(int fromIndex, int toIndex)
     {
         OnItemDropped?.Invoke(fromIndex, toIndex);
+    }
+
+    public void ForceRefresh()
+    {
+        for (int i = 0; i < slotViews.Count; i++)
+        {
+            var item = inventory.GetItem(i);
+            slotViews[i].SetItem(item, item != null ? item.Quantity : 0);
+        }
     }
 }

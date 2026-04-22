@@ -41,6 +41,7 @@ public class InventorySlotView : MonoBehaviour,
         icon.enabled = true;
         icon.sprite = item.Data.icon;
         stackText.text = amount > 1 ? amount.ToString() : "";
+        Debug.LogWarning($"{item.Data.displayName}");
     }
 
     public void OnPointerClick(PointerEventData eventData)

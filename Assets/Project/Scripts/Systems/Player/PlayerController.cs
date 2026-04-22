@@ -5,7 +5,6 @@ using UnityEngine.InputSystem;
 
 /// <summary>
 /// PlayerController: Controla la entrada del jugador.
-/// INTEGRACIÓN CON GAMEMANAGER: Sincroniza posición/rotación para guardado automático.
 /// </summary>
 public class PlayerController : MonoBehaviour
 {
@@ -17,10 +16,16 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private GameObject inventoryPanel;
     [SerializeField] private GameObject inventoryDescription;
     [SerializeField] private GameObject crosshair;
+
+    // 🔥 YA LO NECESITAS para el contexto
+    private InventoryController inventoryController;
+
+    private InteractionContext interactionContext;
+
     private bool isInventoryOpen;
 
     private float lastGameManagerUpdateTime = 0f;
-    private float gameManagerUpdateInterval = 0.5f; // Actualizar cada 0.5 segundos
+    private float gameManagerUpdateInterval = 0.5f;
 
     private void Awake()
     {
@@ -28,9 +33,25 @@ public class PlayerController : MonoBehaviour
         mouseLook = GetComponentInChildren<MouseLook>();
         inputActions = new InputSystem_Actions();
         interactionDetector = GetComponentInChildren<InteractionDetector>();
-        
-        // No resetear la posición del jugador - dejar que GameRestorer la restaure
-        // si es una partida cargada
+        inventoryController = GetComponent<InventoryController>();
+    }
+    private void Start()
+    {
+        if (inventoryController == null)
+        {
+            Debug.LogError("InventoryController no asignado");
+            return;
+        }
+
+        var inventory = inventoryController.GetInventorySystem();
+
+        if (inventory == null)
+        {
+            Debug.LogError("InventorySystem sigue NULL en Start");
+            return;
+        }
+
+        interactionContext = new InteractionContext(inventory);
     }
 
     private void OnEnable()
@@ -38,7 +59,7 @@ public class PlayerController : MonoBehaviour
         inputActions.Enable();
 
         inputActions.Player.Jump.started += ctx => movementController.OnJumpStarted();
-        inputActions.Player.Inventory.performed += ctx => ToggleInventory();
+        inputActions.Player.Inventory.performed += ctx => CallInventory();
 
         inputActions.Player.Jetpack.performed += ctx => movementController.SetJetpack(true);
         inputActions.Player.Jetpack.canceled += ctx => movementController.SetJetpack(false);
@@ -55,35 +76,35 @@ public class PlayerController : MonoBehaviour
         inputActions.Player.Interact.performed += OnInteract;
 
         Cursor.visible = false;
-        
     }
-    private void ToggleInventory()
+
+    private void CallInventory()
     {
         isInventoryOpen = !isInventoryOpen;
+        TogglePause(inventoryPanel,isInventoryOpen );
+        
+    }
 
-        // UI
-        inventoryPanel.SetActive(isInventoryOpen);
+    public void TogglePause(GameObject panel, bool status)
+    {
+        isInventoryOpen = status;
+        panel.SetActive(isInventoryOpen);
         crosshair.SetActive(!isInventoryOpen);
-
-        // Cursor
         Cursor.lockState = isInventoryOpen ? CursorLockMode.None : CursorLockMode.Locked;
         Cursor.visible = isInventoryOpen;
 
-        // Pausa del juego
         Time.timeScale = isInventoryOpen ? 0f : 1f;
 
-        // Bloquear cámara
         if (mouseLook != null)
             mouseLook.enabled = !isInventoryOpen;
 
-        // Bloquear movimiento
         if (movementController != null)
             movementController.SetInputEnabled(!isInventoryOpen);
     }
 
+
     private void Update()
     {
-        // Sincronizar con GameManager periódicamente para auto-save
         if (GameManager.Instance != null)
         {
             lastGameManagerUpdateTime += Time.deltaTime;
@@ -96,11 +117,20 @@ public class PlayerController : MonoBehaviour
             }
         }
     }
+
     private void OnInteract(InputAction.CallbackContext ctx)
     {
+        if (!ctx.performed) return;
+
         if (interactionDetector == null)
         {
             Debug.LogError("InteractionDetector NULL");
+            return;
+        }
+
+        if (interactionContext == null)
+        {
+            Debug.LogError("InteractionContext NULL");
             return;
         }
 
@@ -109,21 +139,27 @@ public class PlayerController : MonoBehaviour
         if (interactable != null)
         {
             Debug.Log("INTERACTUANDO CON: " + interactable);
-            interactable.Interact();
+
+            // 🔥 AQUÍ ESTÁ EL FIX FINAL
+            interactable.Interact(interactionContext);
+        }
+        else
+        {
+            Debug.Log("NO HAY INTERACTUABLE");
         }
     }
 
-    private void OnMove(InputAction.CallbackContext context) => movementController.SetMoveInput(context.ReadValue<Vector2>());
+    private void OnMove(InputAction.CallbackContext context) =>
+        movementController.SetMoveInput(context.ReadValue<Vector2>());
 
-    private void OnSprint(InputAction.CallbackContext context) => movementController.SetSprint(context.ReadValueAsButton());
+    private void OnSprint(InputAction.CallbackContext context) =>
+        movementController.SetSprint(context.ReadValueAsButton());
 
-    private void OnLook(InputAction.CallbackContext context) => mouseLook.SetLookInput(context.ReadValue<Vector2>());
+    private void OnLook(InputAction.CallbackContext context) =>
+        mouseLook.SetLookInput(context.ReadValue<Vector2>());
 
     private void OnDisable() => inputActions.Disable();
 
-    /// <summary>
-    /// Se llama cuando el jugador presiona una tecla de guardado manual (Ctrl+S)
-    /// </summary>
     public void RequestManualSave()
     {
         if (GameManager.Instance != null)

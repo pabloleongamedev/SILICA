@@ -9,6 +9,9 @@ public class InteractionDetector : MonoBehaviour
 
     private void Update()
     {
+        // 🔥 Limpieza de referencias destruidas
+        interactables.RemoveAll(i => i == null);
+
         if (interactables.Count > 0)
         {
             CurrentInteractable = interactables[interactables.Count - 1];
@@ -17,8 +20,6 @@ public class InteractionDetector : MonoBehaviour
         {
             CurrentInteractable = null;
         }
-
-        Debug.Log("Current: " + CurrentInteractable);
     }
 
     private void OnTriggerEnter(Collider other)
@@ -27,12 +28,15 @@ public class InteractionDetector : MonoBehaviour
 
         var interactable = other.GetComponentInParent<IInteractable>();
 
-        if (interactable != null)
+        if (interactable != null && !interactables.Contains(interactable))
         {
-            if (!interactables.Contains(interactable))
+            interactables.Add(interactable);
+            Debug.Log("Interactuable agregado");
+
+            // 🔥 Suscribirse si es ItemPickup
+            if (interactable is ItemPickup item)
             {
-                interactables.Add(interactable);
-                Debug.Log("Interactuable agregado");
+                item.OnPicked += HandleItemPicked;
             }
         }
     }
@@ -41,13 +45,32 @@ public class InteractionDetector : MonoBehaviour
     {
         var interactable = other.GetComponentInParent<IInteractable>();
 
-        if (interactable != null)
+        if (interactable != null && interactables.Contains(interactable))
         {
-            if (interactables.Contains(interactable))
+            interactables.Remove(interactable);
+            Debug.Log("Interactuable removido");
+
+            // 🔥 Desuscribirse si es ItemPickup
+            if (interactable is ItemPickup item)
             {
-                interactables.Remove(interactable);
-                Debug.Log("Interactuable removido");
+                item.OnPicked -= HandleItemPicked;
             }
         }
+    }
+
+    // 🔥 Limpieza inmediata cuando el item se recoge
+    private void HandleItemPicked(ItemPickup item)
+    {
+        if (interactables.Contains(item))
+        {
+            interactables.Remove(item);
+            Debug.Log("Item removido por evento OnPicked");
+        }
+    }
+    public string GetCurrentInteractionText()
+    {
+        if (CurrentInteractable == null) return string.Empty;
+
+        return CurrentInteractable.GetInteractionText();
     }
 }

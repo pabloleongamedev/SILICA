@@ -10,7 +10,6 @@ public class InventoryListView : MonoBehaviour
     [SerializeField] private InventoryDragHandler dragHandler;
 
     private IInventoryReadModel inventory;
-
     private List<InventoryListItemView> items = new List<InventoryListItemView>();
 
     public Action<int, int> OnItemDropped;
@@ -22,22 +21,24 @@ public class InventoryListView : MonoBehaviour
 
         Build();
 
+        // 🔥 FIX CRÍTICO: evitar múltiples suscripciones
+        inventory.OnItemChanged -= UpdateSlot;
         inventory.OnItemChanged += UpdateSlot;
     }
 
     private void Build()
     {
-        // limpiar por si reinicializas
+        // limpiar
         foreach (var item in items)
             Destroy(item.gameObject);
 
         items.Clear();
 
+        // 🔥 IMPORTANTE: SIEMPRE usar Capacity (1:1 con grid)
         for (int i = 0; i < inventory.Capacity; i++)
         {
             var itemView = Instantiate(itemPrefab, container);
 
-            // 🔥 INYECCIÓN
             itemView.Initialize(i, dragHandler);
 
             itemView.OnItemDropped += HandleDrop;
@@ -55,7 +56,12 @@ public class InventoryListView : MonoBehaviour
         if (index < 0 || index >= items.Count)
             return;
 
-        items[index].SetItem(item);
+        // 🔥 FIX CRÍTICO: SIEMPRE consultar el modelo real
+        var realItem = inventory.GetItem(index);
+
+        items[index].SetItem(realItem);
+        Debug.Log($"EVENT ITEM: {item}");
+        Debug.Log($"REAL ITEM: {inventory.GetItem(index)}");
     }
 
     private void HandleDrop(int fromIndex, int toIndex)
