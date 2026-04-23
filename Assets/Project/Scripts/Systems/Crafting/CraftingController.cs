@@ -54,15 +54,25 @@ public class CraftingController : MonoBehaviour
 
     private void HandleItemDropped(int slotIndex, ItemData_SO item)
     {
+        if (system.GetCurrentRecipe() == null)
+        {
+            Debug.Log("Selecciona una receta primero");
+            return;
+        }
+
         if (!system.TryPlaceItem(slotIndex, item, inventorySystem))
             return;
 
         toolView.SetItemInSlot(slotIndex, item);
 
-        if (system.IsRecipeComplete())
-            Debug.Log("RECETA COMPLETA");
+        UpdateCraftButton();
     }
+    private void UpdateCraftButton()
+    {
+        if (craftButton == null) return;
 
+        craftButton.interactable = system.IsRecipeComplete();
+    }
     private void HandleItemReturned(int slotIndex, ItemData_SO item)
     {
         Debug.Log("RETURN ITEM");
@@ -96,6 +106,8 @@ public class CraftingController : MonoBehaviour
     }
     private void OnRecipeSelected(RecipeData_SO recipe)
     {
+        system.ReturnAllItems(inventorySystem);
+        toolView.Clear();
         Debug.Log("RECIPE SELECTED: " + recipe.name);
 
         system.SetRecipe(recipe);
@@ -109,7 +121,7 @@ public class CraftingController : MonoBehaviour
     }
     private void OnCraftClicked()
     {
-        var recipe = system.GetCurrentRecipe(); // usa tu método real
+        var recipe = system.GetCurrentRecipe();
 
         if (recipe == null)
         {
@@ -117,16 +129,24 @@ public class CraftingController : MonoBehaviour
             return;
         }
 
-        if (!toolView.IsComplete(recipe))
+        if (!system.IsRecipeComplete())
         {
             Debug.Log("Receta incompleta");
+
+            // DEVOLVER ITEMS
+            system.ReturnAllItems(inventorySystem);
+            toolView.Clear();
+
             return;
         }
 
         inventorySystem.AddItem(recipe.result, recipe.resultAmount);
 
         toolView.ConsumeAllSlots();
+        system.ClearAll();
 
         Debug.Log("CRAFT COMPLETADO");
     }
+    
+
 }
