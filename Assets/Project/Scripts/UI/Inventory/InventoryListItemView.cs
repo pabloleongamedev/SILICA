@@ -32,10 +32,7 @@ public class InventoryListItemView : MonoBehaviour,
         if (item == null)
         {
             icon.enabled = false;
-<<<<<<< HEAD
-=======
             icon.sprite = null;
->>>>>>> 7ca46c4 (restore scripts interaction system)
             nameText.text = "";
             amountText.text = "";
             return;
@@ -43,14 +40,10 @@ public class InventoryListItemView : MonoBehaviour,
 
         icon.enabled = true;
         icon.sprite = item.Data.icon;
-<<<<<<< HEAD
-        nameText.text = item.Data.itemID;
-=======
 
         // 🔥 FIX: usar displayName (no itemID)
         nameText.text = item.Data.displayName;
 
->>>>>>> 7ca46c4 (restore scripts interaction system)
         amountText.text = item.Quantity > 1 ? $"x{item.Quantity}" : "";
     }
 
@@ -87,24 +80,14 @@ public class InventoryListItemView : MonoBehaviour,
 
         OnItemDropped?.Invoke(from.index, this.index);
     }
-<<<<<<< HEAD
-=======
 
->>>>>>> 7ca46c4 (restore scripts interaction system)
     public InventoryItemInstance GetItem()
     {
         return currentItem;
     }
-<<<<<<< HEAD
-=======
 
->>>>>>> 7ca46c4 (restore scripts interaction system)
     public ItemData_SO GetItemData()
     {
         return currentItem != null ? currentItem.Data : null;
     }
-<<<<<<< HEAD
-    
-=======
->>>>>>> 7ca46c4 (restore scripts interaction system)
 }

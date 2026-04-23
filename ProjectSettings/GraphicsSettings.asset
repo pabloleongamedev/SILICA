@@ -1,8 +1,3 @@
-<<<<<<< HEAD
-version https://git-lfs.github.com/spec/v1
-oid sha256:a5e0958b629479544fd862d081eefdc623f7019385ec6b794ee2057b73268cd0
-size 279
-=======
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
 --- !u!30 &1
@@ -73,4 +68,3 @@ GraphicsSettings:
   m_LightProbeOutsideHullStrategy: 0
   m_CameraRelativeLightCulling: 0
   m_CameraRelativeShadowCulling: 0
->>>>>>> a516ae7 (Fix Git config: Unity YAML out of LFS + normalization)

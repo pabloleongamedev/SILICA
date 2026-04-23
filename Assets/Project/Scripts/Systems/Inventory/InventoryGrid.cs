@@ -1,8 +1,5 @@
-<<<<<<< HEAD
-=======
 using System.Collections.Generic;
 
->>>>>>> 7ca46c4 (restore scripts interaction system)
 public class InventoryGrid
 {
     private InventorySlot[,] grid;
@@ -55,8 +52,6 @@ public class InventoryGrid
     {
         return grid[x, y];
     }
-<<<<<<< HEAD
-=======
 
     public IEnumerable<InventorySlot> GetAllSlots()
     {
@@ -69,5 +64,4 @@ public class InventoryGrid
         }
     }
 
->>>>>>> 7ca46c4 (restore scripts interaction system)
 }

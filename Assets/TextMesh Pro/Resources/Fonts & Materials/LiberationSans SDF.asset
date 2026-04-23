@@ -1,8 +1,3 @@
-<<<<<<< HEAD
-version https://git-lfs.github.com/spec/v1
-oid sha256:fba2d1758bb22c96fe8efb7eadbb4497002ee65b82d77f296137ed2462128e52
-size 296
-=======
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
 --- !u!21 &2180264
@@ -8099,4 +8094,3 @@ Texture2D:
     offset: 0
     size: 0
     path: 
->>>>>>> a516ae7 (Fix Git config: Unity YAML out of LFS + normalization)

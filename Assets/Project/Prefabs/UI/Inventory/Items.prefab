@@ -1,8 +1,3 @@
-<<<<<<< HEAD
-version https://git-lfs.github.com/spec/v1
-oid sha256:03b6b4856d7813bb35f7592ae784c8ad9a5bac168b2054a6784fdd4bbd5d974b
-size 19894
-=======
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
 --- !u!1 &266288236113729947
@@ -676,4 +671,3 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ItemPickup
   itemData: {fileID: 11400000, guid: b8a5a6f6c0b6ba546bd707ecdeffb2e5, type: 2}
   amount: 12
->>>>>>> a516ae7 (Fix Git config: Unity YAML out of LFS + normalization)

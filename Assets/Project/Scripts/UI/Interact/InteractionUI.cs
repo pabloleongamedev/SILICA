@@ -1,37 +1,15 @@
-<<<<<<< HEAD
-using TMPro;
-using UnityEngine;
-=======
 using UnityEngine;
 using TMPro;
->>>>>>> 7ca46c4 (restore scripts interaction system)
 
 public class InteractionUI : MonoBehaviour
 {
      /////////////// ESTO ES BASURA
     [SerializeField] private InteractionDetector detector;
-<<<<<<< HEAD
-    [SerializeField] private GameObject panel;
-=======
     [SerializeField] private GameObject container;
->>>>>>> 7ca46c4 (restore scripts interaction system)
     [SerializeField] private TextMeshProUGUI text;
 
     private void Update()
     {
-<<<<<<< HEAD
-        var interactable = detector.CurrentInteractable;
-
-        if (interactable != null)
-        {
-            panel.SetActive(true);
-            text.text = interactable.GetInteractionText();
-        }
-        else
-        {
-            panel.SetActive(false);
-        }
-=======
         if (detector == null)
         {
             container.SetActive(false);
@@ -57,6 +35,5 @@ public class InteractionUI : MonoBehaviour
 
         container.SetActive(true);
         text.text = message;
->>>>>>> 7ca46c4 (restore scripts interaction system)
     }
 }

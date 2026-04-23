@@ -12,9 +12,6 @@ public class DescriptionPanelView : MonoBehaviour
     {
         Clear();
     }
-<<<<<<< HEAD
-
-=======
         public void Show(InventoryItemInstance item)
     {
         if (item == null)
@@ -31,7 +28,6 @@ public class DescriptionPanelView : MonoBehaviour
         itemIcon.enabled = true;
     }
 /*
->>>>>>> 7ca46c4 (restore scripts interaction system)
     public void Show(InventorySlot slot)
     {
         if (slot == null || slot.IsEmpty)
@@ -47,11 +43,7 @@ public class DescriptionPanelView : MonoBehaviour
         itemIcon.enabled = true;
         itemDescription.text = data.description;
     }
-<<<<<<< HEAD
-
-=======
 */
->>>>>>> 7ca46c4 (restore scripts interaction system)
     public void Clear()
     {
         itemName.text = "";

@@ -10,10 +10,6 @@ public class InventoryListView : MonoBehaviour
     [SerializeField] private InventoryDragHandler dragHandler;
 
     private IInventoryReadModel inventory;
-<<<<<<< HEAD
-
-=======
->>>>>>> 7ca46c4 (restore scripts interaction system)
     private List<InventoryListItemView> items = new List<InventoryListItemView>();
 
     public Action<int, int> OnItemDropped;
@@ -25,38 +21,24 @@ public class InventoryListView : MonoBehaviour
 
         Build();
 
-<<<<<<< HEAD
-=======
         // 🔥 FIX CRÍTICO: evitar múltiples suscripciones
         inventory.OnItemChanged -= UpdateSlot;
->>>>>>> 7ca46c4 (restore scripts interaction system)
         inventory.OnItemChanged += UpdateSlot;
     }
 
     private void Build()
     {
-<<<<<<< HEAD
-        // limpiar por si reinicializas
-=======
         // limpiar
->>>>>>> 7ca46c4 (restore scripts interaction system)
         foreach (var item in items)
             Destroy(item.gameObject);
 
         items.Clear();
 
-<<<<<<< HEAD
-=======
         // 🔥 IMPORTANTE: SIEMPRE usar Capacity (1:1 con grid)
->>>>>>> 7ca46c4 (restore scripts interaction system)
         for (int i = 0; i < inventory.Capacity; i++)
         {
             var itemView = Instantiate(itemPrefab, container);
 
-<<<<<<< HEAD
-            // 🔥 INYECCIÓN
-=======
->>>>>>> 7ca46c4 (restore scripts interaction system)
             itemView.Initialize(i, dragHandler);
 
             itemView.OnItemDropped += HandleDrop;
@@ -74,19 +56,10 @@ public class InventoryListView : MonoBehaviour
         if (index < 0 || index >= items.Count)
             return;
 
-<<<<<<< HEAD
-        items[index].SetItem(item);
-=======
         // 🔥 FIX CRÍTICO: SIEMPRE consultar el modelo real
         var realItem = inventory.GetItem(index);
 
         items[index].SetItem(realItem);
-<<<<<<< HEAD
-        Debug.Log($"EVENT ITEM: {item}");
-        Debug.Log($"REAL ITEM: {inventory.GetItem(index)}");
->>>>>>> 7ca46c4 (restore scripts interaction system)
-=======
->>>>>>> 52f1bdd (Sistemas de Inventario, Crafteo e Interaccion completos)
     }
 
     private void HandleDrop(int fromIndex, int toIndex)

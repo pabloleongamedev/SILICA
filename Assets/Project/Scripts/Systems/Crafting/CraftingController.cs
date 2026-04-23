@@ -25,11 +25,7 @@ public class CraftingController : MonoBehaviour
             return;
         }
 
-<<<<<<< HEAD
-        inventorySystem = inventoryController.GetInventory();
-=======
         inventorySystem = inventoryController.GetInventorySystem();
->>>>>>> 7ca46c4 (restore scripts interaction system)
 
         if (inventorySystem == null)
         {

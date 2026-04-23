@@ -31,8 +31,5 @@ public class InventoryDragHandler : MonoBehaviour
     {
         ghostIcon.gameObject.SetActive(false);
     }
-<<<<<<< HEAD
-=======
     
->>>>>>> 7ca46c4 (restore scripts interaction system)
 }

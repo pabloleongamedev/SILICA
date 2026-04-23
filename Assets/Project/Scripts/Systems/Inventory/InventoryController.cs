@@ -2,25 +2,6 @@ using UnityEngine;
 
 public class InventoryController : MonoBehaviour
 {
-<<<<<<< HEAD
-    [SerializeField] private InventoryConfig_SO config;
-    private InventorySystem inventory;
-    
-
-    private void Awake()
-    {
-        inventory = new InventorySystem(config.width, config.height);
-    }
-
-    public bool TryAddItem(ItemData_SO itemData)
-    {
-        return inventory.AddItem(itemData);
-    }
-
-    public InventorySystem GetInventory()
-    {
-        return inventory;
-=======
     [Header("Config")]
     [SerializeField] private InventoryConfig_SO config;
     [Header("View")]
@@ -95,6 +76,5 @@ public class InventoryController : MonoBehaviour
     public InventorySystem GetInventorySystem()
     {
         return inventorySystem;
->>>>>>> 7ca46c4 (restore scripts interaction system)
     }
 }

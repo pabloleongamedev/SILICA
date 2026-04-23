@@ -1,35 +1,15 @@
-<<<<<<< HEAD
-=======
 using Microsoft.Unity.VisualStudio.Editor;
->>>>>>> 7ca46c4 (restore scripts interaction system)
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 /// <summary>
-<<<<<<< HEAD
-/// PlayerController: Controla la entrada del jugador.
-<<<<<<< HEAD
-/// INTEGRACIÓN CON GAMEMANAGER: Sincroniza posición/rotación para guardado automático.
-=======
->>>>>>> 7ca46c4 (restore scripts interaction system)
-=======
 /// PlayerController: Controla la entrada del jugador. ////////// ESTO ES BASURA
->>>>>>> 52f1bdd (Sistemas de Inventario, Crafteo e Interaccion completos)
 /// </summary>
 public class PlayerController : MonoBehaviour
 {
     private MovementController movementController;
     private InputSystem_Actions inputActions;
-<<<<<<< HEAD
-    [SerializeField] private MouseLook mouseLook;
-    [SerializeField] private GameObject inventoryPanel;
-    [SerializeField] private GameObject inventoryDescription;
-    private bool isInventoryOpen;
-
-    private float lastGameManagerUpdateTime = 0f;
-    private float gameManagerUpdateInterval = 0.5f; // Actualizar cada 0.5 segundos
-=======
     private InteractionDetector interactionDetector;
 
     [SerializeField] private MouseLook mouseLook;
@@ -46,18 +26,12 @@ public class PlayerController : MonoBehaviour
 
     private float lastGameManagerUpdateTime = 0f;
     private float gameManagerUpdateInterval = 0.5f;
->>>>>>> 7ca46c4 (restore scripts interaction system)
 
     private void Awake()
     {
         movementController = GetComponent<MovementController>();
         mouseLook = GetComponentInChildren<MouseLook>();
         inputActions = new InputSystem_Actions();
-<<<<<<< HEAD
-        
-        // No resetear la posición del jugador - dejar que GameRestorer la restaure
-        // si es una partida cargada
-=======
         interactionDetector = GetComponentInChildren<InteractionDetector>();
         inventoryController = GetComponent<InventoryController>();
     }
@@ -78,7 +52,6 @@ public class PlayerController : MonoBehaviour
         }
 
         interactionContext = new InteractionContext(inventory);
->>>>>>> 7ca46c4 (restore scripts interaction system)
     }
 
     private void OnEnable()
@@ -86,11 +59,7 @@ public class PlayerController : MonoBehaviour
         inputActions.Enable();
 
         inputActions.Player.Jump.started += ctx => movementController.OnJumpStarted();
-<<<<<<< HEAD
-        inputActions.Player.Inventory.performed += ctx => ToggleInventory();
-=======
         inputActions.Player.Inventory.performed += ctx => CallInventory();
->>>>>>> 7ca46c4 (restore scripts interaction system)
 
         inputActions.Player.Jetpack.performed += ctx => movementController.SetJetpack(true);
         inputActions.Player.Jetpack.canceled += ctx => movementController.SetJetpack(false);
@@ -103,23 +72,6 @@ public class PlayerController : MonoBehaviour
 
         inputActions.Player.Look.performed += OnLook;
         inputActions.Player.Look.canceled += OnLook;
-<<<<<<< HEAD
-    }
-    private void ToggleInventory()
-    {
-        isInventoryOpen = !isInventoryOpen;
-
-        inventoryPanel.SetActive(isInventoryOpen);
-        //inventoryDescription.SetActive(true);
-
-        Cursor.lockState = isInventoryOpen ? CursorLockMode.None : CursorLockMode.Locked;
-        Cursor.visible = isInventoryOpen;
-    }
-
-    private void Update()
-    {
-        // Sincronizar con GameManager periódicamente para auto-save
-=======
 
         inputActions.Player.Interact.performed += OnInteract;
 
@@ -153,7 +105,6 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
->>>>>>> 7ca46c4 (restore scripts interaction system)
         if (GameManager.Instance != null)
         {
             lastGameManagerUpdateTime += Time.deltaTime;
@@ -167,19 +118,6 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-<<<<<<< HEAD
-    private void OnMove(InputAction.CallbackContext context) => movementController.SetMoveInput(context.ReadValue<Vector2>());
-
-    private void OnSprint(InputAction.CallbackContext context) => movementController.SetSprint(context.ReadValueAsButton());
-
-    private void OnLook(InputAction.CallbackContext context) => mouseLook.SetLookInput(context.ReadValue<Vector2>());
-
-    private void OnDisable() => inputActions.Disable();
-
-    /// <summary>
-    /// Se llama cuando el jugador presiona una tecla de guardado manual (Ctrl+S)
-    /// </summary>
-=======
     private void OnInteract(InputAction.CallbackContext ctx)
     {
         if (!ctx.performed) return;
@@ -222,7 +160,6 @@ public class PlayerController : MonoBehaviour
 
     private void OnDisable() => inputActions.Disable();
 
->>>>>>> 7ca46c4 (restore scripts interaction system)
     public void RequestManualSave()
     {
         if (GameManager.Instance != null)

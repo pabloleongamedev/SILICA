@@ -1,8 +1,3 @@
-<<<<<<< HEAD
-version https://git-lfs.github.com/spec/v1
-oid sha256:f8fb0ab885e44a05a91a2abac625b107cc258f14f26adf4acc45b5d6fc38df54
-size 293
-=======
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
 --- !u!29 &1
@@ -4521,4 +4516,3 @@ SceneRoots:
   - {fileID: 991097390}
   - {fileID: 1833855190}
   - {fileID: 504247720}
->>>>>>> a516ae7 (Fix Git config: Unity YAML out of LFS + normalization)

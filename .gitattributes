@@ -1,10 +1,10 @@
 # =========================
-# AUTO NORMALIZATION
+# AUTO TEXT NORMALIZATION
 # =========================
 * text=auto
 
 # =========================
-# UNITY YAML (SIEMPRE TEXTO)
+# UNITY YAML (MERGEABLE)
 # =========================
 *.meta text eol=lf
 *.unity text eol=lf
@@ -12,9 +12,6 @@
 *.asset text eol=lf
 *.anim text eol=lf
 *.mat text eol=lf
-
-# ProjectSettings (CRÍTICO)
-ProjectSettings/** text eol=lf
 
 # =========================
 # CODE
@@ -25,10 +22,9 @@ ProjectSettings/** text eol=lf
 *.hlsl text eol=lf
 *.json text eol=lf
 *.xml text eol=lf
-*.yml text eol=lf
 
 # =========================
-# LFS (SOLO BINARIOS)
+# LFS (SOLO BINARIOS REALES)
 # =========================
 *.fbx filter=lfs diff=lfs merge=lfs -text
 *.png filter=lfs diff=lfs merge=lfs -text
@@ -37,11 +33,3 @@ ProjectSettings/** text eol=lf
 *.psd filter=lfs diff=lfs merge=lfs -text
 *.wav filter=lfs diff=lfs merge=lfs -text
 *.mp4 filter=lfs diff=lfs merge=lfs -text
-
-# =========================
-# ANTI ERRORES
-# =========================
-*.asset text
-*.prefab text
-*.unity text
-*.mat text
