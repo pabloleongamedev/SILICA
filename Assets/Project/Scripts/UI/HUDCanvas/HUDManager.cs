@@ -4,12 +4,14 @@ using TMPro;
 public class HUDManager : MonoBehaviour
 {
     [Header("Referencias")]
-    [SerializeField] private VitalityBarSegments vitalityBar;
-    [SerializeField] private MissionTimer missionTimer;
+    [SerializeField] VitalityBarSegments vitalityBar;
+    [SerializeField] MissionTimer missionTimer;
     
     [Header("Textos de Estado")]
-    [SerializeField] private TMP_Text statusText;
-    [SerializeField] private TMP_Text diagnosticText;
+    [SerializeField] TMP_Text statusText;
+    [SerializeField] TMP_Text diagnosticText;
+    [SerializeField] TMP_Text vibraText;
+    Color redColor = new Color(255,180,171,255);
 
     void OnEnable()
     {
@@ -42,18 +44,21 @@ public class HUDManager : MonoBehaviour
         {
             statusText.text = "CRÍTICO";
             diagnosticText.text = "SISTEMA: FALLA INMINENTE";
-            statusText.color = Color.red;
+            vibraText.text = "VIBRA CRÍTICA";
+            statusText.color = redColor;
         }
         else if (ratio <= 0.6f)
         {
             statusText.text = "INESTABLE";
             diagnosticText.text = "ENERGÍA AL 50%";
+            vibraText.text = "";
             statusText.color = Color.yellow;
         }
         else
         {
             statusText.text = "NOMINAL";
             diagnosticText.text = "INTEGRIDAD ÓPTIMA";
+            vibraText.text = "";
             statusText.color = Color.cyan;
         }
     }

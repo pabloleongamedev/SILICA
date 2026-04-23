@@ -33,7 +33,6 @@ public class GraphicsSettings : MonoBehaviour
 
         PlayerPrefs.SetFloat("Brightness", value);
         PlayerPrefs.Save();
-        Debug.Log("✅ Brillo aplicado: " + value);
     }
 
     void ApplyFullscreen(bool isFullscreen)
@@ -41,6 +40,5 @@ public class GraphicsSettings : MonoBehaviour
         Screen.fullScreen = isFullscreen;
         PlayerPrefs.SetInt("Fullscreen", isFullscreen ? 1 : 0);
         PlayerPrefs.Save();
-        Debug.Log("✅ Pantalla completa: " + isFullscreen);
     }
 }

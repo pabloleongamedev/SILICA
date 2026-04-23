@@ -9,6 +9,7 @@ public class VitalityBarSegments : MonoBehaviour
     [SerializeField] private Color colorTop = new Color(0f, 1f, 1f, 1f);
     [SerializeField] private Color colorBottom = new Color(1f, 0.7058824f, 0.67058825f, 1f);
     [SerializeField] private Color emptyColor = new Color(0.4f, 0.4f, 0.4f, 0.8f);
+    Color redColor = new Color(255,180,171,255);
 
     public void UpdateVisuals(float ratio, float secondsRemaining)
     {
@@ -29,7 +30,7 @@ public class VitalityBarSegments : MonoBehaviour
                 if (secondsRemaining <= 15f)
                 {
                     float blink = Mathf.Abs(Mathf.Sin(Time.time * 8f));
-                    segments[i].color = Color.Lerp(segments[i].color, Color.red, blink);
+                    segments[i].color = Color.Lerp(segments[i].color, redColor, blink);
                 }
             }
             else
