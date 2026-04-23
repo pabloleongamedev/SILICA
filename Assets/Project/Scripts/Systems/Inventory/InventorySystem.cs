@@ -127,13 +127,16 @@ public class InventorySystem : IInventoryWriteModel
                 int removed = slot.Item.Remove(remaining);
                 remaining -= removed;
 
-                // 🔥 NOTIFICAR CAMBIO (CLAVE)
-                NotifySlotChanged(x, y, slot.Item);
-
-                // 🔥 si quedó vacío, notifícalo como null
+                // 🔥 SI QUEDA VACÍO → LIMPIAR SLOT REAL
                 if (slot.Item.IsEmpty())
                 {
+                    slot.Clear(); // 👈 ESTO ES LO QUE TE FALTA
+
                     NotifySlotChanged(x, y, null);
+                }
+                else
+                {
+                    NotifySlotChanged(x, y, slot.Item);
                 }
             }
         }

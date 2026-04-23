@@ -10,19 +10,23 @@ public class CraftingSystem
 
     public CraftingSystem(List<RecipeData_SO> recipes)
     {
-        if (recipes != null && recipes.Count > 0)
-            currentRecipe = recipes[0];
+        currentRecipe = null; 
     }
 
     public void SetRecipe(RecipeData_SO recipe)
     {
         currentRecipe = recipe;
-        slots.Clear();
+        ClearAll();
     }
 
     public bool TryPlaceItem(int slotIndex, ItemData_SO item, InventorySystem inventory)
     {
-        if (currentRecipe == null) return false;
+        // 🔥 BLOQUEO CLAVE
+        if (currentRecipe == null)
+        {
+            Debug.Log("No hay receta seleccionada");
+            return false;
+        }
 
         var ingredient = currentRecipe.ingredients
             .Find(x => x.item.itemID == item.itemID);
@@ -45,12 +49,12 @@ public class CraftingSystem
 
         slots[slotIndex] = (item, ingredient.amount);
 
-        Debug.Log($"Item colocado en slot {slotIndex}");
-
         return true;
     }
     public int GetRequiredAmount(ItemData_SO item)
     {
+        if (currentRecipe == null) return 0;
+
         var ingredient = currentRecipe.ingredients
             .Find(x => x.item.itemID == item.itemID);
 
@@ -87,8 +91,21 @@ public class CraftingSystem
 
         return true;
     }
+    public void ReturnAllItems(InventorySystem inventory)
+    {
+        foreach (var slot in slots.Values)
+        {
+            inventory.AddItem(slot.item, slot.amount);
+        }
+
+        slots.Clear();
+    }
     public RecipeData_SO GetCurrentRecipe()
     {
         return currentRecipe;
+    }
+    public void ClearAll()
+    {
+        slots.Clear();
     }
 }
