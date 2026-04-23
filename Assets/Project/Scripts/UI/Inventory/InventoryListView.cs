@@ -81,9 +81,12 @@ public class InventoryListView : MonoBehaviour
         var realItem = inventory.GetItem(index);
 
         items[index].SetItem(realItem);
+<<<<<<< HEAD
         Debug.Log($"EVENT ITEM: {item}");
         Debug.Log($"REAL ITEM: {inventory.GetItem(index)}");
 >>>>>>> 7ca46c4 (restore scripts interaction system)
+=======
+>>>>>>> 52f1bdd (Sistemas de Inventario, Crafteo e Interaccion completos)
     }
 
     private void HandleDrop(int fromIndex, int toIndex)

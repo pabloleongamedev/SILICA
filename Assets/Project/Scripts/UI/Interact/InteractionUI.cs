@@ -8,6 +8,7 @@ using TMPro;
 
 public class InteractionUI : MonoBehaviour
 {
+     /////////////// ESTO ES BASURA
     [SerializeField] private InteractionDetector detector;
 <<<<<<< HEAD
     [SerializeField] private GameObject panel;

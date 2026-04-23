@@ -7,11 +7,15 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 
 /// <summary>
+<<<<<<< HEAD
 /// PlayerController: Controla la entrada del jugador.
 <<<<<<< HEAD
 /// INTEGRACIÓN CON GAMEMANAGER: Sincroniza posición/rotación para guardado automático.
 =======
 >>>>>>> 7ca46c4 (restore scripts interaction system)
+=======
+/// PlayerController: Controla la entrada del jugador. ////////// ESTO ES BASURA
+>>>>>>> 52f1bdd (Sistemas de Inventario, Crafteo e Interaccion completos)
 /// </summary>
 public class PlayerController : MonoBehaviour
 {
@@ -30,7 +34,7 @@ public class PlayerController : MonoBehaviour
 
     [SerializeField] private MouseLook mouseLook;
     [SerializeField] private GameObject inventoryPanel;
-    [SerializeField] private GameObject inventoryDescription;
+    //[SerializeField] private GameObject inventoryDescription;
     [SerializeField] private GameObject crosshair;
 
     // 🔥 YA LO NECESITAS para el contexto

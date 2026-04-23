@@ -21,14 +21,18 @@ public class InteractionController : MonoBehaviour
         if (!ctx.performed) return;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
         Debug.Log("INTERACT PRESSED");
 
 >>>>>>> 7ca46c4 (restore scripts interaction system)
+=======
+>>>>>>> 52f1bdd (Sistemas de Inventario, Crafteo e Interaccion completos)
         var interactable = detector.CurrentInteractable;
 
         if (interactable != null)
         {
+<<<<<<< HEAD
 <<<<<<< HEAD
             interactable.Interact();
 =======
@@ -40,5 +44,9 @@ public class InteractionController : MonoBehaviour
             Debug.Log("NO HAY INTERACTUABLE");
 >>>>>>> 7ca46c4 (restore scripts interaction system)
         }
+=======
+            interactable.Interact(context);
+        }
+>>>>>>> 52f1bdd (Sistemas de Inventario, Crafteo e Interaccion completos)
     }
 }
