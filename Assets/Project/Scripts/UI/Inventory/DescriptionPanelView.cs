@@ -12,7 +12,22 @@ public class DescriptionPanelView : MonoBehaviour
     {
         Clear();
     }
+        public void Show(InventoryItemInstance item)
+    {
+        if (item == null)
+        {
+            Clear();
+            return;
+        }
 
+        gameObject.SetActive(true);
+
+        itemName.text = item.Data.displayName;
+        itemDescription.text = item.Data.description;
+        itemIcon.sprite = item.Data.icon;
+        itemIcon.enabled = true;
+    }
+/*
     public void Show(InventorySlot slot)
     {
         if (slot == null || slot.IsEmpty)
@@ -28,7 +43,7 @@ public class DescriptionPanelView : MonoBehaviour
         itemIcon.enabled = true;
         itemDescription.text = data.description;
     }
-
+*/
     public void Clear()
     {
         itemName.text = "";

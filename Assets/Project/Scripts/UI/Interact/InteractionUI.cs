@@ -1,24 +1,39 @@
-using TMPro;
 using UnityEngine;
+using TMPro;
 
 public class InteractionUI : MonoBehaviour
 {
+     /////////////// ESTO ES BASURA
     [SerializeField] private InteractionDetector detector;
-    [SerializeField] private GameObject panel;
+    [SerializeField] private GameObject container;
     [SerializeField] private TextMeshProUGUI text;
 
     private void Update()
     {
+        if (detector == null)
+        {
+            container.SetActive(false);
+            return;
+        }
+
         var interactable = detector.CurrentInteractable;
 
-        if (interactable != null)
+        // 🔥 FIX CLAVE: validar null real (Unity destroyed object)
+        if (interactable == null)
         {
-            panel.SetActive(true);
-            text.text = interactable.GetInteractionText();
+            container.SetActive(false);
+            return;
         }
-        else
+
+        string message = interactable.GetInteractionText();
+
+        if (string.IsNullOrEmpty(message))
         {
-            panel.SetActive(false);
+            container.SetActive(false);
+            return;
         }
+
+        container.SetActive(true);
+        text.text = message;
     }
 }
