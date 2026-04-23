@@ -43,6 +43,36 @@ public class InventorySystem
         return true;
     }
 
+    public bool AddItem(ItemData_SO itemData, int amount)
+    {
+        int remaining = amount;
+
+        // 🔥 1. intentar stackear primero
+        remaining = TryStackItem(itemData, remaining);
+
+        // 🔥 2. crear nuevos stacks si sobra
+        while (remaining > 0)
+        {
+            if (!grid.TryFindFirstEmptySlot(out int x, out int y))
+            {
+                OnInventoryFull?.Invoke();
+                return false;
+            }
+
+            var instance = new InventoryItemInstance(itemData);
+
+            int added = instance.Add(remaining);
+            remaining -= added;
+
+            grid.SetItem(x, y, instance);
+
+            OnItemAdded?.Invoke(instance);
+        }
+
+        OnInventoryChanged?.Invoke();
+        return true;
+    }
+
     private bool TryAddInstance(InventoryItemInstance item)
     {
         if (!grid.TryFindFirstEmptySlot(out int x, out int y))
@@ -185,6 +215,57 @@ public class InventorySystem
 
         OnInventoryChanged?.Invoke();
         return true;
+    }
+
+    public int GetAmount(ItemData_SO itemData)
+    {
+        int total = 0;
+
+        for (int y = 0; y < grid.Height; y++)
+        {
+            for (int x = 0; x < grid.Width; x++)
+            {
+                var slot = grid.GetSlot(x, y);
+
+                if (!slot.IsEmpty && slot.Item.Data == itemData)
+                {
+                    total += slot.Item.Quantity;
+                }
+            }
+        }
+
+        return total;
+    }
+
+    public bool RemoveItem(ItemData_SO itemData, int amount)
+    {
+        int remaining = amount;
+
+        for (int y = 0; y < grid.Height && remaining > 0; y++)
+        {
+            for (int x = 0; x < grid.Width && remaining > 0; x++)
+            {
+                var slot = grid.GetSlot(x, y);
+
+                if (slot.IsEmpty || slot.Item.Data != itemData)
+                    continue;
+
+                int removed = System.Math.Min(remaining, slot.Item.Quantity);
+                slot.Item.Remove(removed);
+                remaining -= removed;
+
+                if (slot.Item.IsEmpty())
+                    slot.Clear();
+            }
+        }
+
+        if (remaining <= 0)
+        {
+            OnInventoryChanged?.Invoke();
+            return true;
+        }
+
+        return false;
     }
 
 }
