@@ -21,7 +21,7 @@ public class ItemPickup : MonoBehaviour, IInteractable
 
     public string GetInteractionText()
     {
+        if (itemData == null) return null;
         return $"Presiona E para recoger {itemData.itemID}";
-        
     }
 }

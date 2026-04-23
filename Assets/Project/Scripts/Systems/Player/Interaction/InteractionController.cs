@@ -17,18 +17,11 @@ public class InteractionController : MonoBehaviour
     {
         if (!ctx.performed) return;
 
-        Debug.Log("INTERACT PRESSED");
-
         var interactable = detector.CurrentInteractable;
 
         if (interactable != null)
         {
-            Debug.Log("INTERACTUANDO CON: " + interactable);
             interactable.Interact(context);
-        }
-        else
-        {
-            Debug.Log("NO HAY INTERACTUABLE");
         }
     }
 }

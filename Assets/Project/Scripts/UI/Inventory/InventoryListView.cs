@@ -60,8 +60,6 @@ public class InventoryListView : MonoBehaviour
         var realItem = inventory.GetItem(index);
 
         items[index].SetItem(realItem);
-        Debug.Log($"EVENT ITEM: {item}");
-        Debug.Log($"REAL ITEM: {inventory.GetItem(index)}");
     }
 
     private void HandleDrop(int fromIndex, int toIndex)

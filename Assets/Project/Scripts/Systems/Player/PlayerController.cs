@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 
 /// <summary>
-/// PlayerController: Controla la entrada del jugador.
+/// PlayerController: Controla la entrada del jugador. ////////// ESTO ES BASURA
 /// </summary>
 public class PlayerController : MonoBehaviour
 {
@@ -14,7 +14,7 @@ public class PlayerController : MonoBehaviour
 
     [SerializeField] private MouseLook mouseLook;
     [SerializeField] private GameObject inventoryPanel;
-    [SerializeField] private GameObject inventoryDescription;
+    //[SerializeField] private GameObject inventoryDescription;
     [SerializeField] private GameObject crosshair;
 
     // 🔥 YA LO NECESITAS para el contexto
