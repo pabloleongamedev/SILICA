@@ -8,10 +8,10 @@ public class InventoryTester : MonoBehaviour
     {
         if (Keyboard.current.iKey.wasPressedThisFrame)
         {
-            PrintInventory();
+            //PrintInventory(); creo que pertenece a una linea de tiempo diferente
         }
     }
-
+/*
     private void PrintInventory()
     {
         var inventory = playerInventory.GetInventory();
@@ -24,4 +24,5 @@ public class InventoryTester : MonoBehaviour
 
         Debug.Log(inventory.GetDebugView());
     }
+*/
 }

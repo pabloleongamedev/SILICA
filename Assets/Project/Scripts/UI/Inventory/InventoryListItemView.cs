@@ -32,6 +32,7 @@ public class InventoryListItemView : MonoBehaviour,
         if (item == null)
         {
             icon.enabled = false;
+            icon.sprite = null;
             nameText.text = "";
             amountText.text = "";
             return;
@@ -39,7 +40,10 @@ public class InventoryListItemView : MonoBehaviour,
 
         icon.enabled = true;
         icon.sprite = item.Data.icon;
-        nameText.text = item.Data.itemID;
+
+        // 🔥 FIX: usar displayName (no itemID)
+        nameText.text = item.Data.displayName;
+
         amountText.text = item.Quantity > 1 ? $"x{item.Quantity}" : "";
     }
 
@@ -76,13 +80,14 @@ public class InventoryListItemView : MonoBehaviour,
 
         OnItemDropped?.Invoke(from.index, this.index);
     }
+
     public InventoryItemInstance GetItem()
     {
         return currentItem;
     }
+
     public ItemData_SO GetItemData()
     {
         return currentItem != null ? currentItem.Data : null;
     }
-    
 }
