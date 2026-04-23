@@ -1,17 +1,47 @@
-# ========== LFS SOLO PARA BINARIOS ==========
+# =========================
+# AUTO NORMALIZATION
+# =========================
+* text=auto
+
+# =========================
+# UNITY YAML (SIEMPRE TEXTO)
+# =========================
+*.meta text eol=lf
+*.unity text eol=lf
+*.prefab text eol=lf
+*.asset text eol=lf
+*.anim text eol=lf
+*.mat text eol=lf
+
+# ProjectSettings (CRÍTICO)
+ProjectSettings/** text eol=lf
+
+# =========================
+# CODE
+# =========================
+*.cs text eol=lf
+*.shader text eol=lf
+*.cginc text eol=lf
+*.hlsl text eol=lf
+*.json text eol=lf
+*.xml text eol=lf
+*.yml text eol=lf
+
+# =========================
+# LFS (SOLO BINARIOS)
+# =========================
 *.fbx filter=lfs diff=lfs merge=lfs -text
 *.png filter=lfs diff=lfs merge=lfs -text
-*.jpg filter=lfs diff=lfs merge=lfs -textgit 
+*.jpg filter=lfs diff=lfs merge=lfs -text
 *.tga filter=lfs diff=lfs merge=lfs -text
 *.psd filter=lfs diff=lfs merge=lfs -text
 *.wav filter=lfs diff=lfs merge=lfs -text
 *.mp4 filter=lfs diff=lfs merge=lfs -text
-# ========== UNITY YAML (NO LFS) ==========
-*.unity filter=lfs diff=lfs merge=lfs -text
-*.prefab filter=lfs diff=lfs merge=lfs -text
-*.asset filter=lfs diff=lfs merge=lfs -text
-*.meta text
-# ========== OPCIONAL (recomendado) ==========
-*.cs text
-*.shader text
-*.mat filter=lfs diff=lfs merge=lfs -text
+
+# =========================
+# ANTI ERRORES
+# =========================
+*.asset text
+*.prefab text
+*.unity text
+*.mat text
