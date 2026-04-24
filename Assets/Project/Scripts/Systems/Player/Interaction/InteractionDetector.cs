@@ -7,47 +7,94 @@ public class InteractionDetector : MonoBehaviour
 
     public IInteractable CurrentInteractable { get; private set; }
 
+    public System.Action<IInteractable> OnInteractableChanged;
+
+    [Header("References")]
+    [SerializeField] private Transform playerTransform;
+    [SerializeField] private Transform cameraTransform;
+
+    [Header("Settings")]
+    [SerializeField] private float maxDistance = 3f;
+    [SerializeField] private float maxAngle = 60f;
+
+    private float cosAngleThreshold;
+
+    private void Awake()
+    {
+        if (playerTransform == null)
+            playerTransform = transform;
+
+        cosAngleThreshold = Mathf.Cos(maxAngle * Mathf.Deg2Rad);
+    }
+
     private void Update()
     {
-        if (interactables.Count > 0)
-        {
-            CurrentInteractable = interactables[interactables.Count - 1];
-        }
-        else
-        {
-            CurrentInteractable = null;
-        }
-
-        Debug.Log("Current: " + CurrentInteractable);
+        CleanInvalidInteractables();
+        EvaluateBestInteractable();
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        Debug.Log("Entró en trigger: " + other.name);
-
-        var interactable = other.GetComponentInParent<IInteractable>();
-
-        if (interactable != null)
+        if (other.TryGetComponent<IInteractable>(out var interactable))
         {
             if (!interactables.Contains(interactable))
-            {
                 interactables.Add(interactable);
-                Debug.Log("Interactuable agregado");
-            }
         }
     }
 
     private void OnTriggerExit(Collider other)
     {
-        var interactable = other.GetComponentInParent<IInteractable>();
-
-        if (interactable != null)
+        if (other.TryGetComponent<IInteractable>(out var interactable))
         {
-            if (interactables.Contains(interactable))
+            interactables.Remove(interactable);
+        }
+    }
+
+    private void CleanInvalidInteractables()
+    {
+        interactables.RemoveAll(i =>
+        {
+            if (i == null) return true;
+
+            var mb = i as MonoBehaviour;
+            return mb == null || !mb.gameObject.activeInHierarchy;
+        });
+    }
+
+    private void EvaluateBestInteractable()
+    {
+        IInteractable best = null;
+        float bestDistance = float.MaxValue;
+
+        foreach (var interactable in interactables)
+        {
+            var mb = interactable as MonoBehaviour;
+            if (mb == null) continue;
+
+            Vector3 targetPos = mb.transform.position;
+
+            float distance = Vector3.Distance(playerTransform.position, targetPos);
+            if (distance > maxDistance) continue;
+
+            if (cameraTransform != null)
             {
-                interactables.Remove(interactable);
-                Debug.Log("Interactuable removido");
+                Vector3 dir = (targetPos - cameraTransform.position).normalized;
+                float dot = Vector3.Dot(cameraTransform.forward, dir);
+
+                if (dot < cosAngleThreshold) continue;
             }
+
+            if (distance < bestDistance)
+            {
+                bestDistance = distance;
+                best = interactable;
+            }
+        }
+
+        if (CurrentInteractable != best)
+        {
+            CurrentInteractable = best;
+            OnInteractableChanged?.Invoke(CurrentInteractable);
         }
     }
 }
