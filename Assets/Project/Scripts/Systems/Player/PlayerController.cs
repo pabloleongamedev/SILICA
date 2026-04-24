@@ -23,9 +23,12 @@ public class PlayerController : MonoBehaviour
     private InteractionContext interactionContext;
 
     private bool isInventoryOpen;
+    bool isPaused = false; 
 
     private float lastGameManagerUpdateTime = 0f;
     private float gameManagerUpdateInterval = 0.5f;
+
+
 
     private void Awake()
     {
@@ -102,7 +105,6 @@ public class PlayerController : MonoBehaviour
             movementController.SetInputEnabled(!isInventoryOpen);
     }
 
-
     private void Update()
     {
         if (GameManager.Instance != null)
@@ -168,4 +170,19 @@ public class PlayerController : MonoBehaviour
             Debug.Log("[PlayerController] Guardado manual ejecutado");
         }
     }
+
+    // Desactivar interacciones mientras se presente el menú de Pausa
+    public void SetPaused(bool paused)
+{
+    isPaused = paused;
+    if (paused)
+    {
+        movementController.SetMoveInput(Vector2.zero);
+        mouseLook.enabled = false;
+    }
+    else
+    {
+        mouseLook.enabled = true;
+    }
+}
 }
