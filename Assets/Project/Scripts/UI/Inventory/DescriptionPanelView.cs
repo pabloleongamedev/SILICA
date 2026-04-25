@@ -22,7 +22,7 @@ public class DescriptionPanelView : MonoBehaviour
 
         gameObject.SetActive(true);
 
-        itemName.text = item.Data.displayName;
+        itemName.text = $"Simblo Quimico {item.Data.displayName}";
         itemDescription.text = item.Data.description;
         itemIcon.sprite = item.Data.icon;
         itemIcon.enabled = true;

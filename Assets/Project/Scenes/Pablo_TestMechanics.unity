@@ -826,6 +826,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6b21833d040fc7147a2a41db5eb7616d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::InteractionController
+  detector: {fileID: 1239265222}
 --- !u!114 &1239265222
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5480,6 +5481,7 @@ GameObject:
   - component: {fileID: 7356667523031807904}
   - component: {fileID: 1239265222}
   - component: {fileID: 1239265221}
+  - component: {fileID: 8813028641092328283}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -9773,6 +9775,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9ccbd69672f1b724392bf15194aba8a2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerInputHandler
+--- !u!114 &8813028641092328283
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4044291310940957209}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7f80ef42dd11f7841afd9d6e7b814f71, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::InventoryTester
+  inventoryController: {fileID: 7356667523031807904}
+  testItemA: {fileID: 11400000, guid: b8a5a6f6c0b6ba546bd707ecdeffb2e5, type: 2}
+  testItemB: {fileID: 11400000, guid: 2450ec614ba58a947a73dc3b31c35fe2, type: 2}
 --- !u!114 &8824577032700141623
 MonoBehaviour:
   m_ObjectHideFlags: 0
