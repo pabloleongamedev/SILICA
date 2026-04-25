@@ -60,6 +60,20 @@ public class CraftingSystem
 
         return ingredient != null ? ingredient.amount : 0;
     }
+    public int GetCurrentAmount(ItemData_SO item)
+    {
+        int total = 0;
+
+        foreach (var pair in slots)
+        {
+            var data = pair.Value;
+
+            if (data.item == item)
+                total += data.amount;
+        }
+
+        return total;
+    }
 
     public void ClearSlot(int index)
     {

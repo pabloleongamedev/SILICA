@@ -56,6 +56,20 @@ public class CraftingController : MonoBehaviour
             return;
         }
 
+        // BLOQUEO TOTAL 
+        if (system.IsRecipeComplete())
+            return;
+
+        // 🔥 NUEVO: VALIDACIÓN POR INGREDIENTE
+        int required = system.GetRequiredAmount(item);
+        int current = system.GetCurrentAmount(item); 
+
+        if (required > 0 && current >= required)
+        {
+            Debug.Log("Este ingrediente ya está completo");
+            return;
+        }
+
         if (!system.TryPlaceItem(slotIndex, item, inventorySystem))
             return;
 
