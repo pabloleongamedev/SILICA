@@ -33,6 +33,7 @@ public class TeleportManager : MonoBehaviour
     {
         if (isNearDoor && teleportAction.action.triggered)
         {
+            Debug.Log("¡BOTÓN PRESIONADO! Iniciando teletransporte...");
             teleportPlayer();
         }
     }
@@ -47,15 +48,13 @@ public class TeleportManager : MonoBehaviour
         {
             controller.enabled = false;
         }
-        player.transform.position = endPoint;
         if (rigidBody != null)
         {
             rigidBody.linearVelocity = Vector3.zero;
-            rigidBody.angularVelocity = Vector3.zero;
             rigidBody.isKinematic = true;
         }
-        
         player.transform.position = endPoint;
+        Physics.SyncTransforms();
         if (controller != null) controller.enabled = true;
 
         if (rigidBody != null)
