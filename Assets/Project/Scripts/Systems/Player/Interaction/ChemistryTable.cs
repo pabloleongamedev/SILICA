@@ -2,21 +2,38 @@ using UnityEngine;
 
 public class ChemistryTable : MonoBehaviour, IInteractable
 {
+    private PlayerStateController playerState;
+
+    private void Awake()
+    {
+        playerState = FindFirstObjectByType<PlayerStateController>();
+    }
+
     public void Interact(InteractionContext context)
     {
-        if (context.Inventory == null)
+        if (playerState == null) return;
+
+        var current = playerState.GetState();
+
+        // 🔥 TOGGLE LIMPIO basado en estado global
+        if (current == UIState.Chemistry)
         {
-            Debug.LogError("Inventory NULL");
-            return;
+            playerState.SetState(UIState.None);
         }
-
-        Debug.Log("Abrir sistema químico con inventario");
-
-        // aquí puedes abrir UI o validar ingredientes
+        else if (current == UIState.None)
+        {
+            playerState.SetState(UIState.Chemistry);
+        }
     }
 
     public string GetInteractionText()
     {
-        return "Presiona E para usar mesa química";
+        if (playerState == null)
+            return "Presiona E para usar refinador";
+
+        // basado en estado real, no en bool local
+        return playerState.GetState() == UIState.Chemistry
+            ? null
+            : "Presiona E para usar refinador";
     }
 }

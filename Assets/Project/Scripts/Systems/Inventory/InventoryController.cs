@@ -7,8 +7,9 @@ public class InventoryController : MonoBehaviour
     [Header("View")]
     [SerializeField] private InventoryView inventoryView;
     [SerializeField] private InventoryListView listView;
-  
-    
+
+public IInventoryReadModel ReadModel => inventorySystem.ReadModel;
+public IInventoryWriteModel WriteModel => inventorySystem;  
 
     private InventorySystem inventorySystem;
     private InventoryGrid grid;
@@ -60,7 +61,7 @@ public class InventoryController : MonoBehaviour
             return;
 
         // 🔥 DECISIÓN: MERGE o SWAP
-        if (!toSlot.IsEmpty && fromSlot.Item.Data.itemID == toSlot.Item.Data.itemID)
+        if (!toSlot.IsEmpty && fromSlot.ItemInstance.Data.itemID == toSlot.ItemInstance.Data.itemID)
         {
             inventorySystem.MergeItem(from.x, from.y, to.x, to.y);
         }
@@ -68,6 +69,13 @@ public class InventoryController : MonoBehaviour
         {
             inventorySystem.MoveItem(from.x, from.y, to.x, to.y);
         }
+    }
+    public void ResetInventory()
+    {
+        inventorySystem.Clear();
+
+        // opcional pero recomendado para seguridad visual
+        inventoryView.ForceRefresh();
     }
 
     // =========================

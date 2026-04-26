@@ -6,19 +6,22 @@ public class CraftingUIController : MonoBehaviour
 
     private void OnEnable()
     {
-        GameplayEvents.OnCraftingToggle += Handle;
+        GameplayEvents.OnUIStateChanged += HandleState;
     }
 
     private void OnDisable()
     {
-        GameplayEvents.OnCraftingToggle -= Handle;
+        GameplayEvents.OnUIStateChanged -= HandleState;
     }
 
-    private void Handle(bool isOpen)
+    private void HandleState(UIState state)
     {
-        Debug.Log("CRAFTING PANEL: " + isOpen);
+        if (craftingPanel == null) return;
 
-        if (craftingPanel != null)
-            craftingPanel.SetActive(isOpen);
+        bool isActive = state == UIState.Crafting;
+
+        Debug.Log("CRAFTING PANEL: " + isActive);
+
+        craftingPanel.SetActive(isActive);
     }
 }

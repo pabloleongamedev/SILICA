@@ -64,6 +64,8 @@ public class InventoryListView : MonoBehaviour
 
     private void HandleDrop(int fromIndex, int toIndex)
     {
+        Debug.Log($"[InventoryListView] DROP from {fromIndex} to {toIndex}");
+
         OnItemDropped?.Invoke(fromIndex, toIndex);
     }
 

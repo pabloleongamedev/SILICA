@@ -4,13 +4,19 @@ using UnityEngine.InputSystem;
 public class InteractionController : MonoBehaviour
 {
     [SerializeField] private InteractionDetector detector;
-    [SerializeField] private InventorySystem inventorySystem;
+    [SerializeField] private InventoryController inventoryController;
 
     private InteractionContext context;
 
-    private void Awake()
+    private void Start()
     {
-        context = new InteractionContext(inventorySystem);
+        if (inventoryController == null)
+        {
+            Debug.LogError("InventoryController no asignado");
+            return;
+        }
+
+        context = new InteractionContext(inventoryController.GetInventorySystem());
     }
 
     public void OnInteract(InputAction.CallbackContext ctx)

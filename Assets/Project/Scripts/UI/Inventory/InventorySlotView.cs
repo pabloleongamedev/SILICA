@@ -16,6 +16,7 @@ public class InventorySlotView : MonoBehaviour,
 
     private InventoryDragHandler dragHandler;
     private InventoryItemInstance currentItem;
+    private int currentAmount;
 
     public Action<InventoryItemInstance> OnSlotClicked;
     public Action<int, int> OnItemDropped;
@@ -24,14 +25,19 @@ public class InventorySlotView : MonoBehaviour,
     {
         this.index = index;
         this.dragHandler = dragHandler;
-    }
 
+        
+    }
     public void SetItem(InventoryItemInstance item, int amount)
     {
         currentItem = item;
+        currentAmount = amount;
 
-        if (item == null)
+        if (item == null || amount <= 0)
         {
+            currentItem = null;
+            currentAmount = 0;
+
             icon.enabled = false;
             icon.sprite = null;
             stackText.text = "";
@@ -41,12 +47,12 @@ public class InventorySlotView : MonoBehaviour,
         icon.enabled = true;
         icon.sprite = item.Data.icon;
         stackText.text = amount > 1 ? amount.ToString() : "";
-        Debug.LogWarning($"{item.Data.displayName}");
     }
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        if (currentItem == null) return;
+        Debug.Log("CLICK SLOT"); // 👈
+
         OnSlotClicked?.Invoke(currentItem);
     }
 
