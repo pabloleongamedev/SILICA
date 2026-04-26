@@ -153,10 +153,11 @@ public class CraftingController : MonoBehaviour
             return;
         }
 
-        // 🔥 PRODUCCIÓN (usa inventory system → ya notifica)
+        //  PRODUCCIÓN (usa inventory system → ya notifica)
         write.AddItem(recipe.result, recipe.resultAmount);
-
-        // 🔥 limpiar slots internos
+        // NOTIFICAR CRAFTEO A MISIONES 
+        QuestEvents.OnItemCrafted?.Invoke(recipe.result, recipe.resultAmount);
+        //  limpiar slots internos
         system.ClearAllNoReturn();
 
         toolView.Clear();

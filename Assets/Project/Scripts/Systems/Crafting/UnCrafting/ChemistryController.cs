@@ -244,7 +244,14 @@ public class ChemistryController : MonoBehaviour
             Notify("No se pudo refinar", NotificationType.Error);
             return;
         }
+  
+        //  NOTIFICACIÓN A QUEST SYSTEM (CORRECTO
+        foreach (var output in currentCompound.outputs)
+        {
+            QuestEvents.OnItemRefined?.Invoke(output.item, output.amount);
+        }
 
+        //  LIMPIEZA
         toolView.Clear();
         currentCompound = null;
 

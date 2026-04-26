@@ -72,7 +72,7 @@ public class InventorySystem : IInventoryWriteModel
     }
 
     // =========================================================
-    // ADD (PRO)
+    // ADD SOBRECARGADO CON MODO DE NOTIFICACIÓN
     // =========================================================
     public int AddItem(ItemData_SO item, int amount, InventoryNotificationMode mode)
     {
@@ -99,6 +99,9 @@ public class InventorySystem : IInventoryWriteModel
             Notify($"Has obtenido {item.itemID} x{added}", NotificationType.Success);
         }
 
+        //  NOTIFICACIÓN A QUEST SYSTEM (CORRECTO)
+        Debug.LogWarning("RECOGEMOS ELEMENTOS NECESARIOS!");
+        QuestEvents.OnItemCollected?.Invoke(item, added);
         return added;
     }
 
