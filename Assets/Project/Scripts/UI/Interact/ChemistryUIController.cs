@@ -6,19 +6,22 @@ public class ChemistryUIController : MonoBehaviour
 
     private void OnEnable()
     {
-        GameplayEvents.OnChemistryToggle += Handle;
+        GameplayEvents.OnUIStateChanged += HandleState;
     }
 
     private void OnDisable()
     {
-        GameplayEvents.OnChemistryToggle -= Handle;
+        GameplayEvents.OnUIStateChanged -= HandleState;
     }
 
-    private void Handle(bool isOpen)
+    private void HandleState(UIState state)
     {
-        Debug.Log("CHEMISTRY PANEL: " + isOpen);
+        if (chemistryPanel == null) return;
 
-        if (chemistryPanel != null)
-            chemistryPanel.SetActive(isOpen);
+        bool isActive = state == UIState.Chemistry;
+
+        Debug.Log("CHEMISTRY PANEL: " + isActive);
+
+        chemistryPanel.SetActive(isActive);
     }
 }

@@ -7,17 +7,14 @@ public class InteractionUIController : MonoBehaviour
     [SerializeField] private GameObject panel;
     [SerializeField] private TMP_Text text;
 
-    private bool forceHide; // 🔥 estado de override
-    private int openUI = 0;
+    private bool notificationActive;
 
     private void OnEnable()
-    {   
+    {
         if (detector != null)
             detector.OnInteractableChanged += HandleChanged;
 
-        GameplayEvents.OnCraftingToggle += HandleUI;
-        GameplayEvents.OnInventoryToggle += HandleUI;
-        GameplayEvents.OnChemistryToggle += HandleUI; // 🔥 FALTA ESTO
+        GameplayEvents.OnNotificationStateChanged += HandleNotification;
     }
 
     private void OnDisable()
@@ -25,32 +22,29 @@ public class InteractionUIController : MonoBehaviour
         if (detector != null)
             detector.OnInteractableChanged -= HandleChanged;
 
-        GameplayEvents.OnCraftingToggle -= HandleUI;
-        GameplayEvents.OnInventoryToggle -= HandleUI;
-        GameplayEvents.OnChemistryToggle -= HandleUI;
+        GameplayEvents.OnNotificationStateChanged -= HandleNotification;
     }
 
-    // 🔥 FORZADO POR UI
-    private void HandleUI(bool isOpen)
+    private void HandleNotification(bool isActive)
     {
-        openUI += isOpen ? 1 : -1;
-        openUI = Mathf.Max(0, openUI);
-
-        forceHide = openUI > 0;
-
+        notificationActive = isActive;
         Refresh();
     }
 
-    // 🔹 Evento del detector
     private void HandleChanged(IInteractable interactable)
     {
         Refresh();
     }
 
-    // 🔥 ÚNICO PUNTO DE DECISIÓN
+    private void Update()
+    {
+        Refresh();
+    }
+
     private void Refresh()
     {
-        if (forceHide)
+        // 🔥 PRIORIDAD: NOTIFICACIÓN
+        if (notificationActive)
         {
             Hide();
             return;
@@ -77,12 +71,15 @@ public class InteractionUIController : MonoBehaviour
 
     private void Show(string msg)
     {
-        panel.SetActive(true);
+        if (!panel.activeSelf)
+            panel.SetActive(true);
+
         text.text = msg;
     }
 
     private void Hide()
     {
-        panel.SetActive(false);
+        if (panel.activeSelf)
+            panel.SetActive(false);
     }
 }

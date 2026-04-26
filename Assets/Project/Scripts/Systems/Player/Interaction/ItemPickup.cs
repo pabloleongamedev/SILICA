@@ -7,22 +7,25 @@ public class ItemPickup : MonoBehaviour, IInteractable
 
     public void Interact(InteractionContext context)
     {
-        // 🔥 VALIDACIÓN (READ MODEL)
-        if (!context.InventoryRead.CanAddItemsBatch((item, amount)))
-        {
-            Debug.Log("Inventario lleno");
+        if (item == null)
             return;
-        }
 
-        // 🔥 INSERCIÓN (WRITE MODEL)
+        if (!context.InventoryRead.CanAddItemsBatch((item, amount)))
+            return;
+
         context.InventoryWrite.AddItem(item, amount);
 
-        // 🔥 DESTRUIR
+        // IMPORTANTE: limpiar interacción ANTES de destruir
+        var detector = FindFirstObjectByType<InteractionDetector>();
+        if (detector != null)
+            detector.ForceRefresh();
+
         Destroy(gameObject);
     }
-
     public string GetInteractionText()
     {
-        return item != null ? $"Presiona E para recoger {item.itemID}" : "Recoger objeto";
+        return item != null
+            ? $"Presiona E para recoger {item.itemID}"
+            : "Recoger objeto";
     }
 }

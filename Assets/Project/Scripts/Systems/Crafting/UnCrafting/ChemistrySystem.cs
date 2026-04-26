@@ -1,6 +1,12 @@
 using System.Linq;
 using UnityEngine;
 
+
+/// <summary>
+/// Contiene TODA la lógica de separación.
+/// NO depende de UI.
+/// NO depende de MonoBehaviour.
+/// </summary>
 public class ChemistrySystem
 {
     public bool CanSeparate(

@@ -23,10 +23,7 @@ public class ToolChemistryView : MonoBehaviour, IDropHandler
         if (itemInstance == null) return;
 
         if (currentItem != null)
-        {
-            Debug.Log("[Tool] Slot ocupado");
-            return;
-        }
+            return; // 🔥 sin lógica, sin mensajes
 
         SetItem(itemInstance.Data);
     }

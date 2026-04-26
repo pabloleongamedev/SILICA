@@ -8,14 +8,16 @@ public class ChemistryController : MonoBehaviour
     [SerializeField] private SeparationMethod_SO[] methods;
     [SerializeField] private SeparationDatabase_SO database;
 
-    [Header("Refs")]
+    [Header("UI")]
     [SerializeField] private MethodListView methodListView;
     [SerializeField] private TextMeshProUGUI descriptionText;
 
     [SerializeField] private ToolChemistryView toolView;
-    [SerializeField] private InventoryController inventoryController;
     [SerializeField] private InventoryListView inventoryListView;
     [SerializeField] private Button refineButton;
+
+    [Header("Refs")]
+    [SerializeField] private InventoryController inventoryController;
 
     private SeparationMethod_SO currentMethod;
     private CompoundDefinition_SO currentCompound;
@@ -25,6 +27,9 @@ public class ChemistryController : MonoBehaviour
 
     private ChemistrySystem system;
 
+    // 🔥 evita doble rollback
+    private bool isCleaning;
+
     private void Awake()
     {
         system = new ChemistrySystem();
@@ -32,48 +37,76 @@ public class ChemistryController : MonoBehaviour
 
     private void Start()
     {
-        // =========================
-        // INIT INVENTORY
-        // =========================
         read = inventoryController.ReadModel;
         write = inventoryController.WriteModel;
 
         inventoryListView.Initialize(read);
         inventoryListView.OnItemDropped += HandleInventoryDrop;
 
-        // =========================
-        // INIT METHODS
-        // =========================
         methodListView.Build(methods, OnMethodSelected);
 
-        // =========================
-        // TOOL EVENTS (CLAVE)
-        // =========================
-        toolView.OnItemCleared += HandleToolCleared;
+        toolView.OnItemPlaced += HandleItemPlaced;
+        toolView.OnItemCleared += HandleItemCleared;
 
-        // =========================
-        // BUTTON
-        // =========================
         refineButton.onClick.AddListener(OnRefineClicked);
 
         UpdateButton();
     }
+
     private void OnEnable()
     {
-        toolView.OnItemPlaced += HandleItemPlaced;
-        toolView.OnItemCleared += HandleItemCleared;
+        GameplayEvents.OnUIStateChanged += HandleStateChanged;
     }
 
     private void OnDisable()
     {
-        toolView.OnItemPlaced -= HandleItemPlaced;
-        toolView.OnItemCleared -= HandleItemCleared;
+        GameplayEvents.OnUIStateChanged -= HandleStateChanged;
     }
 
     private void OnDestroy()
     {
         inventoryListView.OnItemDropped -= HandleInventoryDrop;
-        toolView.OnItemCleared -= HandleToolCleared;
+        toolView.OnItemPlaced -= HandleItemPlaced;
+        toolView.OnItemCleared -= HandleItemCleared;
+    }
+
+    // =========================================================
+    // STATE CONTROL (REEMPLAZA OnChemistryToggle)
+    // =========================================================
+    private void HandleStateChanged(UIState state)
+    {
+        // 🔥 si salimos del estado Chemistry → cleanup
+        if (state != UIState.Chemistry)
+        {
+            Cleanup();
+        }
+    }
+
+    private void Cleanup()
+    {
+        Debug.Log("[ChemistryController] Cleanup");
+
+        if (currentCompound == null && toolView.GetItem() == null)
+            return;
+
+        isCleaning = true;
+
+        // 🔥 rollback seguro
+        if (currentCompound != null)
+        {
+            write.AddItem(currentCompound.inputItem, 1);
+        }
+
+        toolView.Clear();
+
+        currentCompound = null;
+        currentMethod = null;
+
+        isCleaning = false;
+
+        Notify("Refinador limpiado", NotificationType.Info);
+
+        UpdateButton();
     }
 
     // =========================================================
@@ -81,93 +114,66 @@ public class ChemistryController : MonoBehaviour
     // =========================================================
     private void HandleInventoryDrop(int fromIndex, int toIndex)
     {
-        Debug.Log($"[ChemistryController] HandleInventoryDrop from {fromIndex}");
-
         var itemInstance = read.GetItem(fromIndex);
 
         if (itemInstance == null)
         {
-            Debug.Log("[ChemistryController] itemInstance NULL");
+            Notify("Slot vacío", NotificationType.Warning);
             return;
         }
 
         var item = itemInstance.Data;
-
-        Debug.Log($"[ChemistryController] Item: {item.name}");
-
         var compound = database.Get(item);
 
         if (compound == null)
         {
-            Debug.Log("[ChemistryController] NO ES SEPARABLE");
+            Notify("Este elemento no se puede separar", NotificationType.Warning);
             return;
         }
 
         if (toolView.GetItem() != null)
         {
-            Debug.Log("[ChemistryController] TOOL OCUPADO");
+            Notify("El refinador ya está ocupado", NotificationType.Warning);
             return;
         }
 
-        Debug.Log("[ChemistryController] CONSUMIENDO ITEM");
+        toolView.SetItem(item);
+    }
+
+    // =========================================================
+    // TOOL EVENTS
+    // =========================================================
+    private void HandleItemPlaced(ItemData_SO item)
+    {
+        var compound = database.Get(item);
+
+        if (compound == null)
+        {
+            Notify("Elemento no se puede refinar", NotificationType.Error);
+            toolView.Clear();
+            return;
+        }
 
         write.RemoveItem(item, 1);
 
-        Debug.Log("[ChemistryController] SET TOOL");
-
-        toolView.SetItem(item);
-
         currentCompound = compound;
 
+        Notify(item.itemID + " listo para refinar", NotificationType.Info);
+
         UpdateButton();
     }
-private void HandleItemPlaced(ItemData_SO item)
-{
-    Debug.Log("[CONTROLLER] HandleItemPlaced LLAMADO");
 
-    var compound = database.Get(item);
-
-    if (compound == null)
-    {
-        Debug.Log("[CONTROLLER] Item no separable");
-
-        toolView.Clear();
-        return;
-    }
-
-    Debug.Log("[CONTROLLER] CONSUMIENDO INVENTARIO");
-
-    write.RemoveItem(item, 1);
-
-    currentCompound = compound;
-
-    UpdateButton();
-}
     private void HandleItemCleared()
     {
-        if (currentCompound == null)
-            return;
+        if (isCleaning) return;
 
-        Debug.Log("[ChemistryController] Devolviendo item");
+        if (currentCompound == null) return;
 
         write.AddItem(currentCompound.inputItem, 1);
 
         currentCompound = null;
 
-        UpdateButton();
-    }
-    // =========================================================
-    // TOOL → INVENTORY (ROLLBACK)
-    // =========================================================
-    private void HandleToolCleared()
-    {
-        if (currentCompound == null)
-            return;
-
-        // 🔥 DEVOLVER ITEM
-        write.AddItem(currentCompound.inputItem, 1);
-
-        currentCompound = null;
+        Notify("Elemento devuelto al inventario", NotificationType.Info);
 
         UpdateButton();
     }
@@ -182,22 +188,19 @@ private void HandleItemPlaced(ItemData_SO item)
         if (descriptionText != null)
             descriptionText.text = method.description;
 
+        Notify("Método seleccionado: " + method.methodName, NotificationType.Info);
+
         UpdateButton();
     }
 
-    // =========================================================
-    // VALIDACIÓN
     // =========================================================
     private void UpdateButton()
     {
         if (refineButton == null)
             return;
 
-        refineButton.interactable = system.CanSeparate(
-            currentCompound,
-            currentMethod,
-            read
-        );
+        // 🔥 siempre activo (validación ocurre al hacer click)
+        refineButton.interactable = true;
     }
 
     // =========================================================
@@ -205,8 +208,29 @@ private void HandleItemPlaced(ItemData_SO item)
     // =========================================================
     private void OnRefineClicked()
     {
-        if (currentCompound == null || currentMethod == null)
+        if (currentCompound == null)
+        {
+            Notify("Debes colocar un compuesto en el refinador", NotificationType.Warning);
             return;
+        }
+
+        if (currentMethod == null)
+        {
+            Notify("Debes seleccionar un método de separación", NotificationType.Warning);
+            return;
+        }
+
+        if (currentCompound.requiredMethod != currentMethod)
+        {
+            Notify("Método incorrecto para este compuesto", NotificationType.Error);
+            return;
+        }
+
+        if (!system.CanSeparate(currentCompound, currentMethod, read))
+        {
+            Notify("No hay espacio en el inventario", NotificationType.Warning);
+            return;
+        }
 
         bool success = system.Execute(
             currentCompound,
@@ -216,15 +240,26 @@ private void HandleItemPlaced(ItemData_SO item)
         );
 
         if (!success)
+        {
+            Notify("No se pudo refinar", NotificationType.Error);
             return;
+        }
 
-        // 🔥 LIMPIAR TOOL (NO DEVUELVE ITEM)
         toolView.Clear();
-
         currentCompound = null;
 
-        UpdateButton();
+        Notify("Elemento refinado con éxito", NotificationType.Success);
+    }
 
-        Debug.Log("SEPARACIÓN COMPLETADA");
+    // =========================================================
+    private void Notify(string msg, NotificationType type)
+    {
+        Debug.Log("[Chemistry] " + msg);
+
+        GameplayEvents.OnNotification?.Invoke(new NotificationData
+        {
+            message = msg,
+            type = type
+        });
     }
 }

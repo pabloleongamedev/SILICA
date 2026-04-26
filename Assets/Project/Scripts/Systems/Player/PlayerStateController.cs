@@ -1,4 +1,5 @@
 using UnityEngine;
+
 public enum UIState
 {
     None,
@@ -9,6 +10,7 @@ public enum UIState
 public class PlayerStateController : MonoBehaviour
 {
     private UIState currentState = UIState.None;
+
     private MovementController movementController;
     private MouseLook mouseLook;
 
@@ -25,7 +27,6 @@ public class PlayerStateController : MonoBehaviour
         currentState = newState;
 
         bool isUI = newState != UIState.None;
-        //crosshair.SetActive(isUI);
 
         Cursor.lockState = isUI ? CursorLockMode.None : CursorLockMode.Locked;
         Cursor.visible = isUI;
@@ -38,8 +39,14 @@ public class PlayerStateController : MonoBehaviour
         if (mouseLook != null)
             mouseLook.enabled = !isUI;
 
+        // 🔥 ESTA LÍNEA ES LA QUE TE FALTABA
+        GameplayEvents.OnUIStateChanged?.Invoke(currentState);
+
         Debug.Log($"[PlayerState] State: {currentState}");
     }
+
+    public UIState GetState() => currentState;
+
     public bool CanInteract(IInteractable interactable)
     {
         switch (currentState)
@@ -51,18 +58,13 @@ public class PlayerStateController : MonoBehaviour
                 return false;
 
             case UIState.Crafting:
-                // 🔥 SOLO permitir interactuar con la mesa actual
                 return interactable is CraftingTable;
 
             case UIState.Chemistry:
-                // SOLO permitir interactuar con la mesa actual
                 return interactable is ChemistryTable;
-                      
 
             default:
                 return false;
         }
     }
-
-    public UIState GetState() => currentState;
 }

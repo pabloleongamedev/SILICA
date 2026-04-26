@@ -1,12 +1,19 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Detecta objetos interactuables usando triggers.
+/// Selecciona el mejor candidato según distancia y ángulo.
+/// </summary>
 public class InteractionDetector : MonoBehaviour
 {
     private readonly List<IInteractable> interactables = new();
 
     public IInteractable CurrentInteractable { get; private set; }
-
+    
+    /// <summary>
+    /// Evento cuando cambia el interactuable actual
+    /// </summary>
     public System.Action<IInteractable> OnInteractableChanged;
 
     [Header("References")]
@@ -23,7 +30,7 @@ public class InteractionDetector : MonoBehaviour
     {
         if (playerTransform == null)
             playerTransform = transform;
-
+        // Precalcular coseno para optimizar comparación
         cosAngleThreshold = Mathf.Cos(maxAngle * Mathf.Deg2Rad);
     }
 
@@ -49,7 +56,9 @@ public class InteractionDetector : MonoBehaviour
             interactables.Remove(interactable);
         }
     }
-
+    /// <summary>
+    /// Limpia referencias inválidas
+    /// </summary>
     private void CleanInvalidInteractables()
     {
         interactables.RemoveAll(i =>
@@ -60,6 +69,10 @@ public class InteractionDetector : MonoBehaviour
             return mb == null || !mb.gameObject.activeInHierarchy;
         });
     }
+
+    /// <summary>
+    /// Selecciona el mejor interactuable
+    /// </summary>
 
     private void EvaluateBestInteractable()
     {
@@ -96,5 +109,21 @@ public class InteractionDetector : MonoBehaviour
             CurrentInteractable = best;
             OnInteractableChanged?.Invoke(CurrentInteractable);
         }
+    }
+    public void ForceClear()
+    {
+        // Elimina SOLO el actual (más preciso que limpiar todo)
+        if (CurrentInteractable != null)
+        {
+            interactables.Remove(CurrentInteractable);
+        }
+
+        CurrentInteractable = null;
+        OnInteractableChanged?.Invoke(null);
+    }
+    public void ForceRefresh()
+    {
+        CleanInvalidInteractables();
+        EvaluateBestInteractable();
     }
 }

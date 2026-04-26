@@ -2,28 +2,37 @@ using UnityEngine;
 
 public class CraftingTable : MonoBehaviour, IInteractable
 {
-        private bool isCraftingTableOpen;
-    
+    private PlayerStateController playerState;
+
+    private void Awake()
+    {
+        playerState = FindFirstObjectByType<PlayerStateController>();
+    }
 
     public void Interact(InteractionContext context)
     {
-        isCraftingTableOpen = !isCraftingTableOpen;
+        if (playerState == null) return;
 
-        GameplayEvents.OnCraftingToggle?.Invoke(isCraftingTableOpen);
+        var current = playerState.GetState();
 
-        var playerState = FindFirstObjectByType<PlayerStateController>();
-
-        if (playerState != null)
+        // 🔥 toggle basado en estado global
+        if (current == UIState.Crafting)
         {
-            playerState.SetState(
-                isCraftingTableOpen ? UIState.Crafting : UIState.None
-            );
+            playerState.SetState(UIState.None);
+        }
+        else if (current == UIState.None)
+        {
+            playerState.SetState(UIState.Crafting);
         }
     }
 
     public string GetInteractionText()
     {
-        if (isCraftingTableOpen) return null;
-        return "Presiona E para usar mesa de crafteo";
+        if (playerState == null)
+            return "Presiona E para usar mesa de crafteo";
+
+        return playerState.GetState() == UIState.Crafting
+            ? null
+            : "Presiona E para usar mesa de crafteo";
     }
 }

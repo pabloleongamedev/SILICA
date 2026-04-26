@@ -1,21 +1,24 @@
 using UnityEngine;
+
 public class InventoryUIController : MonoBehaviour
 {
     [SerializeField] private GameObject inventoryPanel;
 
     private void OnEnable()
     {
-        GameplayEvents.OnInventoryToggle += Handle;
+        GameplayEvents.OnUIStateChanged += HandleState;
     }
 
     private void OnDisable()
     {
-        GameplayEvents.OnInventoryToggle -= Handle;
+        GameplayEvents.OnUIStateChanged -= HandleState;
     }
 
-    private void Handle(bool isOpen)
+    private void HandleState(UIState state)
     {
-        if (inventoryPanel != null)
-            inventoryPanel.SetActive(isOpen);
+        if (inventoryPanel == null) return;
+
+        // 🔥 solo se activa si el estado es Inventory
+        inventoryPanel.SetActive(state == UIState.Inventory);
     }
 }

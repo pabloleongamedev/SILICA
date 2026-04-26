@@ -26,7 +26,6 @@ public class InventorySystem : IInventoryWriteModel
     {
         int canAdd = 0;
 
-        // STACK
         if (item.maxStack > 1)
         {
             foreach (var slot in grid.GetAllSlots())
@@ -41,15 +40,12 @@ public class InventorySystem : IInventoryWriteModel
             }
         }
 
-        // EMPTY
         if (canAdd < amount)
         {
             foreach (var slot in grid.GetAllSlots())
             {
                 if (slot.IsEmpty)
-                {
                     canAdd += item.maxStack;
-                }
 
                 if (canAdd >= amount)
                     break;
@@ -60,7 +56,7 @@ public class InventorySystem : IInventoryWriteModel
     }
 
     // =========================================================
-    //  NUEVO: BATCH SIMULATION REAL
+    // BATCH SIMULATION
     // =========================================================
     public bool CanAddItemsBatch(params (ItemData_SO item, int amount)[] items)
     {
@@ -78,18 +74,13 @@ public class InventorySystem : IInventoryWriteModel
         return true;
     }
 
-    // =========================================================
-    // BATCH REAL: REMOVE + ADD (CRAFTING)
-    // =========================================================
     public bool CanProcessBatch(
         (ItemData_SO item, int amount)[] remove,
         (ItemData_SO item, int amount)[] add)
     {
-        // 1. CLONAR GRID
         var tempGrid = CloneGrid();
         var tempOps = new InventoryOperations(tempGrid);
 
-        // 2. REMOVER PRIMERO (SIMULADO)
         foreach (var r in remove)
         {
             int remaining = r.amount;
@@ -99,10 +90,7 @@ public class InventorySystem : IInventoryWriteModel
                 if (remaining <= 0)
                     break;
 
-                if (slot.IsEmpty)
-                    continue;
-
-                if (slot.ItemInstance.Data != r.item)
+                if (slot.IsEmpty || slot.ItemInstance.Data != r.item)
                     continue;
 
                 int removed = slot.ItemInstance.Remove(remaining);
@@ -112,12 +100,10 @@ public class InventorySystem : IInventoryWriteModel
                     slot.Clear();
             }
 
-            // ❌ NO ALCANZA
             if (remaining > 0)
                 return false;
         }
 
-        // 3. INTENTAR INSERTAR
         foreach (var a in add)
         {
             int added = tempOps.AddItem(a.item, a.amount, null);
@@ -130,7 +116,7 @@ public class InventorySystem : IInventoryWriteModel
     }
 
     // =========================================================
-    //  CLONACIÓN (CRÍTICO)
+    // CLONE
     // =========================================================
     private InventoryGrid CloneGrid()
     {
@@ -151,28 +137,40 @@ public class InventorySystem : IInventoryWriteModel
     }
 
     // =========================================================
-    // ADD
+    // ADD (CON CONTROL DE NOTIFICACIÓN)
     // =========================================================
+     //   IMPLEMENTACIÓN DE INTERFAZ (NO TOCAR)
     public int AddItem(ItemData_SO item, int amount)
+    {
+        return AddItem(item, amount, true);
+    }
+    public int AddItem(ItemData_SO item, int amount, bool notify = true)
     {
         int canAdd = CalculateAddableAmount(item, amount);
 
         if (canAdd <= 0)
         {
-            Debug.LogWarning($"[Inventory] Cannot add {amount} of {item.name} - not enough space.");
+            if (notify)
+                Notify($"Inventario lleno para {item.itemID}", NotificationType.Warning);
             return 0;
         }
 
-        // 🔥 BLOQUEO TOTAL (regla correcta)
         if (canAdd < amount)
         {
-            Debug.LogWarning($"[Inventory] Partial insert blocked for {item.name}");
+            if (notify)
+                Notify($"No hay espacio suficiente para {item.itemID}", NotificationType.Warning);
             return 0;
         }
 
-        return operations.AddItem(item, amount, NotifySlotChanged);
-    }
+        int added = operations.AddItem(item, amount, NotifySlotChanged);
 
+        if (added > 0 && notify)
+        {
+            Notify($"Has obtenido {item.itemID} x{added}", NotificationType.Success);
+        }
+
+        return added;
+    }
     // =========================================================
     // MOVE
     // =========================================================
@@ -197,64 +195,25 @@ public class InventorySystem : IInventoryWriteModel
         }
     }
 
-    public void MoveItem(int fromX, int fromY, int toX, int toY)
-    {
-        operations.Move(fromX, fromY, toX, toY, NotifySlotChanged);
-    }
-
-    public void MergeItem(int fromX, int fromY, int toX, int toY)
-    {
-        operations.Merge(fromX, fromY, toX, toY, NotifySlotChanged);
-    }
-
     // =========================================================
-    // ACCESS
+    // REMOVE
     // =========================================================
-    public InventorySlot GetSlot(int x, int y)
-    {
-        return grid.GetSlot(x, y);
-    }
-
-    public (int x, int y) IndexToGrid(int index)
-    {
-        return (index % grid.Width, index / grid.Width);
-    }
-
-    public int GetAmount(ItemData_SO item)
-    {
-        int total = 0;
-
-        foreach (var slot in grid.GetAllSlots())
-        {
-            if (slot.IsEmpty)
-                continue;
-
-            if (slot.ItemInstance.Data == item)
-            {
-                total += slot.ItemInstance.Quantity;
-            }
-        }
-
-        return total;
-    }
-
     public void RemoveItem(ItemData_SO item, int amount)
     {
         int remaining = amount;
+        int removedTotal = 0;
 
         foreach (var slot in grid.GetAllSlots())
         {
             if (remaining <= 0)
-                return;
+                break;
 
-            if (slot.IsEmpty)
-                continue;
-
-            if (slot.ItemInstance.Data != item)
+            if (slot.IsEmpty || slot.ItemInstance.Data != item)
                 continue;
 
             int removed = slot.ItemInstance.Remove(remaining);
             remaining -= removed;
+            removedTotal += removed;
 
             if (slot.ItemInstance.IsEmpty())
             {
@@ -266,8 +225,16 @@ public class InventorySystem : IInventoryWriteModel
                 NotifySlotChanged(slot.X, slot.Y, slot.ItemInstance);
             }
         }
+
+        if (removedTotal > 0)
+        {
+            Notify($"{item.itemID} x{removedTotal} consumido", NotificationType.Info);
+        }
     }
 
+    // =========================================================
+    // CLEAR
+    // =========================================================
     public void Clear()
     {
         foreach (var slot in grid.GetAllSlots())
@@ -278,10 +245,62 @@ public class InventorySystem : IInventoryWriteModel
                 NotifySlotChanged(slot.X, slot.Y, null);
             }
         }
+
+        Notify("Inventario limpiado", NotificationType.Info);
+    }
+
+    // =========================================================
+    // ACCESS
+    // =========================================================
+    public InventorySlot GetSlot(int x, int y) => grid.GetSlot(x, y);
+
+    public (int x, int y) IndexToGrid(int index)
+        => (index % grid.Width, index / grid.Width);
+
+    public int GetAmount(ItemData_SO item)
+    {
+        int total = 0;
+
+        foreach (var slot in grid.GetAllSlots())
+        {
+            if (!slot.IsEmpty && slot.ItemInstance.Data == item)
+                total += slot.ItemInstance.Quantity;
+        }
+
+        return total;
+    }
+
+    // =========================================================
+    // NOTIFY
+    // =========================================================
+    private void Notify(string message, NotificationType type)
+    {
+        Debug.Log("[Inventory] " + message);
+
+        GameplayEvents.OnNotification?.Invoke(new NotificationData
+        {
+            message = message,
+            type = type
+        });
     }
 
     private void NotifySlotChanged(int x, int y, InventoryItemInstance item)
     {
         adapter.NotifySlotChanged(x, y, item);
+    }
+    // =========================================================
+    // MOVE (GRID COORDS)
+    // =========================================================
+    public void MoveItem(int fromX, int fromY, int toX, int toY)
+    {
+        operations.Move(fromX, fromY, toX, toY, NotifySlotChanged);
+    }
+
+    // =========================================================
+    // MERGE
+    // =========================================================
+    public void MergeItem(int fromX, int fromY, int toX, int toY)
+    {
+        operations.Merge(fromX, fromY, toX, toY, NotifySlotChanged);
     }
 }

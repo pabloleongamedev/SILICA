@@ -4,27 +4,21 @@ public class UIController : MonoBehaviour
 {
     [SerializeField] private GameObject crosshair;
 
-    private int openPanels = 0;
-
     private void OnEnable()
     {
-        GameplayEvents.OnInventoryToggle += HandlePanel;
-        GameplayEvents.OnCraftingToggle += HandlePanel;
-        GameplayEvents.OnChemistryToggle += HandlePanel;
+        GameplayEvents.OnUIStateChanged += HandleState;
     }
 
     private void OnDisable()
     {
-        GameplayEvents.OnInventoryToggle -= HandlePanel;
-        GameplayEvents.OnCraftingToggle -= HandlePanel;
-        GameplayEvents.OnChemistryToggle -= HandlePanel;
+        GameplayEvents.OnUIStateChanged -= HandleState;
     }
 
-    private void HandlePanel(bool isOpen)
+    private void HandleState(UIState state)
     {
-        openPanels += isOpen ? 1 : -1;
-        openPanels = Mathf.Max(0, openPanels);
+        if (crosshair == null) return;
 
-        crosshair.SetActive(openPanels == 0);
+        // 🔥 visible SOLO cuando no hay UI
+        crosshair.SetActive(state == UIState.None);
     }
 }

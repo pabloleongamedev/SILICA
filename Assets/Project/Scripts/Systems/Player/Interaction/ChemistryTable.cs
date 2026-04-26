@@ -2,27 +2,38 @@ using UnityEngine;
 
 public class ChemistryTable : MonoBehaviour, IInteractable
 {
-    private bool isOpen;
+    private PlayerStateController playerState;
+
+    private void Awake()
+    {
+        playerState = FindFirstObjectByType<PlayerStateController>();
+    }
 
     public void Interact(InteractionContext context)
     {
-        isOpen = !isOpen;
+        if (playerState == null) return;
 
-        GameplayEvents.OnChemistryToggle?.Invoke(isOpen);
+        var current = playerState.GetState();
 
-        var playerState = FindFirstObjectByType<PlayerStateController>();
-
-        if (playerState != null)
+        // 🔥 TOGGLE LIMPIO basado en estado global
+        if (current == UIState.Chemistry)
         {
-            playerState.SetState(
-                isOpen ? UIState.Chemistry : UIState.None
-            );
+            playerState.SetState(UIState.None);
+        }
+        else if (current == UIState.None)
+        {
+            playerState.SetState(UIState.Chemistry);
         }
     }
 
     public string GetInteractionText()
     {
-        if (isOpen) return null;
-        return "Presiona E para usar refinador";
+        if (playerState == null)
+            return "Presiona E para usar refinador";
+
+        // basado en estado real, no en bool local
+        return playerState.GetState() == UIState.Chemistry
+            ? null
+            : "Presiona E para usar refinador";
     }
 }
