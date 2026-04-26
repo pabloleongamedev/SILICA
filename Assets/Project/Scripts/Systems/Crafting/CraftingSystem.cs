@@ -5,11 +5,8 @@ public class CraftingSystem
 {
     private RecipeData_SO currentRecipe;
 
-    // 🔥 Estado interno del crafting (NO inventario real)
     private Dictionary<int, (ItemData_SO item, int amount)> slots = new();
 
-    // =========================
-    // SET RECIPE
     // =========================
     public void SetRecipe(RecipeData_SO recipe)
     {
@@ -18,65 +15,45 @@ public class CraftingSystem
     }
 
     // =========================
-    // PLACE ITEM (CLAVE)
-    // =========================
-    public bool TryPlaceItem(int slotIndex, ItemData_SO item, IInventoryReadModel read, IInventoryWriteModel write)
+    public CraftingResult TryPlaceItem(int slotIndex, ItemData_SO item, IInventoryReadModel read, IInventoryWriteModel write)
     {
         if (slots.ContainsKey(slotIndex))
-        {
-            Debug.Log("Slot ya ocupado");
-            return false;
-        }
-        if (currentRecipe == null)
-            return false;
+            return CraftingResult.Fail("No puedes agregar mas elementos.");
 
-        // validar que pertenece a la receta
+        if (currentRecipe == null)
+            return CraftingResult.Fail("No hay una formula seleccionada");
+
         var ingredient = currentRecipe.ingredients
             .Find(x => x.item.itemID == item.itemID);
 
         if (ingredient == null)
-        {
-            Debug.Log("Item no pertenece a la receta");
-            return false;
-        }
+            return CraftingResult.Fail("Este elemento no pertenece a la formula");
 
-        // cuánto ya hay colocado
         int current = GetCurrentAmount(item);
         int required = ingredient.amount;
 
         if (current >= required)
-        {
-            Debug.Log("Ingrediente ya completo");
-            return false;
-        }
+            return CraftingResult.Fail("Ya agregaste los elementos necesarios de este tipo");
 
-        // cuánto falta
         int remaining = required - current;
-
-        // validar inventario (READ)
         int available = read.GetAmount(item);
 
         if (available < remaining)
-        {
-            Debug.Log("No hay suficientes items en inventario");
-            return false;
-        }
+            return CraftingResult.Fail("No hay suficientes elementos en el inventario");
 
-        // consumir inventario (WRITE)
         write.RemoveItem(item, remaining);
 
-        // guardar en slot
         slots[slotIndex] = (item, remaining);
 
-        return true;
+        return CraftingResult.Success($"Agregaste  {item.itemID}  x{remaining}");
     }
+
+    // =========================
     public void ClearAllNoReturn()
     {
         slots.Clear();
     }
 
-    // =========================
-    // GET CURRENT AMOUNT
     // =========================
     public int GetCurrentAmount(ItemData_SO item)
     {
@@ -92,8 +69,6 @@ public class CraftingSystem
     }
 
     // =========================
-    // CLEAR SLOT (DEVOLVER)
-    // =========================
     public void ClearSlot(int index, IInventoryWriteModel write)
     {
         if (!slots.ContainsKey(index))
@@ -101,14 +76,11 @@ public class CraftingSystem
 
         var data = slots[index];
 
-        // 🔥 devolver items al inventario
         write.AddItem(data.item, data.amount);
 
         slots.Remove(index);
     }
 
-    // =========================
-    // CLEAR ALL
     // =========================
     public void ClearAll(IInventoryWriteModel write)
     {
@@ -120,8 +92,6 @@ public class CraftingSystem
         slots.Clear();
     }
 
-    // =========================
-    // VALIDACIÓN
     // =========================
     public bool IsRecipeComplete()
     {
@@ -138,8 +108,6 @@ public class CraftingSystem
     }
 
     // =========================
-    // BATCH REMOVE (para validación)
-    // =========================
     public (ItemData_SO item, int amount)[] BuildRemoveBatch()
     {
         if (currentRecipe == null)
@@ -155,8 +123,6 @@ public class CraftingSystem
         return list.ToArray();
     }
 
-    // =========================
-    // ACCESS
     // =========================
     public RecipeData_SO GetCurrentRecipe()
     {

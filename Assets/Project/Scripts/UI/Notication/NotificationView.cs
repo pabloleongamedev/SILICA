@@ -38,8 +38,6 @@ public class NotificationView : MonoBehaviour
 
         text.text = data.message;
 
-        Debug.Log("[NotificationView] SHOW: " + data.message);
-
         yield return new WaitForSecondsRealtime(duration);
 
         // 🔥 limpiar
