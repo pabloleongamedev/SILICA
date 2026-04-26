@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Audio;
 
 public class UIAudioManager : MonoBehaviour
 {
@@ -16,6 +17,31 @@ public class UIAudioManager : MonoBehaviour
     [SerializeField] private AudioClip sliderLimitClip;
     [SerializeField] private AudioClip errorClip;
 
+    [SerializeField] private AudioMixerGroup sfxMixerGroup; // asignar en el Inspector
+    [SerializeField] private bool applyVolumeFromSettings = true; // si quieres que el AudioSource también ajuste su .volume
+
+    
+    private void Start()
+{
+    // Si no hay AudioSource, intentar obtenerlo (ya lo haces en Awake)
+    if (uiAudioSource == null)
+        uiAudioSource = GetComponent<AudioSource>();
+
+    // Asignar el AudioMixerGroup si se proporcionó
+    if (sfxMixerGroup != null && uiAudioSource != null)
+        uiAudioSource.outputAudioMixerGroup = sfxMixerGroup;
+
+    // Aplicar volumen inicial opcionalmente (efecto combinado Master * Effects)
+    if (applyVolumeFromSettings && uiAudioSource != null)
+    {
+        float master = GameSettings.Instance.MasterVolume; // 0.1 - 1
+        float sfx   = GameSettings.Instance.EffectsVolume; // 0 - 1
+        uiAudioSource.volume = Mathf.Clamp01(master * sfx);
+    }
+
+    Debug.Log("[UIAudioManager] Initialized. OutputGroup assigned: " + (sfxMixerGroup != null));
+}
+    
     private void Awake()
     {
         // Singleton básico para que solo exista un UIAudioManager

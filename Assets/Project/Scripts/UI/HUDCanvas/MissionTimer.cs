@@ -19,6 +19,7 @@ public class MissionTimer : MonoBehaviour
     private float lastNotifiedRatio = -1f;
 
     public float CurrentTime => currentTime;
+    Color redColor = new Color(1f, 180f/255f, 171f/255f, 1f);
 
     void Start()
     {
@@ -78,11 +79,11 @@ public class MissionTimer : MonoBehaviour
         if (currentTime <= 15f && currentTime > 0)
         {
             float blink = Mathf.Abs(Mathf.Sin(Time.time * blinkSpeed));
-            timeText.color = Color.Lerp(Color.white, Color.red, blink);
+            timeText.color = Color.Lerp(Color.white, redColor, blink);
         }
         else if (currentTime <= 0)
         {
-            timeText.color = Color.red;
+            timeText.color = redColor;
         }
     }
 }

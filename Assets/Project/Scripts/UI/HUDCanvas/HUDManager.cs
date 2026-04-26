@@ -11,7 +11,7 @@ public class HUDManager : MonoBehaviour
     [SerializeField] TMP_Text statusText;
     [SerializeField] TMP_Text diagnosticText;
     [SerializeField] TMP_Text vibraText;
-    Color redColor = new Color(255,180,171,255);
+    Color redColor = new Color(1f, 180f/255f, 171f/255f, 1f);
 
     void OnEnable()
     {
