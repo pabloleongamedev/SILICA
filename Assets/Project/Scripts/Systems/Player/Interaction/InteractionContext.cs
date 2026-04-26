@@ -1,12 +1,11 @@
 public class InteractionContext
 {
-    public InventorySystem Inventory;
-
-    public IInventoryReadModel InventoryRead;
-    public IInventoryWriteModel InventoryWrite;
+    public IInventoryReadModel InventoryRead { get; }
+    public IInventoryWriteModel InventoryWrite { get; }
 
     public InteractionContext(InventorySystem inventory)
     {
-        Inventory = inventory;
+        InventoryRead = inventory.ReadModel;
+        InventoryWrite = inventory;
     }
 }

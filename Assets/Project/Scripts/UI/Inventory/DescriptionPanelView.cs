@@ -8,14 +8,17 @@ public class DescriptionPanelView : MonoBehaviour
     [SerializeField] private Image itemIcon;
     [SerializeField] private TextMeshProUGUI itemDescription;
 
-    void OnEnable()
-    {
-        Clear();
-    }
+        void Start()
+        {
+            Clear();
+        }
         public void Show(InventoryItemInstance item)
     {
+
+        Debug.Log("SHOW DESCRIPTION"); // 👈
         if (item == null)
         {
+            Debug.Log("ITEM NULL, CLEARING"); // 👈
             Clear();
             return;
         }
@@ -50,6 +53,8 @@ public class DescriptionPanelView : MonoBehaviour
         itemIcon.sprite = null;
         itemIcon.enabled = false;
         itemDescription.text = "";
+
+        gameObject.SetActive(false);
     }
     
 }

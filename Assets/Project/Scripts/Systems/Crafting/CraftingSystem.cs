@@ -5,29 +5,32 @@ public class CraftingSystem
 {
     private RecipeData_SO currentRecipe;
 
-    private Dictionary<int, (ItemData_SO item, int amount)> slots
-        = new Dictionary<int, (ItemData_SO, int)>();
+    // 🔥 Estado interno del crafting (NO inventario real)
+    private Dictionary<int, (ItemData_SO item, int amount)> slots = new();
 
-    public CraftingSystem(List<RecipeData_SO> recipes)
-    {
-        currentRecipe = null; 
-    }
-
+    // =========================
+    // SET RECIPE
+    // =========================
     public void SetRecipe(RecipeData_SO recipe)
     {
         currentRecipe = recipe;
-        ClearAll();
+        slots.Clear();
     }
 
-    public bool TryPlaceItem(int slotIndex, ItemData_SO item, InventorySystem inventory)
+    // =========================
+    // PLACE ITEM (CLAVE)
+    // =========================
+    public bool TryPlaceItem(int slotIndex, ItemData_SO item, IInventoryReadModel read, IInventoryWriteModel write)
     {
-        // 🔥 BLOQUEO CLAVE
-        if (currentRecipe == null)
+        if (slots.ContainsKey(slotIndex))
         {
-            Debug.Log("No hay receta seleccionada");
+            Debug.Log("Slot ya ocupado");
             return false;
         }
+        if (currentRecipe == null)
+            return false;
 
+        // validar que pertenece a la receta
         var ingredient = currentRecipe.ingredients
             .Find(x => x.item.itemID == item.itemID);
 
@@ -37,89 +40,126 @@ public class CraftingSystem
             return false;
         }
 
-        int available = inventory.GetAmount(item);
+        // cuánto ya hay colocado
+        int current = GetCurrentAmount(item);
+        int required = ingredient.amount;
 
-        if (available < ingredient.amount)
+        if (current >= required)
         {
-            Debug.Log("Cantidad insuficiente");
+            Debug.Log("Ingrediente ya completo");
             return false;
         }
 
-        inventory.RemoveItem(item, ingredient.amount);
+        // cuánto falta
+        int remaining = required - current;
 
-        slots[slotIndex] = (item, ingredient.amount);
+        // validar inventario (READ)
+        int available = read.GetAmount(item);
+
+        if (available < remaining)
+        {
+            Debug.Log("No hay suficientes items en inventario");
+            return false;
+        }
+
+        // consumir inventario (WRITE)
+        write.RemoveItem(item, remaining);
+
+        // guardar en slot
+        slots[slotIndex] = (item, remaining);
 
         return true;
     }
-    public int GetRequiredAmount(ItemData_SO item)
+    public void ClearAllNoReturn()
     {
-        if (currentRecipe == null) return 0;
-
-        var ingredient = currentRecipe.ingredients
-            .Find(x => x.item.itemID == item.itemID);
-
-        return ingredient != null ? ingredient.amount : 0;
+        slots.Clear();
     }
+
+    // =========================
+    // GET CURRENT AMOUNT
+    // =========================
     public int GetCurrentAmount(ItemData_SO item)
     {
         int total = 0;
 
-        foreach (var pair in slots)
+        foreach (var s in slots.Values)
         {
-            var data = pair.Value;
-
-            if (data.item == item)
-                total += data.amount;
+            if (s.item == item)
+                total += s.amount;
         }
 
         return total;
     }
 
-    public void ClearSlot(int index)
+    // =========================
+    // CLEAR SLOT (DEVOLVER)
+    // =========================
+    public void ClearSlot(int index, IInventoryWriteModel write)
     {
-        if (slots.ContainsKey(index))
-            slots.Remove(index);
+        if (!slots.ContainsKey(index))
+            return;
+
+        var data = slots[index];
+
+        // 🔥 devolver items al inventario
+        write.AddItem(data.item, data.amount);
+
+        slots.Remove(index);
     }
 
+    // =========================
+    // CLEAR ALL
+    // =========================
+    public void ClearAll(IInventoryWriteModel write)
+    {
+        foreach (var slot in slots.Values)
+        {
+            write.AddItem(slot.item, slot.amount);
+        }
+
+        slots.Clear();
+    }
+
+    // =========================
+    // VALIDACIÓN
+    // =========================
     public bool IsRecipeComplete()
     {
-        if (currentRecipe == null) return false;
+        if (currentRecipe == null)
+            return false;
 
-        foreach (var ingredient in currentRecipe.ingredients)
+        foreach (var ing in currentRecipe.ingredients)
         {
-            bool found = false;
-
-            foreach (var slot in slots.Values)
-            {
-                if (slot.item.itemID == ingredient.item.itemID &&
-                    slot.amount >= ingredient.amount)
-                {
-                    found = true;
-                    break;
-                }
-            }
-
-            if (!found)
+            if (GetCurrentAmount(ing.item) < ing.amount)
                 return false;
         }
 
         return true;
     }
-    public void ReturnAllItems(InventorySystem inventory)
+
+    // =========================
+    // BATCH REMOVE (para validación)
+    // =========================
+    public (ItemData_SO item, int amount)[] BuildRemoveBatch()
     {
-        foreach (var slot in slots.Values)
+        if (currentRecipe == null)
+            return new (ItemData_SO, int)[0];
+
+        var list = new List<(ItemData_SO, int)>();
+
+        foreach (var ing in currentRecipe.ingredients)
         {
-            inventory.AddItem(slot.item, slot.amount);
+            list.Add((ing.item, ing.amount));
         }
 
-        slots.Clear();
+        return list.ToArray();
     }
+
+    // =========================
+    // ACCESS
+    // =========================
     public RecipeData_SO GetCurrentRecipe()
     {
         return currentRecipe;
-    }
-    public void ClearAll()
-    {
-        slots.Clear();
     }
 }

@@ -15,9 +15,8 @@ public class InventorySlotView : MonoBehaviour,
     [SerializeField] private TextMeshProUGUI stackText;
 
     private InventoryDragHandler dragHandler;
-
     private InventoryItemInstance currentItem;
-    private int currentAmount; // 🔥 FIX
+    private int currentAmount;
 
     public Action<InventoryItemInstance> OnSlotClicked;
     public Action<int, int> OnItemDropped;
@@ -29,24 +28,21 @@ public class InventorySlotView : MonoBehaviour,
 
         
     }
-
     public void SetItem(InventoryItemInstance item, int amount)
     {
-    
+        currentItem = item;
+        currentAmount = amount;
 
-        if (item == null)
+        if (item == null || amount <= 0)
         {
+            currentItem = null;
+            currentAmount = 0;
+
             icon.enabled = false;
             icon.sprite = null;
             stackText.text = "";
             return;
         }
-            // 🔥 EVITA REDRAW INNECESARIO
-        if (currentItem == item && currentAmount == amount)
-            return;
-
-        currentItem = item;
-        currentAmount = amount;
 
         icon.enabled = true;
         icon.sprite = item.Data.icon;
@@ -55,7 +51,8 @@ public class InventorySlotView : MonoBehaviour,
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        if (currentItem == null) return;
+        Debug.Log("CLICK SLOT"); // 👈
+
         OnSlotClicked?.Invoke(currentItem);
     }
 

@@ -14,7 +14,7 @@ public class InventorySystem : IInventoryWriteModel
         this.grid = grid;
 
         operations = new InventoryOperations(grid);
-        adapter = new GridInventoryAdapter(grid);
+        adapter = new GridInventoryAdapter(grid, this);
 
         ReadModel = adapter;
     }
@@ -60,7 +60,7 @@ public class InventorySystem : IInventoryWriteModel
     }
 
     // =========================================================
-    // 🔥 NUEVO: BATCH SIMULATION REAL
+    //  NUEVO: BATCH SIMULATION REAL
     // =========================================================
     public bool CanAddItemsBatch(params (ItemData_SO item, int amount)[] items)
     {
@@ -79,7 +79,58 @@ public class InventorySystem : IInventoryWriteModel
     }
 
     // =========================================================
-    // 🔥 CLONACIÓN (CRÍTICO)
+    // BATCH REAL: REMOVE + ADD (CRAFTING)
+    // =========================================================
+    public bool CanProcessBatch(
+        (ItemData_SO item, int amount)[] remove,
+        (ItemData_SO item, int amount)[] add)
+    {
+        // 1. CLONAR GRID
+        var tempGrid = CloneGrid();
+        var tempOps = new InventoryOperations(tempGrid);
+
+        // 2. REMOVER PRIMERO (SIMULADO)
+        foreach (var r in remove)
+        {
+            int remaining = r.amount;
+
+            foreach (var slot in tempGrid.GetAllSlots())
+            {
+                if (remaining <= 0)
+                    break;
+
+                if (slot.IsEmpty)
+                    continue;
+
+                if (slot.ItemInstance.Data != r.item)
+                    continue;
+
+                int removed = slot.ItemInstance.Remove(remaining);
+                remaining -= removed;
+
+                if (slot.ItemInstance.IsEmpty())
+                    slot.Clear();
+            }
+
+            // ❌ NO ALCANZA
+            if (remaining > 0)
+                return false;
+        }
+
+        // 3. INTENTAR INSERTAR
+        foreach (var a in add)
+        {
+            int added = tempOps.AddItem(a.item, a.amount, null);
+
+            if (added < a.amount)
+                return false;
+        }
+
+        return true;
+    }
+
+    // =========================================================
+    //  CLONACIÓN (CRÍTICO)
     // =========================================================
     private InventoryGrid CloneGrid()
     {

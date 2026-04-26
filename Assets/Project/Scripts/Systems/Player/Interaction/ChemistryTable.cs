@@ -2,17 +2,18 @@ using UnityEngine;
 
 public class ChemistryTable : MonoBehaviour, IInteractable
 {
+    [SerializeField] private GameObject craftingUI;
+
     public void Interact(InteractionContext context)
     {
-        if (context.Inventory == null)
+        if (context.InventoryRead == null)
         {
             Debug.LogError("Inventory NULL");
             return;
         }
 
-        Debug.Log("Abrir sistema químico con inventario");
-
-        // aquí puedes abrir UI o validar ingredientes
+        if (craftingUI != null)
+            craftingUI.SetActive(true);
     }
 
     public string GetInteractionText()

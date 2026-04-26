@@ -827,6 +827,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::InteractionController
   detector: {fileID: 1239265222}
+  inventoryController: {fileID: 7356667523031807904}
 --- !u!114 &1239265222
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6436,7 +6437,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bf341f27aeeb3484b9489a03e1146f12, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ItemPickup
-  itemData: {fileID: 11400000, guid: c702357e020b7224e877216dd429ed47, type: 2}
+  item: {fileID: 11400000, guid: c702357e020b7224e877216dd429ed47, type: 2}
   amount: 15
 --- !u!1 &5239287730132015342
 GameObject:
@@ -8052,7 +8053,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bf341f27aeeb3484b9489a03e1146f12, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ItemPickup
-  itemData: {fileID: 11400000, guid: 2450ec614ba58a947a73dc3b31c35fe2, type: 2}
+  item: {fileID: 11400000, guid: 2450ec614ba58a947a73dc3b31c35fe2, type: 2}
   amount: 16
 --- !u!1 &7069268349952970520
 GameObject:
@@ -9078,7 +9079,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bf341f27aeeb3484b9489a03e1146f12, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ItemPickup
-  itemData: {fileID: 11400000, guid: 95c7214d34bbc2f4f96ac00cb4070148, type: 2}
+  item: {fileID: 11400000, guid: 95c7214d34bbc2f4f96ac00cb4070148, type: 2}
   amount: 3
 --- !u!114 &8176659013790950693
 MonoBehaviour:
@@ -9665,7 +9666,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bf341f27aeeb3484b9489a03e1146f12, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ItemPickup
-  itemData: {fileID: 11400000, guid: b8a5a6f6c0b6ba546bd707ecdeffb2e5, type: 2}
+  item: {fileID: 11400000, guid: b8a5a6f6c0b6ba546bd707ecdeffb2e5, type: 2}
   amount: 3
 --- !u!224 &8802304554282936306
 RectTransform:
@@ -9952,7 +9953,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bf341f27aeeb3484b9489a03e1146f12, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ItemPickup
-  itemData: {fileID: 11400000, guid: 88eb3893adcb3e241ad47a4d6b690b6a, type: 2}
+  item: {fileID: 11400000, guid: 88eb3893adcb3e241ad47a4d6b690b6a, type: 2}
   amount: 12
 --- !u!114 &8992029149349352520
 MonoBehaviour:
