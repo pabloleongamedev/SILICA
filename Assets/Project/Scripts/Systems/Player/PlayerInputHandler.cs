@@ -73,7 +73,7 @@ public class PlayerInputHandler : MonoBehaviour
     {
         var current = stateController.GetState();
 
-        if (current == UIState.Crafting)
+        if (current != UIState.None && current != UIState.Inventory)
         {
             Debug.Log("No puedes abrir inventario durante crafting");
             return;

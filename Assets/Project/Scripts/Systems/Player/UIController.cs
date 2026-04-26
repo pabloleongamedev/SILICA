@@ -2,32 +2,29 @@ using UnityEngine;
 
 public class UIController : MonoBehaviour
 {
-    [SerializeField] private GameObject inventoryPanel;
     [SerializeField] private GameObject crosshair;
-    
 
-    private void Start()
-    {
-        HandleUI(false);
-    }
+    private int openPanels = 0;
 
     private void OnEnable()
-    {        
-        GameplayEvents.OnInventoryToggle += HandleUI;
+    {
+        GameplayEvents.OnInventoryToggle += HandlePanel;
+        GameplayEvents.OnCraftingToggle += HandlePanel;
+        GameplayEvents.OnChemistryToggle += HandlePanel;
     }
 
     private void OnDisable()
     {
-        GameplayEvents.OnInventoryToggle -= HandleUI;
+        GameplayEvents.OnInventoryToggle -= HandlePanel;
+        GameplayEvents.OnCraftingToggle -= HandlePanel;
+        GameplayEvents.OnChemistryToggle -= HandlePanel;
     }
 
-    private void HandleUI(bool isOpen)
+    private void HandlePanel(bool isOpen)
     {
-    
-        if (inventoryPanel != null)
-            inventoryPanel.SetActive(isOpen);
+        openPanels += isOpen ? 1 : -1;
+        openPanels = Mathf.Max(0, openPanels);
 
-        if (crosshair != null)
-            crosshair.SetActive(!isOpen);
+        crosshair.SetActive(openPanels == 0);
     }
 }

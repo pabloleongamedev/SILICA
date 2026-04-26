@@ -8,14 +8,16 @@ public class InteractionUIController : MonoBehaviour
     [SerializeField] private TMP_Text text;
 
     private bool forceHide; // 🔥 estado de override
+    private int openUI = 0;
 
     private void OnEnable()
-    {
+    {   
         if (detector != null)
             detector.OnInteractableChanged += HandleChanged;
 
-        GameplayEvents.OnCraftingToggle += HandleCrafting;
-        GameplayEvents.OnInventoryToggle += HandleInventory;
+        GameplayEvents.OnCraftingToggle += HandleUI;
+        GameplayEvents.OnInventoryToggle += HandleUI;
+        GameplayEvents.OnChemistryToggle += HandleUI; // 🔥 FALTA ESTO
     }
 
     private void OnDisable()
@@ -23,20 +25,19 @@ public class InteractionUIController : MonoBehaviour
         if (detector != null)
             detector.OnInteractableChanged -= HandleChanged;
 
-        GameplayEvents.OnCraftingToggle -= HandleCrafting;
-        GameplayEvents.OnInventoryToggle -= HandleInventory;
+        GameplayEvents.OnCraftingToggle -= HandleUI;
+        GameplayEvents.OnInventoryToggle -= HandleUI;
+        GameplayEvents.OnChemistryToggle -= HandleUI;
     }
 
     // 🔥 FORZADO POR UI
-    private void HandleCrafting(bool isOpen)
+    private void HandleUI(bool isOpen)
     {
-        forceHide = isOpen;
-        Refresh();
-    }
+        openUI += isOpen ? 1 : -1;
+        openUI = Mathf.Max(0, openUI);
 
-    private void HandleInventory(bool isOpen)
-    {
-        forceHide = isOpen;
+        forceHide = openUI > 0;
+
         Refresh();
     }
 

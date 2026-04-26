@@ -3,7 +3,8 @@ public enum UIState
 {
     None,
     Inventory,
-    Crafting
+    Crafting,
+    Chemistry
 }
 public class PlayerStateController : MonoBehaviour
 {
@@ -24,6 +25,7 @@ public class PlayerStateController : MonoBehaviour
         currentState = newState;
 
         bool isUI = newState != UIState.None;
+        //crosshair.SetActive(isUI);
 
         Cursor.lockState = isUI ? CursorLockMode.None : CursorLockMode.Locked;
         Cursor.visible = isUI;
@@ -51,6 +53,11 @@ public class PlayerStateController : MonoBehaviour
             case UIState.Crafting:
                 // 🔥 SOLO permitir interactuar con la mesa actual
                 return interactable is CraftingTable;
+
+            case UIState.Chemistry:
+                // SOLO permitir interactuar con la mesa actual
+                return interactable is ChemistryTable;
+                      
 
             default:
                 return false;

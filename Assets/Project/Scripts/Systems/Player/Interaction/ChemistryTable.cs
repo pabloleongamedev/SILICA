@@ -2,22 +2,27 @@ using UnityEngine;
 
 public class ChemistryTable : MonoBehaviour, IInteractable
 {
-    [SerializeField] private GameObject craftingUI;
+    private bool isOpen;
 
     public void Interact(InteractionContext context)
     {
-        if (context.InventoryRead == null)
-        {
-            Debug.LogError("Inventory NULL");
-            return;
-        }
+        isOpen = !isOpen;
 
-        if (craftingUI != null)
-            craftingUI.SetActive(true);
+        GameplayEvents.OnChemistryToggle?.Invoke(isOpen);
+
+        var playerState = FindFirstObjectByType<PlayerStateController>();
+
+        if (playerState != null)
+        {
+            playerState.SetState(
+                isOpen ? UIState.Chemistry : UIState.None
+            );
+        }
     }
 
     public string GetInteractionText()
     {
-        return "Presiona E para usar mesa química";
+        if (isOpen) return null;
+        return "Presiona E para usar refinador";
     }
 }

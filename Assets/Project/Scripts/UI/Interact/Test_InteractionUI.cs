@@ -3,7 +3,7 @@ using TMPro;
 
 public class InteractionUI : MonoBehaviour
 {
-     /////////////// ESTO ES BASURA
+     /////////////// ESTO ES BASURA, SOLO PARA TESTEAR, NO SE DEBE USAR ASÍ EN EL JUEGO FINAL!!!! ELIMINAR ///////////////
     [SerializeField] private InteractionDetector detector;
     [SerializeField] private GameObject container;
     [SerializeField] private TextMeshProUGUI text;
