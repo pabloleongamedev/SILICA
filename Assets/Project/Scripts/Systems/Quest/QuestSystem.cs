@@ -101,6 +101,10 @@ public class QuestSystem : MonoBehaviour
 
         CheckQuestComplete();
     }
+    public QuestData_SO GetCurrentQuest()
+    {
+        return currentQuest;
+    }
 
     // =========================================
     private void CheckQuestComplete()

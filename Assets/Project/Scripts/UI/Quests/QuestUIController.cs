@@ -15,6 +15,17 @@ public class QuestUIController : MonoBehaviour
     {
         QuestEvents.OnQuestLoaded += BuildUI;
         QuestEvents.OnTaskUpdated += UpdateTask;
+            var questSystem = FindFirstObjectByType<QuestSystem>();
+
+        if (questSystem != null)
+        {
+            var currentQuest = questSystem.GetCurrentQuest();
+
+            if (currentQuest != null)
+            {
+                BuildUI(currentQuest);
+            }
+        }
     }
 
     private void OnDisable()

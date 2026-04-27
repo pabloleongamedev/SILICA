@@ -9,6 +9,8 @@ public class InventoryView : MonoBehaviour
     [SerializeField] private Transform InventoryGridContainer;
     [SerializeField] private DescriptionPanelView descriptionPanel;
     [SerializeField] private InventoryDragHandler dragHandler;
+    [SerializeField] private GameObject QuestPanel;
+    [SerializeField] private GameObject inventoryPanel; 
 
     private IInventoryReadModel inventory;
     private List<InventorySlotView> slotViews = new List<InventorySlotView>();
@@ -68,6 +70,28 @@ public class InventoryView : MonoBehaviour
     private void HandleItemDropped(int fromIndex, int toIndex)
     {
         OnItemDropped?.Invoke(fromIndex, toIndex);
+    }
+
+    // =========================================
+    // UI TOGGLE
+    // =========================================
+
+    public void ShowQuestPanel()
+    {
+        if (QuestPanel != null)
+            QuestPanel.SetActive(true);
+
+        if (inventoryPanel != null)
+            inventoryPanel.SetActive(false);
+    }
+
+    public void ShowInventoryPanel()
+    {
+        if (inventoryPanel != null)
+            inventoryPanel.SetActive(true);
+
+        if (QuestPanel != null)
+            QuestPanel.SetActive(false);
     }
 
     public void ForceRefresh()
