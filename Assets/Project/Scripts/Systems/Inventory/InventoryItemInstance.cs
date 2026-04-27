@@ -37,4 +37,8 @@ public class InventoryItemInstance
     {
         return Quantity <= 0;
     }
+    public int GetRemainingSpace()
+    {
+        return Data.MaxStack - Quantity;
+    }
 }

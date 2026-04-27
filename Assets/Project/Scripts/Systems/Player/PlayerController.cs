@@ -4,7 +4,9 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 
 /// <summary>
-/// PlayerController: Controla la entrada del jugador. ////////// ESTO ES BASURA
+/// VERSION ANTERIOR LA BORRO POR QUE HAY IMPLEMENTACIONES DE INTERFAZ QUE CAMBIAN COSAS EN EL CONTEXTO DE INTERACCIÓN, 
+/// ASÍ QUE MEJOR HACER UNA NUEVA DESDE CERO Y NO TENER QUE HACER UN REVERT DE TODO EL CÓDIGOS     
+/// --->PENDIENTDE BORRAR ESTA CLASE DESPUÉS DE HACER LA NUEVA IMPLEMENTACIÓN  
 /// </summary>
 public class PlayerController : MonoBehaviour
 {
