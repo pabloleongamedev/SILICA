@@ -2,26 +2,30 @@ using UnityEngine;
 
 public class ItemPickup : MonoBehaviour, IInteractable
 {
-    [SerializeField] private ItemData_SO itemData;
+    [SerializeField] private ItemData_SO item;
     [SerializeField] private int amount = 1;
-    public System.Action<ItemPickup> OnPicked;
 
     public void Interact(InteractionContext context)
     {
-        if (context == null || context.Inventory == null)
-        {
-            Debug.LogError("Inventory NULL en contexto");
+        if (item == null)
             return;
-        }
 
-        context.Inventory.AddItem(itemData, amount);
-        OnPicked?.Invoke(this);
+        if (!context.InventoryRead.CanAddItemsBatch((item, amount)))
+            return;
+
+        context.InventoryWrite.AddItem(item, amount);
+
+        // IMPORTANTE: limpiar interacción ANTES de destruir
+        var detector = FindFirstObjectByType<InteractionDetector>();
+        if (detector != null)
+            detector.ForceRefresh();
+
         Destroy(gameObject);
     }
-
     public string GetInteractionText()
     {
-        if (itemData == null) return null;
-        return $"Presiona E para recoger {itemData.itemID}";
+        return item != null
+            ? $"Presiona E para recoger {item.itemID}"
+            : "Recoger objeto";
     }
 }

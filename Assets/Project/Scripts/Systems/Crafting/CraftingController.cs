@@ -3,34 +3,39 @@ using UnityEngine.UI;
 
 public class CraftingController : MonoBehaviour
 {
+    [Header("Data")]
     [SerializeField] private RecipeDatabase_SO database;
-    [SerializeField] private ToolCraftingView toolView;
+
+    [Header("Refs")]
     [SerializeField] private InventoryController inventoryController;
+    [SerializeField] private ToolCraftingView toolView;
     [SerializeField] private CraftingRecipeListView listView;
     [SerializeField] private CraftingRecipeDetailView detailView;
     [SerializeField] private Button craftButton;
 
     private CraftingSystem system;
-    private InventorySystem inventorySystem;
+
+    private IInventoryReadModel read;
+    private IInventoryWriteModel write;
 
     private void Awake()
     {
-        system = new CraftingSystem(database.recipes);
+        system = new CraftingSystem();
     }
+
     private void Start()
     {
         if (inventoryController == null)
         {
-            Debug.LogError("InventoryController no asignado");
+            Debug.LogError("[CraftingController] InventoryController no asignado");
             return;
         }
 
-        inventorySystem = inventoryController.GetInventorySystem();
+        read = inventoryController.ReadModel;
+        write = inventoryController.WriteModel;
 
-        if (inventorySystem == null)
-        {
-            Debug.LogError("InventorySystem sigue siendo NULL en Start");
-        }
+        BuildRecipesUI();
+        UpdateCraftButton();
     }
 
     private void OnEnable()
@@ -38,111 +43,139 @@ public class CraftingController : MonoBehaviour
         toolView.OnItemDroppedInSlot += HandleItemDropped;
         toolView.OnItemDragOut += HandleItemReturned;
         craftButton.onClick.AddListener(OnCraftClicked);
-
-        BuildRecipesUI();
     }
 
     private void OnDisable()
     {
         toolView.OnItemDroppedInSlot -= HandleItemDropped;
         toolView.OnItemDragOut -= HandleItemReturned;
-    }
+        craftButton.onClick.RemoveListener(OnCraftClicked);
 
-    private void HandleItemDropped(int slotIndex, ItemData_SO item)
-    {
-        if (system.GetCurrentRecipe() == null)
+        // 🔥 rollback seguro
+        if (write != null)
         {
-            Debug.Log("Selecciona una receta primero");
-            return;
+            system.ClearAll(write);
+            toolView.Clear();
         }
-
-        if (!system.TryPlaceItem(slotIndex, item, inventorySystem))
-            return;
-
-        toolView.SetItemInSlot(slotIndex, item);
-
-        UpdateCraftButton();
     }
-    private void UpdateCraftButton()
-    {
-        if (craftButton == null) return;
 
-        craftButton.interactable = system.IsRecipeComplete();
-    }
-    private void HandleItemReturned(int slotIndex, ItemData_SO item)
-    {
-        Debug.Log("RETURN ITEM");
-
-        int amount = system.GetRequiredAmount(item);
-
-        if (amount <= 0) return;
-
-        inventorySystem.AddItem(item, amount);
-
-        system.ClearSlot(slotIndex);
-        toolView.ClearSlot(slotIndex);
-    }
+    // =========================================================
+    // UI BUILD
+    // =========================================================
     private void BuildRecipesUI()
     {
-        if (listView == null)
-        {
-            Debug.LogError("ListView not assigned");
+        if (listView == null || database == null)
             return;
-        }
-
-        if (database == null)
-        {
-            Debug.LogError("Database not assigned");
-            return;
-        }
-
-        Debug.Log("BUILD RECIPES UI");
 
         listView.Build(database.recipes, OnRecipeSelected);
     }
+
     private void OnRecipeSelected(RecipeData_SO recipe)
     {
-        system.ReturnAllItems(inventorySystem);
-        toolView.Clear();
-        Debug.Log("RECIPE SELECTED: " + recipe.name);
+        // 🔥 devolver items antes de cambiar
+        system.ClearAll(write);
 
         system.SetRecipe(recipe);
 
+        toolView.Clear();
+
         if (detailView != null)
+            detailView.ShowRecipe(recipe);
+
+        Notify("Receta seleccionada: " + recipe.name, NotificationType.Info);
+
+        UpdateCraftButton();
+    }
+
+    // =========================================================
+    // DRAG & DROP
+    // =========================================================
+    private void HandleItemDropped(int slotIndex, ItemData_SO item)
+    {
+        var result = system.TryPlaceItem(slotIndex, item, read, write);
+
+        if (!result.success)
         {
-            detailView.ShowRecipe(recipe); 
+            Notify(result.message, result.type);
+            return;
         }
 
-        toolView.Clear();
+        toolView.SetItemInSlot(slotIndex, item);
+
+        Notify(result.message, result.type);
+
+        UpdateCraftButton();
     }
+
+    private void HandleItemReturned(int slotIndex, ItemData_SO item)
+    {
+        system.ClearSlot(slotIndex, write);
+        toolView.ClearSlot(slotIndex);
+
+        Notify($"{item.itemID} devuelto", NotificationType.Info);
+
+        UpdateCraftButton();
+    }
+
+    // =========================================================
+    // VALIDACIÓN
+    // =========================================================
+    private void UpdateCraftButton()
+    {
+        if (craftButton == null)
+            return;
+
+        craftButton.interactable = system.IsRecipeComplete();
+    }
+
+    // =========================================================
+    // CRAFT
+    // =========================================================
     private void OnCraftClicked()
     {
         var recipe = system.GetCurrentRecipe();
 
         if (recipe == null)
         {
-            Debug.Log("No hay receta seleccionada");
+            Notify("No hay receta seleccionada", NotificationType.Warning);
             return;
         }
 
         if (!system.IsRecipeComplete())
         {
-            Debug.Log("Receta incompleta");
+            Notify("Receta incompleta", NotificationType.Warning);
 
-            // DEVOLVER ITEMS
-            system.ReturnAllItems(inventorySystem);
+            // rollback
+            system.ClearAll(write);
             toolView.Clear();
 
+            UpdateCraftButton();
             return;
         }
 
-        inventorySystem.AddItem(recipe.result, recipe.resultAmount);
+        //  PRODUCCIÓN (usa inventory system → ya notifica)
+        write.AddItem(recipe.result, recipe.resultAmount);
+        // NOTIFICAR CRAFTEO A MISIONES 
+        QuestEvents.OnItemCrafted?.Invoke(recipe.result, recipe.resultAmount);
+        //  limpiar slots internos
+        system.ClearAllNoReturn();
 
-        toolView.ConsumeAllSlots();
-        system.ClearAll();
+        toolView.Clear();
 
-        Debug.Log("CRAFT COMPLETADO");
+        Notify("Crafteo completado", NotificationType.Success);
+
+        UpdateCraftButton();
     }
-    
 
+    // =========================================================
+    // NOTIFY
+    // =========================================================
+    private void Notify(string message, NotificationType type)
+    {
+        GameplayEvents.OnNotification?.Invoke(new NotificationData
+        {
+            message = message,
+            type = type
+        });
+    }
 }

@@ -52,6 +52,23 @@ public class InventoryGrid
     {
         return grid[x, y];
     }
+    public InventoryGrid Clone()
+    {
+        var newGrid = new InventoryGrid(Width, Height);
+
+        foreach (var slot in GetAllSlots())
+        {
+            if (!slot.IsEmpty)
+            {
+                var instance = new InventoryItemInstance(slot.ItemInstance.Data);
+                instance.Add(slot.ItemInstance.Quantity);
+
+                newGrid.GetSlot(slot.X, slot.Y).SetItem(instance);
+            }
+        }
+
+        return newGrid;
+    }
 
     public IEnumerable<InventorySlot> GetAllSlots()
     {

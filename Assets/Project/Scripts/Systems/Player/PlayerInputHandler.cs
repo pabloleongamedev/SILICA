@@ -13,6 +13,8 @@ public class PlayerInputHandler : MonoBehaviour
 
     private InputSystem_Actions inputActions;
     private InteractionContext interactionContext;
+    
+    
 
     private void Awake()
     {
@@ -73,21 +75,16 @@ public class PlayerInputHandler : MonoBehaviour
     {
         var current = stateController.GetState();
 
-        if (current == UIState.Crafting)
-        {
-            Debug.Log("No puedes abrir inventario durante crafting");
-            return;
-        }
-
         if (current == UIState.Inventory)
         {
             stateController.SetState(UIState.None);
-            GameplayEvents.OnInventoryToggle?.Invoke(false);
             return;
         }
 
-        stateController.SetState(UIState.Inventory);
-        GameplayEvents.OnInventoryToggle?.Invoke(true);
+        if (current == UIState.None)
+        {
+            stateController.SetState(UIState.Inventory);
+        }
     }
 
     private void OnInteract(InputAction.CallbackContext ctx)
@@ -98,13 +95,13 @@ public class PlayerInputHandler : MonoBehaviour
 
         if (interactable == null) return;
 
-        // 🔥 DELEGACIÓN LIMPIA
+        // VALIDACIÓN POR ESTADO (UI abierta, etc)
         if (!stateController.CanInteract(interactable))
         {
             Debug.Log("Interact bloqueado por estado");
             return;
         }
-
+        // EJECUCIÓN
         interactable.Interact(interactionContext);
     }
 

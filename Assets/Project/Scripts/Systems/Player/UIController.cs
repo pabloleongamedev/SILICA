@@ -2,32 +2,23 @@ using UnityEngine;
 
 public class UIController : MonoBehaviour
 {
-    [SerializeField] private GameObject inventoryPanel;
     [SerializeField] private GameObject crosshair;
-    
-
-    private void Start()
-    {
-        HandleUI(false);
-    }
 
     private void OnEnable()
-    {        
-        GameplayEvents.OnInventoryToggle += HandleUI;
+    {
+        GameplayEvents.OnUIStateChanged += HandleState;
     }
 
     private void OnDisable()
     {
-        GameplayEvents.OnInventoryToggle -= HandleUI;
+        GameplayEvents.OnUIStateChanged -= HandleState;
     }
 
-    private void HandleUI(bool isOpen)
+    private void HandleState(UIState state)
     {
-    
-        if (inventoryPanel != null)
-            inventoryPanel.SetActive(isOpen);
+        if (crosshair == null) return;
 
-        if (crosshair != null)
-            crosshair.SetActive(!isOpen);
+        // 🔥 visible SOLO cuando no hay UI
+        crosshair.SetActive(state == UIState.None);
     }
 }
