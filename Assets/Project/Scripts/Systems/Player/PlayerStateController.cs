@@ -42,8 +42,6 @@ public class PlayerStateController : MonoBehaviour
 
         // 🔥 ESTA LÍNEA ES LA QUE TE FALTABA
         GameplayEvents.OnUIStateChanged?.Invoke(currentState);
-
-        Debug.Log($"[PlayerState] State: {currentState}");
     }
 
     public UIState GetState() => currentState;

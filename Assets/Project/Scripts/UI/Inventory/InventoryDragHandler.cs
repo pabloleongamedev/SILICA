@@ -15,10 +15,8 @@ public class InventoryDragHandler : MonoBehaviour
 
     public void StartDrag(Sprite icon)
     {
-        Debug.Log("START DRAG"); // 👈 agrega esto
         ghostIcon.transform.SetAsLastSibling();
         ghostIcon.sprite = icon;
-        Debug.Log(icon.name);
         ghostIcon.gameObject.SetActive(true);
     }
 

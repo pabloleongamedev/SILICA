@@ -20,8 +20,6 @@ public class ChemistryUIController : MonoBehaviour
 
         bool isActive = state == UIState.Chemistry;
 
-        Debug.Log("CHEMISTRY PANEL: " + isActive);
-
         chemistryPanel.SetActive(isActive);
     }
 }

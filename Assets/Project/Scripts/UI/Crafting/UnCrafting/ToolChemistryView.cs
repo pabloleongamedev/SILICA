@@ -5,6 +5,7 @@ using System;
 public class ToolChemistryView : MonoBehaviour, IDropHandler
 {
     [SerializeField] private ChemistrySlotView slot;
+    [SerializeField] private SeparationDatabase_SO database;
 
     private ItemData_SO currentItem;
 
@@ -22,10 +23,29 @@ public class ToolChemistryView : MonoBehaviour, IDropHandler
         var itemInstance = itemView.GetItem();
         if (itemInstance == null) return;
 
-        if (currentItem != null)
-            return; // 🔥 sin lógica, sin mensajes
+        var item = itemInstance.Data;
 
-        SetItem(itemInstance.Data);
+        // =====================================================
+        // 🔥 VALIDACIÓN + NOTIFICACIÓN
+        // =====================================================
+        var compound = database.Get(item);
+
+        if (compound == null)
+        {
+            Notify("Este elemento no se puede refinar", NotificationType.Warning);
+            return;
+        }
+
+        if (currentItem != null)
+        {
+            Notify("El refinador ya está ocupado", NotificationType.Warning);
+            return;
+        }
+
+        // =====================================================
+        // ✔ SOLO SI PASA VALIDACIÓN
+        // =====================================================
+        SetItem(item);
     }
 
     public void SetItem(ItemData_SO item)
@@ -48,4 +68,18 @@ public class ToolChemistryView : MonoBehaviour, IDropHandler
     }
 
     public ItemData_SO GetItem() => currentItem;
+
+    // =====================================================
+    // 🔥 SISTEMA DE NOTIFICACIÓN CENTRALIZADO
+    // =====================================================
+    private void Notify(string msg, NotificationType type)
+    {
+        Debug.Log("[Chemistry][Drop] " + msg);
+
+        GameplayEvents.OnNotification?.Invoke(new NotificationData
+        {
+            message = msg,
+            type = type
+        });
+    }
 }

@@ -1,81 +1,95 @@
 using System.Linq;
 using UnityEngine;
 
-
 /// <summary>
-/// Contiene TODA la lógica de separación.
-/// NO depende de UI.
-/// NO depende de MonoBehaviour.
+/// Sistema PURO de lógica de separación.
+/// ✔ No depende de MonoBehaviour
+/// ✔ No depende de UI
+/// ✔ No consume input (eso ya ocurre en el DROP)
+/// ✔ Solo valida outputs y los ejecuta
 /// </summary>
 public class ChemistrySystem
 {
+    // =========================================================
+    // VALIDACIÓN
+    // =========================================================
     public bool CanSeparate(
         CompoundDefinition_SO compound,
         SeparationMethod_SO method,
         IInventoryReadModel read)
     {
-        if (compound == null || method == null)
-            return false;
-
-        if (compound.requiredMethod != method)
-            return false;
-
-        int available = GetAmount(read, compound.inputItem);
-
-        if (available <= 0)
-            return false;
-
-        var remove = new[]
+        // 🔥 VALIDACIONES BASE
+        if (compound == null)
         {
-            (compound.inputItem, 1)
-        };
+            Debug.LogWarning("CanSeparate: compound NULL");
+            return false;
+        }
 
+        if (method == null)
+        {
+            Debug.LogWarning("CanSeparate: method NULL");
+            return false;
+        }
+
+        // 🔥 VALIDAR MÉTODO
+        if (compound.requiredMethod != method)
+        {
+            Debug.LogWarning("CanSeparate: método incorrecto");
+            return false;
+        }
+
+        // 🔥 IMPORTANTE:
+        // ❌ NO VALIDAMOS INPUT EN INVENTARIO
+        // ✔ porque ya fue consumido en el DROP
+
+        // 🔥 VALIDAR ESPACIO PARA OUTPUTS
         var add = compound.outputs
             .Select(o => (o.item, o.amount))
             .ToArray();
 
-        return read.CanProcessBatch(remove, add);
+        bool canAdd = read.CanAddItemsBatch(add);
+
+        if (!canAdd)
+        {
+            Debug.LogWarning("CanSeparate: no hay espacio para outputs");
+        }
+
+        return canAdd;
     }
 
+    // =========================================================
+    // EJECUCIÓN
+    // =========================================================
     public bool Execute(
         CompoundDefinition_SO compound,
         SeparationMethod_SO method,
         IInventoryReadModel read,
         IInventoryWriteModel write)
     {
+
+        if (compound == null)
+            return false;
+        
+        // VALIDAR ANTES DE EJECUTAR
         if (!CanSeparate(compound, method, read))
             return false;
+        
 
-        // 🔥 CONSUMIR
-        write.RemoveItem(compound.inputItem, 1);
-
-        // 🔥 PRODUCIR
+        //  PRODUCIR OUTPUTS
         foreach (var output in compound.outputs)
         {
+            if (output.item == null)
+                continue;
+
+            if (output.amount <= 0)
+                continue;
+
+
             write.AddItem(output.item, output.amount);
         }
 
+        Debug.Log("✔ Separación completada");
+
         return true;
-    }
-
-    // =========================
-    // UTILIDAD INTERNA
-    // =========================
-    private int GetAmount(IInventoryReadModel read, ItemData_SO item)
-    {
-        int total = 0;
-
-        for (int i = 0; i < read.Capacity; i++)
-        {
-            var slot = read.GetItem(i);
-
-            if (slot == null)
-                continue;
-
-            if (slot.Data == item)
-                total += slot.Quantity;
-        }
-
-        return total;
     }
 }

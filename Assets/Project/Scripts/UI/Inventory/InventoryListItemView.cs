@@ -57,7 +57,6 @@ public class InventoryListItemView : MonoBehaviour,
     // DRAG
     public void OnBeginDrag(PointerEventData eventData)
     {
-         Debug.Log("[DRAG] START DRAG");
         if (currentItem == null || dragHandler == null) return;
         dragHandler.StartDrag(currentItem.Data.icon);
     }

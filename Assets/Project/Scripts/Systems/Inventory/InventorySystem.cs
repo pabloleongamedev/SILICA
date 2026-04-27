@@ -100,7 +100,6 @@ public class InventorySystem : IInventoryWriteModel
         }
 
         //  NOTIFICACIÓN A QUEST SYSTEM (CORRECTO)
-        Debug.LogWarning("RECOGEMOS ELEMENTOS NECESARIOS!");
         QuestEvents.OnItemCollected?.Invoke(item, added);
         return added;
     }
@@ -217,7 +216,6 @@ public class InventorySystem : IInventoryWriteModel
     // =========================================================
     private void Notify(string message, NotificationType type)
     {
-        Debug.Log("[Inventory] " + message);
 
         GameplayEvents.OnNotification?.Invoke(new NotificationData
         {
