@@ -1,6 +1,6 @@
 public enum QuestTaskType
 {
-    CollectItem,
-    CraftItem,
-    RefineItem
+    Collect,
+    Refine,
+    Craft
 }
