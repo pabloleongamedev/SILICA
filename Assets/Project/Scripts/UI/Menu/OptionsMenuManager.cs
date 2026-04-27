@@ -17,40 +17,61 @@ public class OptionsMenuManager : MonoBehaviour
     [SerializeField] private Slider effectsSlider;
     [SerializeField] private Slider masterVolumeSlider;
 
-    void Start()
-    {
-        // Inicializar sliders con valores guardados
-        brightnessSlider.value = GameSettings.Instance.Brightness;
-        musicSlider.value = GameSettings.Instance.MusicVolume;
-        effectsSlider.value = GameSettings.Instance.EffectsVolume;
-        masterVolumeSlider.value = GameSettings.Instance.MasterVolume;
+    [Header("Audio")]
+    [SerializeField] private SoundSettings soundSettings;
 
-        // Conectar botones
+    private void Start()
+    {
+        ConfigureMasterSlider();
+        LoadSettingsIntoUI();
+
         applyButton.onClick.AddListener(ApplySettings);
         resetButton.onClick.AddListener(ResetSettings);
         closeButton.onClick.AddListener(CloseOptionsPanel);
     }
 
-    void ApplySettings()
+    private void ConfigureMasterSlider()
+    {
+        masterVolumeSlider.minValue = 1f;
+        masterVolumeSlider.maxValue = 10f;
+        masterVolumeSlider.wholeNumbers = true;
+    }
+
+    private void LoadSettingsIntoUI()
+    {
+        brightnessSlider.value = GameSettings.Instance.Brightness;
+        musicSlider.value = GameSettings.Instance.MusicVolume;
+        effectsSlider.value = GameSettings.Instance.EffectsVolume;
+        masterVolumeSlider.value = GameSettings.Instance.GetMasterVolumeSegments();
+    }
+
+    private void ApplySettings()
     {
         GameSettings.Instance.Brightness = brightnessSlider.value;
         GameSettings.Instance.MusicVolume = musicSlider.value;
         GameSettings.Instance.EffectsVolume = effectsSlider.value;
-        GameSettings.Instance.MasterVolume = masterVolumeSlider.value;
+        GameSettings.Instance.SetMasterVolumeFromSegments(masterVolumeSlider.value);
+
         GameSettings.Instance.Save();
+
+        if (soundSettings != null)
+        {
+            soundSettings.ApplySound();
+        }
     }
 
-    void ResetSettings()
+    private void ResetSettings()
     {
         GameSettings.Instance.ResetToDefaults();
+        LoadSettingsIntoUI();
 
-        brightnessSlider.value = GameSettings.Instance.Brightness;
-        musicSlider.value = GameSettings.Instance.MusicVolume;
-        effectsSlider.value = GameSettings.Instance.EffectsVolume;
-        masterVolumeSlider.value = GameSettings.Instance.MasterVolume;
+        if (soundSettings != null)
+        {
+            soundSettings.ApplySound();
+        }
     }
 
-    void CloseOptionsPanel()
+    private void CloseOptionsPanel()
     {
         optionsPanel.SetActive(false);
     }

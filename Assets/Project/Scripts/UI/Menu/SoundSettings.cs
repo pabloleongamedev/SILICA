@@ -1,37 +1,63 @@
 using UnityEngine;
-using UnityEngine.UI;
+using UnityEngine.Audio;
 
 public class SoundSettings : MonoBehaviour
 {
-    [Header("UI References")]
-    public Slider masterVolumeSlider;
-    public Slider musicSlider;
-    public Slider sfxSlider;
+    [Header("Audio Mixer")]
+    [SerializeField] private AudioMixer audioMixer;
 
-    void Start()
+    [Header("Exposed Parameter Names")]
+    [SerializeField] private string masterVolumeParameter = "MasterVol";
+    [SerializeField] private string musicVolumeParameter = "MusicVol";
+    [SerializeField] private string sfxVolumeParameter = "SFXVol";
+
+    private void Start()
     {
-        // Cargar valores guardados
-        masterVolumeSlider.value = PlayerPrefs.GetFloat("MasterVolume", 1f);
-        musicSlider.value = PlayerPrefs.GetFloat("MusicVolume", 0.5f);
-        sfxSlider.value = PlayerPrefs.GetFloat("SFXVolume", 0.8f);
-
         ApplySound();
     }
 
     public void ApplySound()
     {
-        // Volumen maestro
-        AudioListener.volume = masterVolumeSlider.value;
-
-        // Aquí puedes conectar con tus AudioMixers si los tienes
-        // Ejemplo:
-        // audioMixer.SetFloat("MusicVol", Mathf.Log10(musicSlider.value) * 20);
-        // audioMixer.SetFloat("SFXVol", Mathf.Log10(sfxSlider.value) * 20);
-
-        // Guardar
-        PlayerPrefs.SetFloat("MasterVolume", masterVolumeSlider.value);
-        PlayerPrefs.SetFloat("MusicVolume", musicSlider.value);
-        PlayerPrefs.SetFloat("SFXVolume", sfxSlider.value);
-        PlayerPrefs.Save();
+        DebugSetMixerVolume(masterVolumeParameter, GameSettings.Instance.MasterVolume);
+        DebugSetMixerVolume(musicVolumeParameter, GameSettings.Instance.MusicVolume);
+        DebugSetMixerVolume(sfxVolumeParameter, GameSettings.Instance.EffectsVolume);
     }
+
+    public void PreviewMusicVolume(float value)
+    {
+        DebugSetMixerVolume(musicVolumeParameter, value);
+    }
+
+    public void PreviewSFXVolume(float value)
+    {
+        DebugSetMixerVolume(sfxVolumeParameter, value);
+    }
+
+    public void PreviewMasterVolume(float segments)
+{
+    segments = Mathf.Clamp(segments, 1f, 10f);
+
+    float normalizedVolume = segments / 10f;
+    GameSettings.Instance.MasterVolume = normalizedVolume;
+
+    DebugSetMixerVolume(masterVolumeParameter, normalizedVolume);
+}
+
+
+    private void DebugSetMixerVolume(string parameterName, float normalizedVolume)
+    {
+        normalizedVolume = Mathf.Clamp(normalizedVolume, 0.5f, 1f);
+        float volumeInDb = Mathf.Log10(normalizedVolume) * 20f;
+
+        bool setOk = audioMixer.SetFloat(parameterName, volumeInDb);
+
+        float currentValue;
+        bool getOk = audioMixer.GetFloat(parameterName, out currentValue);
+
+        Debug.Log(
+            $"[AUDIO DEBUG] Param: {parameterName} | Normalized: {normalizedVolume} | dB: {volumeInDb} | SetOK: {setOk} | GetOK: {getOk} | Current: {currentValue}"
+        );
+    }
+    
+
 }

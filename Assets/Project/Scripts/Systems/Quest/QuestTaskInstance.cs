@@ -1,28 +1,48 @@
+using UnityEngine;
+
 public class QuestTaskInstance
 {
-    private QuestTaskData_SO data;
+    private QuestTask data;
 
-    public int currentAmount { get; private set; }
+    public int CurrentAmount { get; private set; }
 
-    public bool IsComplete => currentAmount >= data.requiredAmount;
+    public bool IsComplete => CurrentAmount >= data.requiredAmount;
 
-    public QuestTaskInstance(QuestTaskData_SO data)
+    public QuestTaskInstance(QuestTask data)
     {
         this.data = data;
-        currentAmount = 0;
+        CurrentAmount = 0;
     }
 
-    public void Progress(ItemData_SO item, int amount, QuestTaskType type)
+    public bool Progress(ItemData_SO item, int amount, QuestTaskType type)
     {
+        if (data == null)
+            return false;
+
+        if (data.targetItem == null)
+            return false;
+
         if (data.type != type)
-            return;
+            return false;
 
         if (data.targetItem != item)
-            return;
+            return false;
 
-        currentAmount += amount;
+        CurrentAmount += amount;
 
-        if (currentAmount > data.requiredAmount)
-            currentAmount = data.requiredAmount;
+        if (CurrentAmount > data.requiredAmount)
+            CurrentAmount = data.requiredAmount;
+
+        return true; // indica que esta tarea fue afectada
+    }
+
+    public int GetRequiredAmount()
+    {
+        return data.requiredAmount;
+    }
+
+    public string GetDescription()
+    {
+        return data.description;
     }
 }

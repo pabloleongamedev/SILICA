@@ -1,74 +1,122 @@
-using System.Collections.Generic;
 using UnityEngine;
+using System.Collections.Generic;
 
 public class QuestSystem : MonoBehaviour
 {
-    private List<QuestInstance> activeQuests = new();
+    [SerializeField] private List<QuestData_SO> quests;
 
+    private int currentQuestIndex = 0;
+    private QuestData_SO currentQuest;
 
+    private Dictionary<int, int> progress = new();
 
-    // =========================
-    // PRUEBA DE FUNCIONAMIENTO -->BORRAR
-    // =========================
-    [SerializeField] private QuestData_SO testQuest;
+    private bool isInitialized = false;
 
     private void Start()
     {
-        if (testQuest != null)
-        {
-            AddQuest(testQuest);
-            Debug.Log("Quest cargada: " + testQuest.name);
-        }
-    }
-    // =========================
-    // INIT
-    // =========================
-    public void AddQuest(QuestData_SO questData)
-    {
-        activeQuests.Add(new QuestInstance(questData));
+        LoadQuest(0);
     }
 
-    // =========================
-    // PROGRESS
-    // =========================
-    public void Progress(ItemData_SO item, int amount, QuestTaskType type)
-    {
-        foreach (var quest in activeQuests)
-        {
-            quest.Progress(item, amount, type);
-
-            if (quest.IsComplete)
-            {
-                Debug.Log("MISIÓN COMPLETADA");
-            }
-        }
-    }
     private void OnEnable()
     {
-        QuestEvents.OnItemCollected += OnCollected;
-        QuestEvents.OnItemCrafted += OnCrafted;
-        QuestEvents.OnItemRefined += OnRefined;
+        QuestEvents.OnItemCollected += HandleCollect;
+        QuestEvents.OnItemRefined += HandleRefined;
+        QuestEvents.OnItemCrafted += HandleCraft;
     }
 
     private void OnDisable()
     {
-        QuestEvents.OnItemCollected -= OnCollected;
-        QuestEvents.OnItemCrafted -= OnCrafted;
-        QuestEvents.OnItemRefined -= OnRefined;
+        QuestEvents.OnItemCollected -= HandleCollect;
+        QuestEvents.OnItemRefined -= HandleRefined;
+        QuestEvents.OnItemCrafted -= HandleCraft;
     }
 
-    private void OnCollected(ItemData_SO item, int amount)
+    // =========================================
+    private void LoadQuest(int index)
     {
-        Progress(item, amount, QuestTaskType.CollectItem);
+        if (index >= quests.Count)
+        {
+            Debug.Log("TODAS LAS MISIONES COMPLETADAS");
+            return;
+        }
+
+        currentQuestIndex = index;
+        currentQuest = quests[index];
+
+        progress.Clear();
+
+        for (int i = 0; i < currentQuest.tasks.Count; i++)
+            progress[i] = 0;
+
+        isInitialized = true;
+
+        // 🔥 UI
+        QuestEvents.OnQuestLoaded?.Invoke(currentQuest);
     }
 
-    private void OnCrafted(ItemData_SO item, int amount)
+    // =========================================
+    private void HandleCollect(ItemData_SO item, int amount)
     {
-        Progress(item, amount, QuestTaskType.CraftItem);
+        if (!isInitialized) return;
+        UpdateTasks(item, amount, QuestTaskType.Collect);
     }
 
-    private void OnRefined(ItemData_SO item, int amount)
+    private void HandleRefined(ItemData_SO item, int amount)
     {
-        Progress(item, amount, QuestTaskType.RefineItem);
+        if (!isInitialized) return;
+        UpdateTasks(item, amount, QuestTaskType.Refine);
+    }
+
+    private void HandleCraft(ItemData_SO item, int amount)
+    {
+        if (!isInitialized) return;
+        UpdateTasks(item, amount, QuestTaskType.Craft);
+    }
+
+    // =========================================
+    private void UpdateTasks(ItemData_SO item, int amount, QuestTaskType type)
+    {
+        if (currentQuest == null) return;
+        if (currentQuest.tasks == null) return;
+
+        for (int i = 0; i < currentQuest.tasks.Count; i++)
+        {
+            var task = currentQuest.tasks[i];
+
+            if (task == null || task.targetItem == null)
+                continue;
+
+            if (task.type != type) continue;
+            if (task.targetItem != item) continue;
+
+            progress[i] += amount;
+
+            int current = progress[i];
+            int required = task.requiredAmount;
+
+            bool completed = current >= required;
+
+            QuestEvents.OnTaskUpdated?.Invoke(i, current, required, completed);
+        }
+
+        CheckQuestComplete();
+    }
+    public QuestData_SO GetCurrentQuest()
+    {
+        return currentQuest;
+    }
+
+    // =========================================
+    private void CheckQuestComplete()
+    {
+        for (int i = 0; i < currentQuest.tasks.Count; i++)
+        {
+            if (progress[i] < currentQuest.tasks[i].requiredAmount)
+                return;
+        }
+
+        Debug.Log("MISIÓN COMPLETADA");
+
+        LoadQuest(currentQuestIndex + 1);
     }
 }

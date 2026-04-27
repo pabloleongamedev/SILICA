@@ -9,7 +9,7 @@ public class VitalityBarSegments : MonoBehaviour
     [SerializeField] private Color colorTop = new Color(0f, 1f, 1f, 1f);
     [SerializeField] private Color colorBottom = new Color(1f, 0.7058824f, 0.67058825f, 1f);
     [SerializeField] private Color emptyColor = new Color(0.4f, 0.4f, 0.4f, 0.8f);
-    Color redColor = new Color(255,180,171,255);
+    Color redColor = new Color(1f, 180f/255f, 171f/255f, 1f);
 
     public void UpdateVisuals(float ratio, float secondsRemaining)
     {
