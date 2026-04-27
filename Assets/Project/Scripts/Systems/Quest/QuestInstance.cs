@@ -1,27 +1,47 @@
-using System.Linq;
+using System.Collections.Generic;
 
 public class QuestInstance
 {
-    private QuestData_SO data;
+    public QuestData_SO data;
 
-    private QuestTaskInstance[] tasks;
-
-    public bool IsComplete => tasks.All(t => t.IsComplete);
+    private Dictionary<int, int> progress = new();
 
     public QuestInstance(QuestData_SO data)
     {
         this.data = data;
 
-        tasks = data.tasks
-            .Select(t => new QuestTaskInstance(t))
-            .ToArray();
+        for (int i = 0; i < data.tasks.Count; i++)
+            progress[i] = 0;
     }
 
-    public void Progress(ItemData_SO item, int amount, QuestTaskType type)
+    public void AddProgress(ItemData_SO item, int amount, QuestTaskType type)
     {
-        foreach (var task in tasks)
+        for (int i = 0; i < data.tasks.Count; i++)
         {
-            task.Progress(item, amount, type);
+            var task = data.tasks[i];
+
+            if (task.type != type) continue;
+            if (task.targetItem != item) continue;
+
+            progress[i] += amount;
+
+            int current = progress[i];
+            int required = task.requiredAmount;
+
+            bool completed = current >= required;
+
+            QuestEvents.OnTaskUpdated?.Invoke(i, current, required, completed);
         }
+    }
+    
+
+    public bool IsComplete()
+    {
+        for (int i = 0; i < data.tasks.Count; i++)
+        {
+            if (progress[i] < data.tasks[i].requiredAmount)
+                return false;
+        }
+        return true;
     }
 }
