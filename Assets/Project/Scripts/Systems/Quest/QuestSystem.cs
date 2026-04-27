@@ -105,6 +105,13 @@ public class QuestSystem : MonoBehaviour
     {
         return currentQuest;
     }
+    public int GetTaskProgress(int index)
+    {
+        if (progress.ContainsKey(index))
+            return progress[index];
+
+        return 0;
+    }
 
     // =========================================
     private void CheckQuestComplete()

@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f8ea758fc9c82e94ca5c432a90fe54dd, type: 3}
   m_Name: Item_Wood
   m_EditorClassIdentifier: Assembly-CSharp::ItemData_SO
-  itemID: (C6 H10 05)n
-  displayName: Wood
+  itemID: Wood
+  displayName: (C6 H10 05)n
   icon: {fileID: 21300000, guid: f932da17d2cbe264988d65613c94cbc7, type: 3}
   maxStack: 99
   description: "Fibra de Celulosa: El material de construcci\xF3n m\xE1s eficiente

@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f8ea758fc9c82e94ca5c432a90fe54dd, type: 3}
   m_Name: Item_Water
   m_EditorClassIdentifier: Assembly-CSharp::ItemData_SO
-  itemID: H20
-  displayName: Water
+  itemID: Water
+  displayName: H2O
   icon: {fileID: 21300000, guid: bce16c3e1b9d8bb4784056b548388789, type: 3}
   maxStack: 99
   description: "\xD3xido de Hidr\xF3geno: Uno de los elementos mas abundantes en

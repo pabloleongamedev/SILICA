@@ -13,6 +13,4 @@ MonoBehaviour:
   m_Name: Pendiente Method_SO
   m_EditorClassIdentifier: Assembly-CSharp::SeparationMethod_SO
   methodName: Pendiente
-  description: "La pir\xF3lisis es un proceso de descomposici\xF3n qu\xEDmica de
-    materia org\xE1nica y otros materiales mediante el uso de calor extremo, pero
-    con una condici\xF3n indispensable: ocurre sin la presencia de ox\xEDgeno."
+  description: Sin descripcion

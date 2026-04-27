@@ -15,15 +15,27 @@ public class QuestUIController : MonoBehaviour
     {
         QuestEvents.OnQuestLoaded += BuildUI;
         QuestEvents.OnTaskUpdated += UpdateTask;
-            var questSystem = FindFirstObjectByType<QuestSystem>();
+
+        var questSystem = FindFirstObjectByType<QuestSystem>();
 
         if (questSystem != null)
         {
-            var currentQuest = questSystem.GetCurrentQuest();
+            var quest = questSystem.GetCurrentQuest();
 
-            if (currentQuest != null)
+            if (quest != null)
             {
-                BuildUI(currentQuest);
+                BuildUI(quest);
+
+                // RECONSTRUIR PROGRESO REAL
+                for (int i = 0; i < quest.tasks.Count; i++)
+                {
+                    int current = questSystem.GetTaskProgress(i);
+                    int required = quest.tasks[i].requiredAmount;
+
+                    bool completed = current >= required;
+
+                    UpdateTask(i, current, required, completed);
+                }
             }
         }
     }

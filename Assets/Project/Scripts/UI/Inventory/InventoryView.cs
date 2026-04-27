@@ -83,6 +83,8 @@ public class InventoryView : MonoBehaviour
 
         if (inventoryPanel != null)
             inventoryPanel.SetActive(false);
+
+        GameplayEvents.OnUIStateChanged?.Invoke(UIState.Quest);
     }
 
     public void ShowInventoryPanel()

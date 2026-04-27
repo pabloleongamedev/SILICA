@@ -5,6 +5,7 @@ public enum UIState
     None,
     Inventory,
     Crafting,
+    Quest,
     Chemistry
 }
 public class PlayerStateController : MonoBehaviour
