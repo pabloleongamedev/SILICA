@@ -4235,8 +4235,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 288.6064, y: -283.4983}
-  m_SizeDelta: {x: 577.2128, y: 499.9566}
+  m_AnchoredPosition: {x: 286.75742, y: -285.21823}
+  m_SizeDelta: {x: 573.51483, y: 503.39648}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &919605442
 MonoBehaviour:
@@ -8059,8 +8059,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 288.6064, y: -16.76}
-  m_SizeDelta: {x: 577.2128, y: 33.52}
+  m_AnchoredPosition: {x: 286.75742, y: -16.76}
+  m_SizeDelta: {x: 573.51483, y: 33.52}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1743041896
 MonoBehaviour:
@@ -8910,8 +8910,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 288.60645, y: -283.4983}
-  m_SizeDelta: {x: 577.2129, y: 499.9566}
+  m_AnchoredPosition: {x: 286.75742, y: -285.21823}
+  m_SizeDelta: {x: 573.51483, y: 503.39648}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1999231500
 MonoBehaviour:
@@ -9106,6 +9106,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ToolChemistryView
   slot: {fileID: 2062063180}
+  database: {fileID: 11400000, guid: 5972099df1744df47897299a399eda9c, type: 2}
 --- !u!1 &2029419509
 GameObject:
   m_ObjectHideFlags: 0
@@ -9267,8 +9268,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 288.60645, y: -16.76}
-  m_SizeDelta: {x: 577.2129, y: 33.52}
+  m_AnchoredPosition: {x: 286.75742, y: -16.76}
+  m_SizeDelta: {x: 573.51483, y: 33.52}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2036107886
 MonoBehaviour:
