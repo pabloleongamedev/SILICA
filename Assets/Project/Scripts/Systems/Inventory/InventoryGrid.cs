@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 public class InventoryGrid
 {
     private InventorySlot[,] grid;
@@ -50,4 +52,33 @@ public class InventoryGrid
     {
         return grid[x, y];
     }
+    public InventoryGrid Clone()
+    {
+        var newGrid = new InventoryGrid(Width, Height);
+
+        foreach (var slot in GetAllSlots())
+        {
+            if (!slot.IsEmpty)
+            {
+                var instance = new InventoryItemInstance(slot.ItemInstance.Data);
+                instance.Add(slot.ItemInstance.Quantity);
+
+                newGrid.GetSlot(slot.X, slot.Y).SetItem(instance);
+            }
+        }
+
+        return newGrid;
+    }
+
+    public IEnumerable<InventorySlot> GetAllSlots()
+    {
+        for (int x = 0; x < Width; x++)
+        {
+            for (int y = 0; y < Height; y++)
+            {
+                yield return grid[x, y];
+            }
+        }
+    }
+
 }

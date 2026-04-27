@@ -8,11 +8,29 @@ public class DescriptionPanelView : MonoBehaviour
     [SerializeField] private Image itemIcon;
     [SerializeField] private TextMeshProUGUI itemDescription;
 
-    void OnEnable()
+        void Start()
+        {
+            Clear();
+        }
+        public void Show(InventoryItemInstance item)
     {
-        Clear();
-    }
 
+        Debug.Log("SHOW DESCRIPTION"); // 👈
+        if (item == null)
+        {
+            Debug.Log("ITEM NULL, CLEARING"); // 👈
+            Clear();
+            return;
+        }
+
+        gameObject.SetActive(true);
+
+        itemName.text = $"Simblo Quimico {item.Data.displayName}";
+        itemDescription.text = item.Data.description;
+        itemIcon.sprite = item.Data.icon;
+        itemIcon.enabled = true;
+    }
+/*
     public void Show(InventorySlot slot)
     {
         if (slot == null || slot.IsEmpty)
@@ -28,13 +46,15 @@ public class DescriptionPanelView : MonoBehaviour
         itemIcon.enabled = true;
         itemDescription.text = data.description;
     }
-
+*/
     public void Clear()
     {
         itemName.text = "";
         itemIcon.sprite = null;
         itemIcon.enabled = false;
         itemDescription.text = "";
+
+        gameObject.SetActive(false);
     }
     
 }
