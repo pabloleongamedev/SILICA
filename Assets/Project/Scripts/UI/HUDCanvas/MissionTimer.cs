@@ -53,6 +53,7 @@ public class MissionTimer : MonoBehaviour
         {
             isRunning = false;
             NotifyRatio(); // Notificar el 0 final
+            Debug.Log("¡Tiempo agotado! Fallaste la misión.");
         }
     }
 

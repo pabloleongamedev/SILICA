@@ -1,4 +1,4 @@
-using UnityEngine;
+/*using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
@@ -28,6 +28,13 @@ public class MainMenuManager : MonoBehaviour
     [SerializeField] private Button optionsFirstButton;
     [SerializeField] private Button creditsFirstButton;
 
+    [Header("UI")]
+    [SerializeField] private GameObject loadingImage;
+
+    [Header("Settings")]
+    [SerializeField] private float delay = 4f;
+    [SerializeField] private int sceneIndex = 1;
+
     [Header("UI References")]
     Button playButton;
     HUDManager hUDManager;
@@ -35,7 +42,7 @@ public class MainMenuManager : MonoBehaviour
 
     void Start()
     {
-        // Asegurarse de que GameManager esté inicializado
+      /*  // Asegurarse de que GameManager esté inicializado
         if (GameManager.Instance == null)
         {
             Debug.LogWarning("[MainMenuManager] Creando GameManager...");
@@ -44,7 +51,26 @@ public class MainMenuManager : MonoBehaviour
         }
 
         // Al iniciar, nos aseguramos de estar en el menú principal
-        ShowMainMenu();
+        ShowMainMenu();*/
+        //StartCoroutine(LoadSceneRoutine());
+   /* }
+
+    public void LoadSceneFromButton()
+    {
+        StartCoroutine(LoadSceneRoutine());
+    }   
+
+       private IEnumerator LoadSceneRoutine()
+    {
+        // 🔥 Mostrar imagen
+        if (loadingImage != null)
+            loadingImage.SetActive(true);
+
+        // 🔥 Esperar
+        yield return new WaitForSeconds(delay);
+
+        // 🔥 Cargar escena
+        SceneManager.LoadScene(sceneIndex);
     }
 
     // --- MÉTODOS DE NAVEGACIÓN ---
@@ -54,9 +80,9 @@ public class MainMenuManager : MonoBehaviour
     public void ShowPlayMenu() 
     {
         // Verificar si existe un guardado previo
-        const string UNIQUE_SLOT = "1";
+//  const string UNIQUE_SLOT = "1";
         
-        if (GameManager.Instance.HasSaveFile(UNIQUE_SLOT))
+/*if (GameManager.Instance.HasSaveFile(UNIQUE_SLOT))
         {
             // Si hay guardado: mostrar opciones "Continuar" / "Nueva Partida"
             SwitchPanel(playPanel, playFirstButton);
@@ -74,8 +100,8 @@ public class MainMenuManager : MonoBehaviour
             // Si NO hay guardado: crear nueva partida y cargar directamente
             Debug.Log("[MainMenuManager] Primera vez - cargando TestMechanics automáticamente");
             GameManager.Instance.CreateNewGame(UNIQUE_SLOT);
-        }
-    }
+        }*/
+   /* }
 
     public void ShowOptions() => SwitchPanel(optionsPanel, optionsFirstButton);
 
@@ -115,13 +141,13 @@ public class MainMenuManager : MonoBehaviour
     {
         // El GameManager ya maneja la carga correcta de escena
         // Este método se puede usar como punto de extensión
-        Debug.Log("[MainMenuManager] StartGame() llamado - GameManager manejará la carga");
+       // Debug.Log("[MainMenuManager] StartGame() llamado - GameManager manejará la carga");
     }
 
     /// <summary>
     /// Carga la escena de juego por nombre (alternativo)
     /// </summary>
-    public void LoadGameScene()
+/*    public void LoadGameScene()
     {
         SceneManager.LoadSceneAsync(1);
     }
@@ -160,5 +186,38 @@ public class MainMenuManager : MonoBehaviour
         //     Debug.LogWarning("[MainMenuManager] No se encontró HUDManager o MissionTimer en la escena cargada.");
         // }
     }
+*/
+using UnityEngine;
+using UnityEngine.SceneManagement;
+using System.Collections;
 
+public class SceneLoader : MonoBehaviour
+{
+    [Header("UI")]
+    [SerializeField] private GameObject loadingImage;
+
+    [Header("Settings")]
+    [SerializeField] private float delay = 4f;
+    [SerializeField] private int sceneIndex = 1;
+
+    // ❌ Quitamos Start()
+
+    // ✅ FUNCIÓN PARA BOTÓN
+    public void LoadSceneFromButton()
+    {
+        StartCoroutine(LoadSceneRoutine());
+    }
+
+    private IEnumerator LoadSceneRoutine()
+    {
+        // 🔥 Mostrar imagen
+        if (loadingImage != null)
+            loadingImage.SetActive(true);
+
+        // 🔥 Esperar
+        yield return new WaitForSeconds(delay);
+
+        // 🔥 Cargar escena
+        SceneManager.LoadScene(sceneIndex);
+    }
 }

@@ -17,4 +17,8 @@ MonoBehaviour:
   - description: Sintetiza metano
     type: 2
     targetItem: {fileID: 11400000, guid: 88eb3893adcb3e241ad47a4d6b690b6a, type: 2}
-    requiredAmount: 1
+    requiredAmount: 2
+  - description: Sintetiza Monoxido de carbono
+    type: 2
+    targetItem: {fileID: 11400000, guid: 8272e73f8a0d75e43874dbff358d823d, type: 2}
+    requiredAmount: 4

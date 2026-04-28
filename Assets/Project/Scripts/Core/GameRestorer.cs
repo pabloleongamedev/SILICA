@@ -15,7 +15,7 @@ public class GameRestorer : MonoBehaviour
     private Vector3 targetPosition = Vector3.zero;
     private Quaternion targetRotation = Quaternion.identity;
     private bool shouldRestorePosition = false;
-
+/*
     private void Start()
     {
         // Usar coroutine para asegurar que TODOS los Awake() y Start() se hayan ejecutado primero
@@ -33,7 +33,7 @@ public class GameRestorer : MonoBehaviour
             yield break;
         }
 
-        GameData gameData = GameManager.Instance.GetCurrentGameData();
+        //GameData gameData = GameManager.Instance.GetCurrentGameData();
 
         if (gameData == null)
         {
@@ -46,8 +46,8 @@ public class GameRestorer : MonoBehaviour
         if (playerController != null)
         {
             Transform playerTransform = playerController.transform;
-            targetPosition = gameData.playerData.GetPosition();
-            targetRotation = gameData.playerData.GetRotation();
+//targetPosition = gameData.playerData.GetPosition();
+   ///         targetRotation = gameData.playerData.GetRotation();
             
             Debug.Log($"[GameRestorer] Posición actual antes de restaurar: {playerTransform.position}");
             Debug.Log($"[GameRestorer] Posición guardada a restaurar: {targetPosition}");
@@ -119,4 +119,5 @@ public class GameRestorer : MonoBehaviour
         shouldRestorePosition = false;
         Debug.Log("[GameRestorer] ✓ Protección de posición desactivada");
     }
+}*/
 }

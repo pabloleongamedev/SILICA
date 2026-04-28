@@ -23,7 +23,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameObject optionsPanel;
     private void Awake()
     {
-        // Patrón Singleton con DontDestroyOnLoad para persistencia entre escenas
+    /*    // Patrón Singleton con DontDestroyOnLoad para persistencia entre escenas
         if (Instance != null && Instance != this)
         {
             Destroy(gameObject);
@@ -340,4 +340,6 @@ public class GameManager : MonoBehaviour
         Posición Jugador: {currentGameData.playerData.GetPosition()}
         ==================";
             }
-}
+}*/
+    }
+    }

@@ -1,5 +1,4 @@
-using Microsoft.Unity.VisualStudio.Editor;
-using Unity.VisualScripting;
+
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -107,7 +106,7 @@ public class PlayerController : MonoBehaviour
             movementController.SetInputEnabled(!isInventoryOpen);
     }
 
-    private void Update()
+/*private void Update()
     {
         if (GameManager.Instance != null)
         {
@@ -120,7 +119,7 @@ public class PlayerController : MonoBehaviour
                 lastGameManagerUpdateTime = 0f;
             }
         }
-    }
+    }*/
 
     private void OnInteract(InputAction.CallbackContext ctx)
     {
@@ -164,7 +163,7 @@ public class PlayerController : MonoBehaviour
 
     private void OnDisable() => inputActions.Disable();
 
-    public void RequestManualSave()
+   /* public void RequestManualSave()
     {
         if (GameManager.Instance != null)
         {
@@ -172,7 +171,7 @@ public class PlayerController : MonoBehaviour
             Debug.Log("[PlayerController] Guardado manual ejecutado");
         }
     }
-
+*/
     // Desactivar interacciones mientras se presente el menú de Pausa
     public void SetPaused(bool paused)
 {

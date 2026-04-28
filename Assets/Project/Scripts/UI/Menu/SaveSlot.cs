@@ -31,7 +31,7 @@ public class SaveSlot : MonoBehaviour
             return;
         }
 
-        RefreshSlot();
+        //RefreshSlot();
     }
 
     /// <summary>
@@ -39,8 +39,8 @@ public class SaveSlot : MonoBehaviour
     /// </summary>
     public void RefreshSlot()
     {
-        hasData = GameManager.Instance.HasSaveFile(UNIQUE_SLOT);
-        saveInfo = GameManager.Instance.GetSaveInfo(UNIQUE_SLOT);
+      //  hasData = GameManager.Instance.HasSaveFile(UNIQUE_SLOT);
+        //saveInfo = GameManager.Instance.GetSaveInfo(UNIQUE_SLOT);
         UpdateSlotVisual();
     }
 
@@ -80,7 +80,7 @@ public class SaveSlot : MonoBehaviour
     /// <summary>
     /// Se llama cuando el usuario presiona el botón
     /// </summary>
-    public void OnSlotPressed()
+/*    public void OnSlotPressed()
     {
         if (hasData)
         {
@@ -92,5 +92,5 @@ public class SaveSlot : MonoBehaviour
             Debug.Log($"[SaveSlot] Creando nueva partida...");
             GameManager.Instance.CreateNewGame(UNIQUE_SLOT);
         }
-    }
+    }*/
 }

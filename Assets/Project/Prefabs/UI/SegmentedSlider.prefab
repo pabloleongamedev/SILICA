@@ -948,7 +948,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 1, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 15}
+  m_SizeDelta: {x: 0, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &5242569065221504292
 MonoBehaviour:
@@ -1036,8 +1036,6 @@ MonoBehaviour:
   - {fileID: 6909808140697577664}
   - {fileID: 1739998303028848877}
   - {fileID: 3778795904115041812}
-  activeColor: {r: 0, g: 1, b: 1, a: 1}
-  inactiveColor: {r: 0.35, g: 0.55, b: 0.55, a: 1}
 --- !u!1 &6471463762051121216
 GameObject:
   m_ObjectHideFlags: 0

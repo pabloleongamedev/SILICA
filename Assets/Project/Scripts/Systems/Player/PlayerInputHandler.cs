@@ -9,12 +9,11 @@ public class PlayerInputHandler : MonoBehaviour
     private MouseLook mouseLook;
     private InventoryController inventoryController;
     private InteractionDetector interactionDetector;
-    
 
     private InputSystem_Actions inputActions;
     private InteractionContext interactionContext;
-    
-    
+    private GameStateController gameStateController;
+
 
     private void Awake()
     {
@@ -23,9 +22,10 @@ public class PlayerInputHandler : MonoBehaviour
         movementController = GetComponent<MovementController>();
         interactionDetector = GetComponent<InteractionDetector>();
         mouseLook = GetComponentInChildren<MouseLook>();
-
+        gameStateController = GetComponent<GameStateController>();  
         inputActions = new InputSystem_Actions();
     }
+
     private void Start()
     {
         var inventory = inventoryController.GetInventorySystem();
@@ -52,12 +52,28 @@ public class PlayerInputHandler : MonoBehaviour
         inputActions.Player.Sprint.performed += OnSprint;
         inputActions.Player.Sprint.canceled += OnSprint;
 
-        inputActions.Player.Jump.started += ctx => movementController.OnJumpStarted();
+        inputActions.Player.Jump.started += ctx =>
+        {
+            movementController.OnJumpStarted();
+            NotifyAnyInput();
+        };
 
-        inputActions.Player.Jetpack.performed += ctx => movementController.SetJetpack(true);
-        inputActions.Player.Jetpack.canceled += ctx => movementController.SetJetpack(false);
+        inputActions.Player.Jetpack.performed += ctx =>
+        {
+            movementController.SetJetpack(true);
+            NotifyAnyInput();
+        };
 
-        inputActions.Player.Inventory.performed += ctx => ToggleInventory();
+        inputActions.Player.Jetpack.canceled += ctx =>
+        {
+            movementController.SetJetpack(false);
+        };
+
+        inputActions.Player.Inventory.performed += ctx =>
+        {
+            ToggleInventory();
+            NotifyAnyInput();
+        };
 
         inputActions.Player.Interact.performed += OnInteract;
     }
@@ -67,12 +83,23 @@ public class PlayerInputHandler : MonoBehaviour
         inputActions.Disable();
     }
 
-    // ------------------------
+    // =========================================================
+    // 🔥 EVENT BRIDGE
+    // =========================================================
+
+    private void NotifyAnyInput()
+    {
+        GameplayEvents.OnAnyInput?.Invoke();
+    }
+
+    // =========================================================
     // INPUT HANDLERS
-    // ------------------------
+    // =========================================================
 
     private void ToggleInventory()
     {
+        if (IsBlocked()) return;
+
         var current = stateController.GetState();
 
         if (current == UIState.Inventory)
@@ -89,28 +116,57 @@ public class PlayerInputHandler : MonoBehaviour
 
     private void OnInteract(InputAction.CallbackContext ctx)
     {
+        if (IsBlocked()) return;
+
         if (!ctx.performed) return;
+
+        NotifyAnyInput();
 
         var interactable = interactionDetector.CurrentInteractable;
 
         if (interactable == null) return;
 
-        // VALIDACIÓN POR ESTADO (UI abierta, etc)
         if (!stateController.CanInteract(interactable))
-        {
-            Debug.Log("Interact bloqueado por estado");
             return;
-        }
-        // EJECUCIÓN
+
         interactable.Interact(interactionContext);
     }
 
-    private void OnMove(InputAction.CallbackContext ctx) =>
-        movementController.SetMoveInput(ctx.ReadValue<Vector2>());
+    private void OnMove(InputAction.CallbackContext ctx)
+    {
+        if (IsBlocked()) return;
 
-    private void OnSprint(InputAction.CallbackContext ctx) =>
-        movementController.SetSprint(ctx.ReadValueAsButton());
+        var value = ctx.ReadValue<Vector2>();
 
-    private void OnLook(InputAction.CallbackContext ctx) =>
-        mouseLook.SetLookInput(ctx.ReadValue<Vector2>());
+        movementController.SetMoveInput(value);
+
+        if (value != Vector2.zero)
+            NotifyAnyInput();
+    }
+    private bool IsBlocked()
+    {
+        return gameStateController != null && gameStateController.IsBlocked();
+    }
+    private void OnSprint(InputAction.CallbackContext ctx)
+    {
+        if (IsBlocked()) return;
+
+        bool pressed = ctx.ReadValueAsButton();
+
+        movementController.SetSprint(pressed);
+
+        if (pressed)
+            NotifyAnyInput();
+    }
+
+    private void OnLook(InputAction.CallbackContext ctx)
+    {
+        if (IsBlocked()) return;
+        var value = ctx.ReadValue<Vector2>();
+
+        mouseLook.SetLookInput(value);
+
+        if (value != Vector2.zero)
+            NotifyAnyInput();
+    }
 }

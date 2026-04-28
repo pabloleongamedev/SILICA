@@ -8,4 +8,7 @@ public static class GameplayEvents
     // Sistema de notificaciones (feedback jugador)
     public static Action<NotificationData> OnNotification;
     public static System.Action<bool> OnNotificationStateChanged;
+    public static System.Action<GameState> OnGameStateChanged;
+
+    public static Action OnAnyInput;
 }

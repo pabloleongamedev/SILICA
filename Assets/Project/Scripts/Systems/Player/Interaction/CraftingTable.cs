@@ -29,10 +29,10 @@ public class CraftingTable : MonoBehaviour, IInteractable
     public string GetInteractionText()
     {
         if (playerState == null)
-            return "Presiona E para usar mesa de crafteo";
+            return "Presiona E para usar sintetizador";
 
         return playerState.GetState() == UIState.Crafting
             ? null
-            : "Presiona E para usar mesa de crafteo";
+            : "Presiona E para usar sintetizador";
     }
 }

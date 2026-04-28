@@ -27,7 +27,7 @@ public class VitalityBarSegments : MonoBehaviour
                 float t = (float)i / (float)(totalSegments - 1);
                 segments[i].color = Color.Lerp(colorBottom, colorTop, t);
                 
-                if (secondsRemaining <= 15f)
+                if (secondsRemaining <= 600f)
                 {
                     float blink = Mathf.Abs(Mathf.Sin(Time.time * 8f));
                     segments[i].color = Color.Lerp(segments[i].color, redColor, blink);

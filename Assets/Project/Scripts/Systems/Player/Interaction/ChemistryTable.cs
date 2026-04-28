@@ -29,11 +29,11 @@ public class ChemistryTable : MonoBehaviour, IInteractable
     public string GetInteractionText()
     {
         if (playerState == null)
-            return "Presiona E para usar refinador";
+            return "Presiona E para usar reactor de ruptura";
 
         // basado en estado real, no en bool local
         return playerState.GetState() == UIState.Chemistry
             ? null
-            : "Presiona E para usar refinador";
+            : "Presiona E para usar reactor de ruptura";
     }
 }
