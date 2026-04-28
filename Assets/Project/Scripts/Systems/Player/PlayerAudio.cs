@@ -9,6 +9,7 @@ public class PlayerAudio : MonoBehaviour
     public InputActionReference jetPackAction;
     private bool isWalkingSoundPlaying = false;
     private bool isJetpackSoundPlaying = false;
+    private string currentGroundTag = "Ground";
     private bool isGrounded = false; // This should be set based on your player's grounded state
     private void OnEnable()
     {
@@ -37,19 +38,21 @@ public class PlayerAudio : MonoBehaviour
         bool isJetPackActive = jetPackAction.action.IsPressed();
         if (inputMovement > 0.1f && isGrounded)
         {
+            string soundToPlay = (currentGroundTag == "MetalGround") ? "PlayerwalkMetalsound" : "Playerwalksound";
             if (!isWalkingSoundPlaying)
             {
-                AudioManager.Instance.Play("Playerwalksound");
+                AudioManager.Instance.Play(soundToPlay);
                 isWalkingSoundPlaying=true;
             }
         float targetPitch = isRunning ? 1.5f : 1f; // Adjust pitch for running
-        AudioManager.Instance.ChangePitch("Playerwalksound", targetPitch);
+        AudioManager.Instance.ChangePitch(soundToPlay, targetPitch);
         }
         else
         {
             if (isWalkingSoundPlaying)
             {
                 AudioManager.Instance.Stop("Playerwalksound");
+                AudioManager.Instance.Stop("PlayerwalkMetalsound");
                 isWalkingSoundPlaying = false;
             }
         }
@@ -70,24 +73,34 @@ public class PlayerAudio : MonoBehaviour
         }
     }
     private void OnCollisionStay(Collision collision) {
-        if (collision.gameObject.CompareTag("Ground"))
+        if (collision.gameObject.CompareTag("Ground") || collision.gameObject.CompareTag("MetalGround"))
         {
             isGrounded = true;
+            currentGroundTag = collision.gameObject.tag;
         }
     }
     private void OnCollisionExit(Collision collision)
     {
-        if (collision.gameObject.CompareTag("Ground"))
+        if (collision.gameObject.CompareTag("Ground") || collision.gameObject.CompareTag("MetalGround"))
         {
             isGrounded = false;
         }
     }
     private void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.CompareTag("Ground"))
+        if (collision.gameObject.CompareTag("Ground") || collision.gameObject.CompareTag("MetalGround"))
         {
-            AudioManager.Instance.Play("Playerjumpsound");
+            // 1. Elegimos el sonido de salto/aterrizaje según la etiqueta
+            string jumpSound = (collision.gameObject.CompareTag("MetalGround"))
+                               ? "PlayerJumpMetalsound"
+                               : "Playerjumpsound";
+
+            // 2. Reproducimos el sonido detectado
+            AudioManager.Instance.Play(jumpSound);
+
+            // 3. Actualizamos el estado
             isGrounded = true;
+            currentGroundTag = collision.gameObject.tag;
         }
     }
     

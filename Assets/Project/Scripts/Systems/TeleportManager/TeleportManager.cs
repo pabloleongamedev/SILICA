@@ -31,7 +31,7 @@ public class TeleportManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (isNearDoor && teleportAction.action.triggered)
+        if (isNearDoor && teleportAction.action.WasPressedThisFrame())
         {
             Debug.Log("¡BOTÓN PRESIONADO! Iniciando teletransporte...");
             teleportPlayer();
