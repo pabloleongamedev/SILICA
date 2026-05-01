@@ -14,9 +14,10 @@ public class TeleportManager : MonoBehaviour, IInteractable
     // =========================================================
     public void Interact(InteractionContext context)
     {
-        if (!canExit)
+        // VALIDACIÓN ANTES DE TELEPORT
+        if (!CanExit(out string message))
         {
-            Notify("Debes completar la segunda misión", NotificationType.Warning);
+            Notify(message, NotificationType.Error);
             return;
         }
 
@@ -31,6 +32,43 @@ public class TeleportManager : MonoBehaviour, IInteractable
     // =========================================================
     // 🔥 VALIDACIÓN DE MISIONES
     // =========================================================
+
+        private bool CanExit(out string message)
+    {
+        message = "";
+
+        if (questSystem == null)
+        {
+            message = "Sistema de misiones no encontrado";
+            return false;
+        }
+
+        var quest = questSystem.GetCurrentQuest();
+
+        if (quest == null || quest.tasks == null)
+        {
+            message = "No hay misión activa";
+            return false;
+        }
+
+        // 🔥 VALIDAMOS LAS PRIMERAS 3 TAREAS
+        int tasksToCheck = Mathf.Min(3, quest.tasks.Count);
+
+        for (int i = 0; i < tasksToCheck; i++)
+        {
+            int current = questSystem.GetTaskProgress(i);
+            int required = quest.tasks[i].requiredAmount;
+
+            if (current < required)
+            {
+                // 🔥 MENSAJE DINÁMICO
+                message = $"Debes completar: {quest.tasks[i].description}";
+                return false;
+            }
+        }
+
+        return true;
+    }
     
 
     private void OnEnable()
