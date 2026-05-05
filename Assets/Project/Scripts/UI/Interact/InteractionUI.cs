@@ -1,6 +1,8 @@
 using TMPro;
 using UnityEngine;
+using System;
 
+[Obsolete("Usar InteractionUIController. Este componente queda solo para compatibilidad con prefabs antiguos.")]
 public class InteractionUI : MonoBehaviour
 {
     [SerializeField] private InteractionDetector detector;

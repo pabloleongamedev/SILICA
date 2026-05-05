@@ -44,6 +44,7 @@ public class ChemistrySystem
 
         // 🔥 VALIDAR ESPACIO PARA OUTPUTS
         var add = compound.outputs
+            .Where(o => o.item != null && o.amount > 0)
             .Select(o => (o.item, o.amount))
             .ToArray();
 
@@ -75,18 +76,14 @@ public class ChemistrySystem
             return false;
         
 
-        //  PRODUCIR OUTPUTS
-        foreach (var output in compound.outputs)
-        {
-            if (output.item == null)
-                continue;
+        var remove = new (ItemData_SO item, int amount)[0];
+        var add = compound.outputs
+            .Where(output => output.item != null && output.amount > 0)
+            .Select(output => (output.item, output.amount))
+            .ToArray();
 
-            if (output.amount <= 0)
-                continue;
-
-
-            write.AddItem(output.item, output.amount);
-        }
+        if (!write.TryProcessBatch(remove, add))
+            return false;
 
         Debug.Log("✔ Separación completada");
 

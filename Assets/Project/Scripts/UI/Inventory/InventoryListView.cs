@@ -17,6 +17,9 @@ public class InventoryListView : MonoBehaviour
 
     public void Initialize(IInventoryReadModel inventory)
     {
+        if (this.inventory != null)
+            this.inventory.OnItemChanged -= UpdateSlot;
+
         this.inventory = inventory;
 
         Build();
@@ -24,6 +27,12 @@ public class InventoryListView : MonoBehaviour
         // 🔥 FIX CRÍTICO: evitar múltiples suscripciones
         inventory.OnItemChanged -= UpdateSlot;
         inventory.OnItemChanged += UpdateSlot;
+    }
+
+    private void OnDestroy()
+    {
+        if (inventory != null)
+            inventory.OnItemChanged -= UpdateSlot;
     }
 
     private void Build()

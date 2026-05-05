@@ -154,7 +154,17 @@ public class CraftingController : MonoBehaviour
         }
 
         //  PRODUCCIÓN (usa inventory system → ya notifica)
-        write.AddItem(recipe.result, recipe.resultAmount);
+        var consumed = new (ItemData_SO item, int amount)[0];
+        var produced = new[] { (recipe.result, recipe.resultAmount) };
+
+        if (!write.TryProcessBatch(consumed, produced))
+        {
+            Notify("No hay espacio para el resultado", NotificationType.Warning);
+            system.ClearAll(write);
+            toolView.Clear();
+            UpdateCraftButton();
+            return;
+        }
         // NOTIFICAR CRAFTEO A MISIONES 
         QuestEvents.OnItemCrafted?.Invoke(recipe.result, recipe.resultAmount);
         //  limpiar slots internos

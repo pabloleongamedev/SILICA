@@ -33,7 +33,7 @@ public class TeleportManager : MonoBehaviour, IInteractable
     // 🔥 VALIDACIÓN DE MISIONES
     // =========================================================
 
-        private bool CanExit(out string message)
+    private bool CanExit(out string message)
     {
         message = "";
 
@@ -51,15 +51,12 @@ public class TeleportManager : MonoBehaviour, IInteractable
             return false;
         }
 
-        // 🔥 VALIDAMOS LAS PRIMERAS 3 TAREAS
-        int tasksToCheck = Mathf.Min(3, quest.tasks.Count);
+        // 🔥 VALIDAMOS LAS PRIMERAS 2 TAREAS
+        int tasksToCheck = Mathf.Min(2, quest.tasks.Count);
 
         for (int i = 0; i < tasksToCheck; i++)
         {
-            int current = questSystem.GetTaskProgress(i);
-            int required = quest.tasks[i].requiredAmount;
-
-            if (current < required)
+            if (!canExit)
             {
                 // 🔥 MENSAJE DINÁMICO
                 message = $"Debes completar: {quest.tasks[i].description}";
@@ -83,8 +80,10 @@ public class TeleportManager : MonoBehaviour, IInteractable
 
     private void HandleQuestCompleted(int questIndex)
     {
+        
         if (questIndex >= 1)
         {
+            
             canExit = true;
         }
     }

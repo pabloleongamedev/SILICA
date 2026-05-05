@@ -1,6 +1,8 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using System;
 
+[Obsolete("Usar PlayerInputHandler como entrada unica de interaccion. Este componente queda solo para compatibilidad de escenas antiguas.")]
 public class InteractionController : MonoBehaviour
 {
     [SerializeField] private InteractionDetector detector;

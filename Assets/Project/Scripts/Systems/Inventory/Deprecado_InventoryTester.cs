@@ -1,6 +1,8 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using System;
 
+[Obsolete("Herramienta manual de debug. No usar en escenas de produccion; reemplazar por tests automatizados del dominio.")]
 public class InventoryTester : MonoBehaviour
 {
     [SerializeField] private InventoryController inventoryController;
@@ -18,8 +20,8 @@ public class InventoryTester : MonoBehaviour
         writeModel = inventoryController.WriteModel;
     }
 
-    private void Update()
-    {
+    //private void Update()
+   /* {
         if (Keyboard.current.digit1Key.wasPressedThisFrame)
             Test_EmptyInventory();
 
@@ -34,7 +36,7 @@ public class InventoryTester : MonoBehaviour
 
         if (Keyboard.current.digit5Key.wasPressedThisFrame)
             Test_PartialInsertProtection();
-    }
+    }*/
 
     // -------------------------
     // CORE
