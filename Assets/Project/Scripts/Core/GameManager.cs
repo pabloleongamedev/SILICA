@@ -1,29 +1,28 @@
+using System.Text;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using System.Collections;
-
-/// GameManager: Gestiona el estado completo de la partida y auto-guardado.
-/// CARACTERISTICAS:
-/// - Acceso global: GameManager.Instance.SaveGame()
-/// - Auto-guardado periódico durante el juego
-/// - Carga/guardado transparente de datos complejos
-/// - Persiste entre escenas (DontDestroyOnLoad)
-/// FLUJO DE USO:
-/// 1. Menú: GameManager.Instance.RefreshSaveStates() → muestra "Continuar" o "Nueva Partida"
-/// 2. Cargar: GameManager.Instance.LoadGame(slotID)
-/// 3. Juego: Auto-save cada X segundos automáticamente
-/// 4. Guardar: GameManager.Instance.SaveGame() manualmente si es necesario
 
 public class GameManager : MonoBehaviour
 {
-    // ===== SINGLETON =====
     public static GameManager Instance { get; private set; }
 
+    [Header("Auto Save")]
+    [SerializeField] private float autoSaveInterval = 60f;
+    [SerializeField] private bool enableAutoSave = true;
+
+    [Header("Menu Panels")]
     [SerializeField] private GameObject mainMenuPanel;
     [SerializeField] private GameObject optionsPanel;
+
+    private SaveController saveController;
+    private GameData currentGameData;
+    private string currentSlotID = "1";
+    private float timeSinceLastSave;
+    private float sessionStartTime;
+    private bool isInGame;
+
     private void Awake()
     {
-        // Patrón Singleton con DontDestroyOnLoad para persistencia entre escenas
         if (Instance != null && Instance != this)
         {
             Destroy(gameObject);
@@ -32,28 +31,8 @@ public class GameManager : MonoBehaviour
 
         Instance = this;
         DontDestroyOnLoad(gameObject);
-
-        // Inicializar el controlador de guardado
         saveController = new SaveController();
-
-        Debug.Log("[GameManager] Inicializado el GameManager Singleton");
     }
-
-    // ===== VARIABLES =====
-
-    [Header("Auto-Save Configuration")]
-    [SerializeField] private float autoSaveInterval = 60f; // Guardar cada 60 segundos
-    [SerializeField] private bool enableAutoSave = true;
-
-    private SaveController saveController;
-    private GameData currentGameData;
-    private string currentSlotID = "1";
-    
-    private float timeSinceLastSave = 0f;
-    private float sessionStartTime = 0f;
-    private bool isInGame = false;
-
-    // ===== CICLO DE VIDA =====
 
     private void Start()
     {
@@ -63,89 +42,62 @@ public class GameManager : MonoBehaviour
 
     private void Update()
     {
-        // Auto-save periódico durante el juego
-        if (isInGame && enableAutoSave && currentGameData != null)
+        if (!isInGame || !enableAutoSave || currentGameData == null)
+            return;
+
+        timeSinceLastSave += Time.deltaTime;
+
+        if (timeSinceLastSave >= autoSaveInterval)
         {
-            timeSinceLastSave += Time.deltaTime;
-
-            if (timeSinceLastSave >= autoSaveInterval)
-            {
-                AutoSave();
-                timeSinceLastSave = 0f;
-            }
-        }
-    }
-
-    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
-    {
-        if (currentGameData != null)
-        {
-            currentGameData.currentScene = scene.name;
-
-            // Si no es el menú, estamos en juego
-            isInGame = scene.name != "Menu";
-
-            if (isInGame)
-            {
-                Debug.Log($"[GameManager] Escena cargada: {scene.name}. Auto-save habilitado.");
-            }
+            AutoSave();
+            timeSinceLastSave = 0f;
         }
     }
 
     private void OnDestroy()
     {
-        SceneManager.sceneLoaded -= OnSceneLoaded;
+        if (Instance == this)
+            SceneManager.sceneLoaded -= OnSceneLoaded;
     }
 
-    // ===== MÉTODOS PÚBLICOS =====
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        if (currentGameData == null)
+            return;
 
-    /// <summary>
-    /// Carga una partida guardada desde disco
-    /// </summary>
+        currentGameData.currentScene = scene.name;
+        isInGame = scene.name != "Menu";
+    }
+
     public void LoadGame(string slotID)
     {
         GameData loadedData = saveController.LoadGame(slotID);
 
-        if (loadedData != null)
+        if (loadedData == null)
         {
-            currentGameData = loadedData;
-            currentSlotID = slotID;
-            sessionStartTime = Time.time; // Resetear sessionStartTime para nueva sesión
-            timeSinceLastSave = 0f;
-
-            Debug.Log($"[GameManager] Partida cargada del slot {slotID}");
-            Debug.Log($"[GameManager] Posición guardada: {currentGameData.playerData.GetPosition()}");
-
-            // Cargar la escena de la partida guardada
-            SceneManager.LoadScene(currentGameData.currentScene);
+            Debug.LogError($"[GameManager] No se pudo cargar la partida del slot {slotID}");
+            return;
         }
-        else
-        {
-            Debug.LogError($"[GameManager] Error: No se pudo cargar la partida del slot {slotID}");
-        }
+
+        currentGameData = loadedData;
+        currentSlotID = slotID;
+        sessionStartTime = Time.time;
+        timeSinceLastSave = 0f;
+
+        SceneManager.LoadScene(currentGameData.currentScene);
     }
 
-    /// <summary>
-    /// Comienza una nueva partida en un slot específico
-    /// </summary>
     public void CreateNewGame(string slotID)
     {
         currentGameData = GameData.CreateNewGame(slotID);
         currentSlotID = slotID;
         sessionStartTime = Time.time;
         timeSinceLastSave = 0f;
-        isInGame = false; // Se establecerá a true en OnSceneLoaded
+        isInGame = false;
 
-        Debug.Log($"[GameManager] Nueva partida creada en slot {slotID}");
-        Debug.Log($"[GameManager] Posición inicial: {currentGameData.playerData.GetPosition()}");
-
-        // Cargar la primera escena del juego
         SceneManager.LoadScene(currentGameData.currentScene);
     }
 
-    /// <summary>
-    /// Guarda manualmente la partida actual
-    /// </summary>
     public void SaveGame()
     {
         if (currentGameData == null)
@@ -154,190 +106,125 @@ public class GameManager : MonoBehaviour
             return;
         }
 
-        // Actualizar datos del jugador antes de guardar
-        UpdatePlayerData();
-
-        // Guardar en disco
+        UpdateRuntimeData();
         saveController.SaveGame(currentGameData, currentSlotID);
-
-        Debug.Log($"[GameManager] Partida guardada en slot {currentSlotID}");
     }
 
-    /// <summary>
-    /// Auto-guarda la partida sin mostrar logs (llamado periódicamente)
-    /// </summary>
-    private void AutoSave()
-    {
-        if (currentGameData == null)
-            return;
-
-        UpdatePlayerData();
-        saveController.SaveGame(currentGameData, currentSlotID);
-
-        Debug.Log($"[GameManager] AUTO-SAVE ejecutado en slot {currentSlotID}");
-    }
-
-    /// <summary>
-    /// Verifica si existe un guardado en un slot específico
-    /// </summary>
     public bool HasSaveFile(string slotID)
     {
         return saveController.HasSaveFile(slotID);
     }
 
-    /// <summary>
-    /// Obtiene información condensada de un guardado (para UI)
-    /// </summary>
     public SaveInfo GetSaveInfo(string slotID)
     {
         return saveController.GetSaveInfo(slotID);
     }
-
-    /// Obtiene información de todos los guardos (para menú)
 
     public SaveInfo[] GetAllSaveInfos()
     {
         return saveController.GetAllSaveInfos();
     }
 
-    /// Recarga datos de guardos desde disco (útil al volver al menú)
-
     public void RefreshSaveStates()
     {
-        Debug.Log("[GameManager] Estados de guardos refrescados");
+        Debug.Log("[GameManager] Save states refreshed");
     }
-
-    /// Obtiene la partida actualmente cargada
 
     public GameData GetCurrentGameData()
     {
         return currentGameData;
     }
 
-    /// Obtiene el ID del slot actual
     public string GetCurrentSlotID()
     {
         return currentSlotID;
     }
 
-    // ===== MÉTODOS PARA SISTEMAS =====
-
-    /// <summary>
-    /// Registra la posición del jugador (llamado por PlayerController)
-    /// </summary>
     public void UpdatePlayerPosition(Vector3 position)
     {
         if (currentGameData != null)
-        {
             currentGameData.playerData.SetPosition(position);
-        }
     }
 
-    /// <summary>
-    /// Registra la rotación del jugador (llamado por MouseLook)
-    /// </summary>
     public void UpdatePlayerRotation(Quaternion rotation)
     {
         if (currentGameData != null)
-        {
             currentGameData.playerData.SetRotation(rotation);
-        }
     }
-
-    /// Registra la salud del jugador
 
     public void UpdatePlayerHealth(int health, int maxHealth)
-    {
-        if (currentGameData != null)
-        {
-            currentGameData.playerData.health = health;
-            currentGameData.playerData.maxHealth = maxHealth;
-        }
-    }
-
-    /// Agrega un item al inventario guardado
-
-    public void AddInventoryItem(string itemID, int gridX, int gridY, int quantity = 1)
     {
         if (currentGameData == null)
             return;
 
-        currentGameData.inventoryItems.Add(new InventorySaveData
-        {
-            itemID = itemID,
-            gridX = gridX,
-            gridY = gridY,
-            quantity = quantity
-        });
+        currentGameData.playerData.health = health;
+        currentGameData.playerData.maxHealth = maxHealth;
     }
-
-
-    /// Registra un elemento como escaneado
 
     public void RegisterScannedElement(string elementID)
     {
         if (currentGameData != null && !currentGameData.scannedElements.Contains(elementID))
-        {
             currentGameData.scannedElements.Add(elementID);
-        }
-    }
-
-    /// Actualiza todos los datos del jugador antes de guardar
-    /// (Se llama automáticamente en SaveGame y AutoSave)
-    private void UpdatePlayerData()
-    {
-        if (currentGameData == null)
-            return;
-
-        // Actualizar tiempo de juego
-        float sessionTime = Time.time - sessionStartTime;
-        currentGameData.UpdatePlayTime((int)sessionTime);
-
-        // Si hay un controlador de jugador en la escena, sincronizar posición
-        PlayerController playerController = FindAnyObjectByType<PlayerController>();
-        if (playerController != null)
-        {
-            Transform playerTransform = playerController.transform;
-            currentGameData.playerData.SetPosition(playerTransform.position);
-            currentGameData.playerData.SetRotation(playerTransform.rotation);
-            
-            Debug.Log($"[GameManager] UpdatePlayerData - Posición sincronizada: {playerTransform.position}");
-        }
-        else
-        {
-            Debug.LogWarning("[GameManager] PlayerController no encontrado en UpdatePlayerData");
-        }
     }
 
     public void OpenOptions()
     {
-        mainMenuPanel.SetActive(false);
-        optionsPanel.SetActive(true);
+        if (mainMenuPanel != null)
+            mainMenuPanel.SetActive(false);
+
+        if (optionsPanel != null)
+            optionsPanel.SetActive(true);
     }
+
     public void CloseOptions()
-    // Al momento de cerrar (ícono) se vuelve a activar el menú principal
-
     {
-        optionsPanel.SetActive(false);
-        mainMenuPanel.SetActive(true);
-    }
+        if (optionsPanel != null)
+            optionsPanel.SetActive(false);
 
-    /// Imprime el estado actual de la partida (para debugging)
+        if (mainMenuPanel != null)
+            mainMenuPanel.SetActive(true);
+    }
 
     public string DebugGetGameState()
     {
         if (currentGameData == null)
             return "Sin partida activa";
 
-        return $@"
-        === GAME STATE ===
-        Slot: {currentSlotID}
-        Escena: {currentGameData.currentScene}
-        Tiempo Jugado: {currentGameData.GetPlayTimeFormatted()}
-        Guardado: {currentGameData.lastSaveTime}
-        Items: {currentGameData.inventoryItems.Count}
-        Elementos Escaneados: {currentGameData.scannedElements.Count}
-        Posición Jugador: {currentGameData.playerData.GetPosition()}
-        ==================";
-            }
+        var builder = new StringBuilder();
+        builder.AppendLine("=== GAME STATE ===");
+        builder.AppendLine($"Slot: {currentSlotID}");
+        builder.AppendLine($"Escena: {currentGameData.currentScene}");
+        builder.AppendLine($"Tiempo Jugado: {currentGameData.GetPlayTimeFormatted()}");
+        builder.AppendLine($"Guardado: {currentGameData.lastSaveTime}");
+        builder.AppendLine($"Items: {currentGameData.inventoryItems.Count}");
+        builder.AppendLine($"Elementos Escaneados: {currentGameData.scannedElements.Count}");
+        builder.AppendLine($"Posicion Jugador: {currentGameData.playerData.GetPosition()}");
+        return builder.ToString();
+    }
+
+    private void AutoSave()
+    {
+        UpdateRuntimeData();
+        saveController.SaveGame(currentGameData, currentSlotID);
+    }
+
+    private void UpdateRuntimeData()
+    {
+        if (currentGameData == null)
+            return;
+
+        currentGameData.UpdatePlayTime(Mathf.RoundToInt(Time.time - sessionStartTime));
+        sessionStartTime = Time.time;
+
+        var playerInput = FindFirstObjectByType<PlayerInputHandler>();
+        if (playerInput != null)
+        {
+            currentGameData.playerData.SetPosition(playerInput.transform.position);
+            currentGameData.playerData.SetRotation(playerInput.transform.rotation);
+        }
+
+        var inventory = FindFirstObjectByType<InventoryController>();
+        if (inventory != null)
+            currentGameData.inventoryItems = inventory.ExportSaveData();
+    }
 }

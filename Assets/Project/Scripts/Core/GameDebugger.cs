@@ -37,13 +37,13 @@ public class GameDebugger : MonoBehaviour
             return;
         }
 
-        Debug.Log(GameManager.Instance.DebugGetGameState());
+        //Debug.Log(GameManager.Instance.DebugGetGameState());
     }
 
     /// <summary>
     /// Imprime información de todos los saves
     /// </summary>
-    public static void PrintAllSaves()
+  /*  public static void PrintAllSaves()
     {
         if (GameManager.Instance == null)
         {
@@ -226,3 +226,4 @@ public class GameDebuggerWindow : EditorWindow
 }
 
 #endif
+*/}

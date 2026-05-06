@@ -4,6 +4,7 @@ using System.Collections.Generic;
 public class QuestSystem : MonoBehaviour
 {
     [SerializeField] private List<QuestData_SO> quests;
+    public static event System.Action<int> OnQuestCompleted;
 
     private int currentQuestIndex = 0;
     private QuestData_SO currentQuest;
@@ -101,12 +102,6 @@ public class QuestSystem : MonoBehaviour
 
         CheckQuestComplete();
     }
-    public QuestData_SO GetCurrentQuest()
-    {
-        return currentQuest;
-    }
-
-    // =========================================
     private void CheckQuestComplete()
     {
         for (int i = 0; i < currentQuest.tasks.Count; i++)
@@ -117,6 +112,22 @@ public class QuestSystem : MonoBehaviour
 
         Debug.Log("MISIÓN COMPLETADA");
 
+        // 🔥 ESTE ES EL PUNTO CLAVE
+        OnQuestCompleted?.Invoke(currentQuestIndex);
+
         LoadQuest(currentQuestIndex + 1);
     }
+    public QuestData_SO GetCurrentQuest()
+    {
+        return currentQuest;
+    }
+
+    public int GetTaskProgress(int index)
+    {
+        if (progress.ContainsKey(index))
+            return progress[index];
+
+        return 0;
+    }
+
 }

@@ -1,5 +1,6 @@
 using UnityEngine;
 using TMPro;
+using System.Collections.Generic;
 
 public class QuestUIController : MonoBehaviour
 {
@@ -11,54 +12,101 @@ public class QuestUIController : MonoBehaviour
     [SerializeField] private Transform taskContent;
     [SerializeField] private GameObject taskPrefab;
 
-    private void OnEnable()
+    // 🔥 TRACK REAL POR MISIÓN
+    private class QuestUIBlock
+    {
+        public GameObject missionGO;
+        public int startIndex;
+        public int taskCount;
+    }
+
+    private List<QuestUIBlock> questBlocks = new();
+
+    private QuestSystem questSystemRef;
+
+    // =========================================================
+    private void Awake()
     {
         QuestEvents.OnQuestLoaded += BuildUI;
         QuestEvents.OnTaskUpdated += UpdateTask;
-            var questSystem = FindFirstObjectByType<QuestSystem>();
-
-        if (questSystem != null)
-        {
-            var currentQuest = questSystem.GetCurrentQuest();
-
-            if (currentQuest != null)
-            {
-                BuildUI(currentQuest);
-            }
-        }
     }
 
-    private void OnDisable()
+    private void OnDestroy()
     {
         QuestEvents.OnQuestLoaded -= BuildUI;
         QuestEvents.OnTaskUpdated -= UpdateTask;
     }
 
-    // =========================================
-    private void BuildUI(QuestData_SO quest)
+    private void OnEnable()
     {
-        Clear();
+        questSystemRef = FindFirstObjectByType<QuestSystem>();
 
-        // 🔥 MISION
-        var missionGO = Instantiate(missionPrefab, missionContent);
-        var missionText = missionGO.GetComponentInChildren<TMP_Text>();
-        missionText.text = quest.questName;
-
-        // 🔥 TAREAS
-        foreach (var task in quest.tasks)
+        if (questSystemRef != null)
         {
-            var go = Instantiate(taskPrefab, taskContent);
-            var texts = go.GetComponentsInChildren<TMP_Text>();
+            var quest = questSystemRef.GetCurrentQuest();
 
-            texts[0].text = task.description;
-            texts[1].text = $"0 / {task.requiredAmount}";
+            if (quest != null)
+            {
+                if (taskContent.childCount == 0)
+                {
+                    BuildUI(quest);
+                }
+
+                RebuildProgress(questSystemRef, quest);
+            }
         }
     }
 
-    // =========================================
+    // =========================================================
+    // 🔥 CREA BLOQUE COMPLETO DE MISIÓN
+    // =========================================================
+    private void BuildUI(QuestData_SO quest)
+    {
+        Debug.Log("BUILD UI: " + quest.questName);
+
+        var block = new QuestUIBlock();
+
+        // 🔥 MISION
+        var missionGO = Instantiate(missionPrefab, missionContent);
+        missionGO.transform.SetSiblingIndex(0);
+
+        var missionText = missionGO.GetComponentInChildren<TMP_Text>();
+        missionText.text = quest.questName;
+
+        block.missionGO = missionGO;
+
+        // 🔥 GUARDAR DONDE EMPIEZAN SUS TASKS
+        block.startIndex = taskContent.childCount;
+        block.taskCount = quest.tasks.Count;
+
+        // 🔥 TASKS
+        foreach (var task in quest.tasks)
+        {
+            var go = Instantiate(taskPrefab, taskContent);
+
+            var texts = go.GetComponentsInChildren<TMP_Text>();
+            texts[0].text = task.description;
+            texts[1].text = $"0 / {task.requiredAmount}";
+        }
+
+        questBlocks.Add(block);
+    }
+
+    // =========================================================
     private void UpdateTask(int index, int current, int required, bool completed)
     {
-        var go = taskContent.GetChild(index);
+        if (questBlocks.Count == 0)
+            return;
+
+        // 🔥 SIEMPRE ACTUALIZAMOS LA ÚLTIMA MISIÓN ACTIVA
+        var block = questBlocks[questBlocks.Count - 1];
+
+        int realIndex = block.startIndex + index;
+
+        if (realIndex < 0 || realIndex >= taskContent.childCount)
+            return;
+
+        var go = taskContent.GetChild(realIndex);
         var texts = go.GetComponentsInChildren<TMP_Text>();
 
         texts[1].text = $"{current} / {required}";
@@ -68,14 +116,44 @@ public class QuestUIController : MonoBehaviour
             texts[0].color = Color.gray;
             texts[1].color = Color.gray;
         }
+
+        CheckMissionCompleted(block);
     }
 
-    private void Clear()
+    // =========================================================
+    private void RebuildProgress(QuestSystem questSystem, QuestData_SO quest)
     {
-        foreach (Transform child in missionContent)
-            Destroy(child.gameObject);
+        for (int i = 0; i < quest.tasks.Count; i++)
+        {
+            int current = questSystem.GetTaskProgress(i);
+            int required = quest.tasks[i].requiredAmount;
 
-        foreach (Transform child in taskContent)
-            Destroy(child.gameObject);
+            bool completed = current >= required;
+
+            UpdateTask(i, current, required, completed);
+        }
+    }
+
+    // =========================================================
+    private void CheckMissionCompleted(QuestUIBlock block)
+    {
+        if (questSystemRef == null)
+            return;
+
+        var quest = questSystemRef.GetCurrentQuest();
+        if (quest == null)
+            return;
+
+        for (int i = 0; i < quest.tasks.Count; i++)
+        {
+            int current = questSystemRef.GetTaskProgress(i);
+            int required = quest.tasks[i].requiredAmount;
+
+            if (current < required)
+                return;
+        }
+
+        var text = block.missionGO.GetComponentInChildren<TMP_Text>();
+        text.color = Color.gray;
     }
 }

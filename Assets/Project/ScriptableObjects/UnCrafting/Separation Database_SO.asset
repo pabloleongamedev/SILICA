@@ -14,3 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SeparationDatabase_SO
   compounds:
   - {fileID: 11400000, guid: 0ee675325f275784baa39f607d00c169, type: 2}
+  - {fileID: 11400000, guid: 2c93430b36875814384a8678943a3290, type: 2}
+  - {fileID: 11400000, guid: dc02842a4cd3c214e8f21305214e74c4, type: 2}

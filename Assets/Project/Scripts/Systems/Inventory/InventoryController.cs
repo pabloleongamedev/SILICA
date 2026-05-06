@@ -1,15 +1,18 @@
 using UnityEngine;
+using System;
+using System.Collections.Generic;
 
 public class InventoryController : MonoBehaviour
 {
     [Header("Config")]
     [SerializeField] private InventoryConfig_SO config;
+
     [Header("View")]
     [SerializeField] private InventoryView inventoryView;
     [SerializeField] private InventoryListView listView;
 
-public IInventoryReadModel ReadModel => inventorySystem.ReadModel;
-public IInventoryWriteModel WriteModel => inventorySystem;  
+    public IInventoryReadModel ReadModel => inventorySystem.ReadModel;
+    public IInventoryWriteModel WriteModel => inventorySystem;
 
     private InventorySystem inventorySystem;
     private InventoryGrid grid;
@@ -18,71 +21,87 @@ public IInventoryWriteModel WriteModel => inventorySystem;
     {
         grid = new InventoryGrid(config.width, config.height);
         inventorySystem = new InventorySystem(config, grid);
+        inventorySystem.OnNotificationRequested += HandleNotificationRequested;
+        inventorySystem.OnItemAdded += HandleItemAdded;
 
         if (inventoryView == null)
-        {
             Debug.LogError("InventoryView not assigned");
-            return;
-        }
     }
+
     private void Start()
     {
-        inventoryView.Initialize(inventorySystem.ReadModel);
-        listView.Initialize(inventorySystem.ReadModel);
+        if (inventoryView != null)
+        {
+            inventoryView.Initialize(inventorySystem.ReadModel);
+            inventoryView.OnItemDropped += MoveItem;
+            inventoryView.ForceRefresh();
+        }
 
-        inventoryView.OnItemDropped += MoveItem;
-        listView.OnItemDropped += MoveItem;
-
-        // 🔥 CLAVE: sincronizar después de todo
-        inventoryView.ForceRefresh();
+        if (listView != null)
+        {
+            listView.Initialize(inventorySystem.ReadModel);
+            listView.OnItemDropped += MoveItem;
+        }
     }
 
+    private void OnDestroy()
+    {
+        if (inventoryView != null)
+            inventoryView.OnItemDropped -= MoveItem;
 
-    // =========================
-    // ADD ITEM
-    // =========================
+        if (listView != null)
+            listView.OnItemDropped -= MoveItem;
+
+        if (inventorySystem != null)
+        {
+            inventorySystem.OnNotificationRequested -= HandleNotificationRequested;
+            inventorySystem.OnItemAdded -= HandleItemAdded;
+        }
+    }
+
     public int TryAddItem(ItemData_SO data, int amount)
     {
         return inventorySystem.AddItem(data, amount);
     }
 
-    // =========================
-    // MOVE / MERGE
-    // =========================
     public void MoveItem(int fromIndex, int toIndex)
     {
-        var from = inventorySystem.IndexToGrid(fromIndex);
-        var to = inventorySystem.IndexToGrid(toIndex);
-
-        var fromSlot = inventorySystem.GetSlot(from.x, from.y);
-        var toSlot = inventorySystem.GetSlot(to.x, to.y);
-
-        if (fromSlot.IsEmpty)
-            return;
-
-        // 🔥 DECISIÓN: MERGE o SWAP
-        if (!toSlot.IsEmpty && fromSlot.ItemInstance.Data.itemID == toSlot.ItemInstance.Data.itemID)
-        {
-            inventorySystem.MergeItem(from.x, from.y, to.x, to.y);
-        }
-        else
-        {
-            inventorySystem.MoveItem(from.x, from.y, to.x, to.y);
-        }
+        inventorySystem.MoveItem(fromIndex, toIndex);
     }
+
     public void ResetInventory()
     {
         inventorySystem.Clear();
 
-        // opcional pero recomendado para seguridad visual
-        inventoryView.ForceRefresh();
+        if (inventoryView != null)
+            inventoryView.ForceRefresh();
     }
 
-    // =========================
-    // ACCESS
-    // =========================
+    public List<InventorySaveData> ExportSaveData()
+    {
+        return inventorySystem.ExportSaveData();
+    }
+
+    public void ImportSaveData(IEnumerable<InventorySaveData> savedItems, Func<string, ItemData_SO> resolveItem)
+    {
+        inventorySystem.ImportSaveData(savedItems, resolveItem);
+
+        if (inventoryView != null)
+            inventoryView.ForceRefresh();
+    }
+
     public InventorySystem GetInventorySystem()
     {
         return inventorySystem;
+    }
+
+    private void HandleNotificationRequested(NotificationData notification)
+    {
+        GameplayEvents.OnNotification?.Invoke(notification);
+    }
+
+    private void HandleItemAdded(ItemData_SO item, int amount)
+    {
+        QuestEvents.OnItemCollected?.Invoke(item, amount);
     }
 }

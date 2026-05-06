@@ -19,14 +19,27 @@ public class InventoryView : MonoBehaviour
 
     public void Initialize(IInventoryReadModel inventory)
     {
+        if (this.inventory != null)
+            this.inventory.OnItemChanged -= UpdateSlot;
+
         this.inventory = inventory;
 
         Build();
         inventory.OnItemChanged += UpdateSlot;
     }
 
+    private void OnDestroy()
+    {
+        if (inventory != null)
+            inventory.OnItemChanged -= UpdateSlot;
+    }
+
     private void Build()
     {
+        foreach (var slotView in slotViews)
+            Destroy(slotView.gameObject);
+
+        slotViews.Clear();
         
         for (int i = 0; i < inventory.Capacity; i++)
         {
@@ -83,6 +96,8 @@ public class InventoryView : MonoBehaviour
 
         if (inventoryPanel != null)
             inventoryPanel.SetActive(false);
+
+        GameplayEvents.OnUIStateChanged?.Invoke(UIState.Quest);
     }
 
     public void ShowInventoryPanel()

@@ -20,6 +20,9 @@ public class GridInventoryAdapter : IInventoryReadModel
     // =========================================================
     public InventoryItemInstance GetItem(int index)
     {
+        if (index < 0 || index >= Capacity)
+            return null;
+
         int x = index % grid.Width;
         int y = index / grid.Width;
 

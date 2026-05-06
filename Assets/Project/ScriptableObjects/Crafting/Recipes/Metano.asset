@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Metano
   m_EditorClassIdentifier: Assembly-CSharp::RecipeData_SO
   result: {fileID: 11400000, guid: 88eb3893adcb3e241ad47a4d6b690b6a, type: 2}
-  resultAmount: 10
+  resultAmount: 1
   ingredients:
   - item: {fileID: 11400000, guid: b8a5a6f6c0b6ba546bd707ecdeffb2e5, type: 2}
     amount: 1

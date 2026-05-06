@@ -31,7 +31,7 @@ public class SaveSlot : MonoBehaviour
             return;
         }
 
-        RefreshSlot();
+        //RefreshSlot();
     }
 
     /// <summary>
@@ -39,6 +39,9 @@ public class SaveSlot : MonoBehaviour
     /// </summary>
     public void RefreshSlot()
     {
+        if (GameManager.Instance == null)
+            return;
+
         hasData = GameManager.Instance.HasSaveFile(UNIQUE_SLOT);
         saveInfo = GameManager.Instance.GetSaveInfo(UNIQUE_SLOT);
         UpdateSlotVisual();

@@ -9,7 +9,7 @@ public class PauseMenuManager : MonoBehaviour
     bool isPaused = false;
     public bool IsPaused => isPaused;
 
-    [SerializeField] PlayerController playerController;
+    [SerializeField] private PlayerStateController playerStateController;
 
     private InputSystem_Actions inputActions;
 
@@ -44,7 +44,8 @@ public class PauseMenuManager : MonoBehaviour
         pauseMenuUI.SetActive(true);
         optionsPanelUI.SetActive(false);
         Time.timeScale = 0f;
-        playerController.SetPaused(true);
+        if (playerStateController != null)
+            playerStateController.SetState(UIState.Blocked);
         isPaused = true;
     }
 
@@ -53,14 +54,16 @@ public class PauseMenuManager : MonoBehaviour
         pauseMenuUI.SetActive(false);
         optionsPanelUI.SetActive(false); // cerrar el panel de opciones
         Time.timeScale = 1f;
-        playerController.SetPaused(false);
+        if (playerStateController != null)
+            playerStateController.SetState(UIState.None);
         isPaused = false;
     }
 
     public void GoToMainMenu()
     {
         Time.timeScale = 1f;
-        playerController.SetPaused(false);
+        if (playerStateController != null)
+            playerStateController.SetState(UIState.None);
         SceneManager.LoadScene("Menu");
     }
 

@@ -20,8 +20,6 @@ public class CraftingUIController : MonoBehaviour
 
         bool isActive = state == UIState.Crafting;
 
-        Debug.Log("CRAFTING PANEL: " + isActive);
-
         craftingPanel.SetActive(isActive);
     }
 }
