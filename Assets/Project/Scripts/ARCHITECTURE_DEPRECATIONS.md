@@ -11,7 +11,7 @@
 
 ## Deprecated But Still Referenced
 
-- `Assets/Project/Scripts/Systems/Inventory/InventoryTester.cs`
+- `Assets/Project/Scripts/Systems/Inventory/InventoryTester_Deprecated.cs`
   - Manual keyboard-driven debug harness.
   - Referenced by active/test scenes.
   - Keep only in test scenes until replaced by automated domain tests.
@@ -37,11 +37,24 @@
 - `Assets/Project/Scripts/UI/Menu/MainMenuManager.cs`
   - Replaced commented legacy content with an active `MainMenuManager` class.
 
+## Renamed / Split In Phase 1
+
+- `NotificacionData.cs` -> `NotificationData.cs`
+- `HealthComponent .cs` -> `HealthComponent.cs`
+- `ScannableObject .cs` -> `ScannableObject.cs`
+- `SeparationDatabase.cs` -> `SeparationDatabase_SO.cs`
+- `Deprecado_InventoryTester.cs` -> `InventoryTester_Deprecated.cs`
+- `UIState` moved from `PlayerStateController.cs` to `UIState.cs`
+- `PlayerSaveData` moved from `GameData.cs` to `PlayerSaveData.cs`
+- `InventorySaveData` moved from `GameData.cs` to `InventorySaveData.cs`
+- `SaveInfo` moved from `SaveController.cs` to `SaveInfo.cs`
+- `NotificationType` moved from `NotificationData.cs` to `NotificationType.cs`
+
 ## Next Cleanup Pass
 
 - Remove deprecated components from scenes/prefabs in the Unity Editor.
 - After scene references are removed, delete:
-  - `InventoryTester.cs`
+  - `InventoryTester_Deprecated.cs`
   - `InteractionController.cs`
   - `InteractionUI.cs`
 - Replace manual inventory tests with EditMode tests for `InventorySystem`.

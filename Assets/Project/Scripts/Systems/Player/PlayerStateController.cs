@@ -1,13 +1,5 @@
 using UnityEngine;
 
-public enum UIState
-{
-    None,
-    Inventory,
-    Crafting,
-    Quest,
-    Chemistry,Blocked 
-}
 public class PlayerStateController : MonoBehaviour
 {
     private UIState currentState = UIState.None;

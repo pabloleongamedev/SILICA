@@ -3,7 +3,7 @@ using UnityEngine.InputSystem;
 using System;
 
 [Obsolete("Herramienta manual de debug. No usar en escenas de produccion; reemplazar por tests automatizados del dominio.")]
-public class InventoryTester : MonoBehaviour
+public class InventoryTester_Deprecated : MonoBehaviour
 {
     [SerializeField] private InventoryController inventoryController;
 
